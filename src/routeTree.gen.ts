@@ -10,11 +10,42 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ComunidadRouteImport } from './routes/comunidad'
+import { Route as EventosRouteImport } from './routes/eventos'
+import { Route as RadioRouteImport } from './routes/radio'
+import { Route as SobreRouteImport } from './routes/sobre'
+import { Route as CategoriasIndexRouteImport } from './routes/categorias.index'
 import { Route as EmprendedoresIndexRouteImport } from './routes/emprendedores.index'
+import { Route as EmprendedoresSlugRouteImport } from './routes/emprendedores.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComunidadRoute = ComunidadRouteImport.update({
+  id: '/comunidad',
+  path: '/comunidad',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EventosRoute = EventosRouteImport.update({
+  id: '/eventos',
+  path: '/eventos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RadioRoute = RadioRouteImport.update({
+  id: '/radio',
+  path: '/radio',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SobreRoute = SobreRouteImport.update({
+  id: '/sobre',
+  path: '/sobre',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CategoriasIndexRoute = CategoriasIndexRouteImport.update({
+  id: '/categorias/',
+  path: '/categorias/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EmprendedoresIndexRoute = EmprendedoresIndexRouteImport.update({
@@ -22,30 +53,84 @@ const EmprendedoresIndexRoute = EmprendedoresIndexRouteImport.update({
   path: '/emprendedores/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EmprendedoresSlugRoute = EmprendedoresSlugRouteImport.update({
+  id: '/emprendedores/$slug',
+  path: '/emprendedores/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/comunidad': typeof ComunidadRoute
+  '/eventos': typeof EventosRoute
+  '/radio': typeof RadioRoute
+  '/sobre': typeof SobreRoute
+  '/emprendedores/$slug': typeof EmprendedoresSlugRoute
+  '/categorias/': typeof CategoriasIndexRoute
   '/emprendedores/': typeof EmprendedoresIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/comunidad': typeof ComunidadRoute
+  '/eventos': typeof EventosRoute
+  '/radio': typeof RadioRoute
+  '/sobre': typeof SobreRoute
+  '/emprendedores/$slug': typeof EmprendedoresSlugRoute
+  '/categorias': typeof CategoriasIndexRoute
   '/emprendedores': typeof EmprendedoresIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/comunidad': typeof ComunidadRoute
+  '/eventos': typeof EventosRoute
+  '/radio': typeof RadioRoute
+  '/sobre': typeof SobreRoute
+  '/emprendedores/$slug': typeof EmprendedoresSlugRoute
+  '/categorias/': typeof CategoriasIndexRoute
   '/emprendedores/': typeof EmprendedoresIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/emprendedores/'
+  fullPaths:
+    | '/'
+    | '/comunidad'
+    | '/eventos'
+    | '/radio'
+    | '/sobre'
+    | '/emprendedores/$slug'
+    | '/categorias/'
+    | '/emprendedores/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/emprendedores'
-  id: '__root__' | '/' | '/emprendedores/'
+  to:
+    | '/'
+    | '/comunidad'
+    | '/eventos'
+    | '/radio'
+    | '/sobre'
+    | '/emprendedores/$slug'
+    | '/categorias'
+    | '/emprendedores'
+  id:
+    | '__root__'
+    | '/'
+    | '/comunidad'
+    | '/eventos'
+    | '/radio'
+    | '/sobre'
+    | '/emprendedores/$slug'
+    | '/categorias/'
+    | '/emprendedores/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ComunidadRoute: typeof ComunidadRoute
+  EventosRoute: typeof EventosRoute
+  RadioRoute: typeof RadioRoute
+  SobreRoute: typeof SobreRoute
+  EmprendedoresSlugRoute: typeof EmprendedoresSlugRoute
+  CategoriasIndexRoute: typeof CategoriasIndexRoute
   EmprendedoresIndexRoute: typeof EmprendedoresIndexRoute
 }
 
@@ -58,6 +143,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/comunidad': {
+      id: '/comunidad'
+      path: '/comunidad'
+      fullPath: '/comunidad'
+      preLoaderRoute: typeof ComunidadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/eventos': {
+      id: '/eventos'
+      path: '/eventos'
+      fullPath: '/eventos'
+      preLoaderRoute: typeof EventosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/radio': {
+      id: '/radio'
+      path: '/radio'
+      fullPath: '/radio'
+      preLoaderRoute: typeof RadioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sobre': {
+      id: '/sobre'
+      path: '/sobre'
+      fullPath: '/sobre'
+      preLoaderRoute: typeof SobreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/categorias/': {
+      id: '/categorias/'
+      path: '/categorias'
+      fullPath: '/categorias/'
+      preLoaderRoute: typeof CategoriasIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/emprendedores/': {
       id: '/emprendedores/'
       path: '/emprendedores'
@@ -65,11 +185,24 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EmprendedoresIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/emprendedores/$slug': {
+      id: '/emprendedores/$slug'
+      path: '/emprendedores/$slug'
+      fullPath: '/emprendedores/$slug'
+      preLoaderRoute: typeof EmprendedoresSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ComunidadRoute: ComunidadRoute,
+  EventosRoute: EventosRoute,
+  RadioRoute: RadioRoute,
+  SobreRoute: SobreRoute,
+  EmprendedoresSlugRoute: EmprendedoresSlugRoute,
+  CategoriasIndexRoute: CategoriasIndexRoute,
   EmprendedoresIndexRoute: EmprendedoresIndexRoute,
 }
 export const routeTree = rootRouteImport
