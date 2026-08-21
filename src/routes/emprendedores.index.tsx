@@ -21,9 +21,9 @@ import {
 } from "@/lib/vitrina";
 
 type SearchParams = {
-  q?: string;
-  categoria?: string;
-  comuna?: string;
+  q?: string | undefined;
+  categoria?: string | undefined;
+  comuna?: string | undefined;
   orden?: DirectoryFilters["sort"];
 };
 
@@ -60,7 +60,7 @@ export const Route = createFileRoute("/emprendedores/")({
 
 function Directory() {
   const search = Route.useSearch();
-  const navigate = useNavigate({ from: "/emprendedores" });
+  const navigate = useNavigate({ from: "/emprendedores/" });
   const [term, setTerm] = useState(search.q ?? "");
 
   useEffect(() => setTerm(search.q ?? ""), [search.q]);
@@ -81,7 +81,7 @@ function Directory() {
   });
 
   const update = (patch: Partial<SearchParams>) =>
-    navigate({ search: (prev) => ({ ...prev, ...patch }) });
+    navigate({ search: (prev: SearchParams) => ({ ...prev, ...patch }) });
 
   return (
     <>
@@ -172,7 +172,7 @@ function Directory() {
                 variant="ghost"
                 size="sm"
                 onClick={() =>
-                  navigate({ search: { q: undefined, categoria: undefined, comuna: undefined } })
+                  navigate({ search: (prev: SearchParams) => ({ ...prev, q: undefined, categoria: undefined, comuna: undefined }) })
                 }
               >
                 Limpiar filtros

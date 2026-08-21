@@ -71,10 +71,10 @@ const CARD_SELECT =
   "*, categories:category_id(name,slug), comunas:comuna_id(name,slug)";
 
 export type DirectoryFilters = {
-  search?: string;
-  categorySlug?: string;
-  comunaSlug?: string;
-  sort?: "recientes" | "visitados" | "destacados" | "alfabetico";
+  search?: string | undefined;
+  categorySlug?: string | undefined;
+  comunaSlug?: string | undefined;
+  sort?: "recientes" | "visitados" | "destacados" | "alfabetico" | undefined;
 };
 
 export async function fetchCategories(): Promise<Category[]> {
