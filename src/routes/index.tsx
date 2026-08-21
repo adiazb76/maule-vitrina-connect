@@ -59,7 +59,7 @@ function Index() {
               className="mt-7 flex w-full max-w-xl flex-col gap-2 sm:flex-row"
               onSubmit={(event) => {
                 event.preventDefault();
-                navigate({ to: "/emprendedores", search: { q: term || undefined } });
+                navigate({ to: "/emprendedores", search: term ? { q: term } : {} });
               }}
             >
               <div className="relative flex-1">
