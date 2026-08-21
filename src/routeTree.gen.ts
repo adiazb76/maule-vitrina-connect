@@ -10,12 +10,14 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ComunidadRouteImport } from './routes/comunidad'
 import { Route as EventosRouteImport } from './routes/eventos'
 import { Route as RadioRouteImport } from './routes/radio'
 import { Route as SobreRouteImport } from './routes/sobre'
 import { Route as SumateRouteImport } from './routes/sumate'
+import { Route as AuthenticatedPanelRouteImport } from './routes/_authenticated/panel'
 import { Route as CategoriasIndexRouteImport } from './routes/categorias.index'
 import { Route as EmprendedoresIndexRouteImport } from './routes/emprendedores.index'
 import { Route as EmprendedoresSlugRouteImport } from './routes/emprendedores.$slug'
@@ -23,6 +25,10 @@ import { Route as EmprendedoresSlugRouteImport } from './routes/emprendedores.$s
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -55,6 +61,11 @@ const SumateRoute = SumateRouteImport.update({
   path: '/sumate',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedPanelRoute = AuthenticatedPanelRouteImport.update({
+  id: '/panel',
+  path: '/panel',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const CategoriasIndexRoute = CategoriasIndexRouteImport.update({
   id: '/categorias/',
   path: '/categorias/',
@@ -79,6 +90,7 @@ export interface FileRoutesByFullPath {
   '/radio': typeof RadioRoute
   '/sobre': typeof SobreRoute
   '/sumate': typeof SumateRoute
+  '/panel': typeof AuthenticatedPanelRoute
   '/emprendedores/$slug': typeof EmprendedoresSlugRoute
   '/categorias/': typeof CategoriasIndexRoute
   '/emprendedores/': typeof EmprendedoresIndexRoute
@@ -91,6 +103,7 @@ export interface FileRoutesByTo {
   '/radio': typeof RadioRoute
   '/sobre': typeof SobreRoute
   '/sumate': typeof SumateRoute
+  '/panel': typeof AuthenticatedPanelRoute
   '/emprendedores/$slug': typeof EmprendedoresSlugRoute
   '/categorias': typeof CategoriasIndexRoute
   '/emprendedores': typeof EmprendedoresIndexRoute
@@ -98,12 +111,14 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/comunidad': typeof ComunidadRoute
   '/eventos': typeof EventosRoute
   '/radio': typeof RadioRoute
   '/sobre': typeof SobreRoute
   '/sumate': typeof SumateRoute
+  '/_authenticated/panel': typeof AuthenticatedPanelRoute
   '/emprendedores/$slug': typeof EmprendedoresSlugRoute
   '/categorias/': typeof CategoriasIndexRoute
   '/emprendedores/': typeof EmprendedoresIndexRoute
@@ -118,6 +133,7 @@ export interface FileRouteTypes {
     | '/radio'
     | '/sobre'
     | '/sumate'
+    | '/panel'
     | '/emprendedores/$slug'
     | '/categorias/'
     | '/emprendedores/'
@@ -130,18 +146,21 @@ export interface FileRouteTypes {
     | '/radio'
     | '/sobre'
     | '/sumate'
+    | '/panel'
     | '/emprendedores/$slug'
     | '/categorias'
     | '/emprendedores'
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
     | '/auth'
     | '/comunidad'
     | '/eventos'
     | '/radio'
     | '/sobre'
     | '/sumate'
+    | '/_authenticated/panel'
     | '/emprendedores/$slug'
     | '/categorias/'
     | '/emprendedores/'
@@ -149,6 +168,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ComunidadRoute: typeof ComunidadRoute
   EventosRoute: typeof EventosRoute
@@ -167,6 +187,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -211,6 +238,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SumateRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/panel': {
+      id: '/_authenticated/panel'
+      path: '/panel'
+      fullPath: '/panel'
+      preLoaderRoute: typeof AuthenticatedPanelRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/categorias/': {
       id: '/categorias/'
       path: '/categorias'
@@ -235,8 +269,20 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedPanelRoute: typeof AuthenticatedPanelRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedPanelRoute: AuthenticatedPanelRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   ComunidadRoute: ComunidadRoute,
   EventosRoute: EventosRoute,
