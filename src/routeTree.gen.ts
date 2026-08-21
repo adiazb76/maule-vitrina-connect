@@ -15,6 +15,7 @@ import { Route as ComunidadRouteImport } from './routes/comunidad'
 import { Route as EventosRouteImport } from './routes/eventos'
 import { Route as RadioRouteImport } from './routes/radio'
 import { Route as SobreRouteImport } from './routes/sobre'
+import { Route as SumateRouteImport } from './routes/sumate'
 import { Route as CategoriasIndexRouteImport } from './routes/categorias.index'
 import { Route as EmprendedoresIndexRouteImport } from './routes/emprendedores.index'
 import { Route as EmprendedoresSlugRouteImport } from './routes/emprendedores.$slug'
@@ -49,6 +50,11 @@ const SobreRoute = SobreRouteImport.update({
   path: '/sobre',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SumateRoute = SumateRouteImport.update({
+  id: '/sumate',
+  path: '/sumate',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CategoriasIndexRoute = CategoriasIndexRouteImport.update({
   id: '/categorias/',
   path: '/categorias/',
@@ -72,6 +78,7 @@ export interface FileRoutesByFullPath {
   '/eventos': typeof EventosRoute
   '/radio': typeof RadioRoute
   '/sobre': typeof SobreRoute
+  '/sumate': typeof SumateRoute
   '/emprendedores/$slug': typeof EmprendedoresSlugRoute
   '/categorias/': typeof CategoriasIndexRoute
   '/emprendedores/': typeof EmprendedoresIndexRoute
@@ -83,6 +90,7 @@ export interface FileRoutesByTo {
   '/eventos': typeof EventosRoute
   '/radio': typeof RadioRoute
   '/sobre': typeof SobreRoute
+  '/sumate': typeof SumateRoute
   '/emprendedores/$slug': typeof EmprendedoresSlugRoute
   '/categorias': typeof CategoriasIndexRoute
   '/emprendedores': typeof EmprendedoresIndexRoute
@@ -95,6 +103,7 @@ export interface FileRoutesById {
   '/eventos': typeof EventosRoute
   '/radio': typeof RadioRoute
   '/sobre': typeof SobreRoute
+  '/sumate': typeof SumateRoute
   '/emprendedores/$slug': typeof EmprendedoresSlugRoute
   '/categorias/': typeof CategoriasIndexRoute
   '/emprendedores/': typeof EmprendedoresIndexRoute
@@ -108,6 +117,7 @@ export interface FileRouteTypes {
     | '/eventos'
     | '/radio'
     | '/sobre'
+    | '/sumate'
     | '/emprendedores/$slug'
     | '/categorias/'
     | '/emprendedores/'
@@ -119,6 +129,7 @@ export interface FileRouteTypes {
     | '/eventos'
     | '/radio'
     | '/sobre'
+    | '/sumate'
     | '/emprendedores/$slug'
     | '/categorias'
     | '/emprendedores'
@@ -130,6 +141,7 @@ export interface FileRouteTypes {
     | '/eventos'
     | '/radio'
     | '/sobre'
+    | '/sumate'
     | '/emprendedores/$slug'
     | '/categorias/'
     | '/emprendedores/'
@@ -142,6 +154,7 @@ export interface RootRouteChildren {
   EventosRoute: typeof EventosRoute
   RadioRoute: typeof RadioRoute
   SobreRoute: typeof SobreRoute
+  SumateRoute: typeof SumateRoute
   EmprendedoresSlugRoute: typeof EmprendedoresSlugRoute
   CategoriasIndexRoute: typeof CategoriasIndexRoute
   EmprendedoresIndexRoute: typeof EmprendedoresIndexRoute
@@ -191,6 +204,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SobreRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sumate': {
+      id: '/sumate'
+      path: '/sumate'
+      fullPath: '/sumate'
+      preLoaderRoute: typeof SumateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/categorias/': {
       id: '/categorias/'
       path: '/categorias'
@@ -222,6 +242,7 @@ const rootRouteChildren: RootRouteChildren = {
   EventosRoute: EventosRoute,
   RadioRoute: RadioRoute,
   SobreRoute: SobreRoute,
+  SumateRoute: SumateRoute,
   EmprendedoresSlugRoute: EmprendedoresSlugRoute,
   CategoriasIndexRoute: CategoriasIndexRoute,
   EmprendedoresIndexRoute: EmprendedoresIndexRoute,
