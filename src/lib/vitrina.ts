@@ -1,7 +1,18 @@
 import { supabase } from "@/integrations/supabase/client";
 
-export type Category = { id: string; name: string; slug: string; sort_order: number };
-export type Comuna = { id: string; name: string; slug: string; region: string };
+export type Category = {
+  id: string;
+  name: string;
+  slug: string;
+  sort_order: number;
+};
+
+export type Comuna = {
+  id: string;
+  name: string;
+  slug: string;
+  region: string;
+};
 
 export type Entrepreneur = {
   id: string;
@@ -28,6 +39,7 @@ export type Entrepreneur = {
   collaboration_offering: string | null;
   status: "pendiente" | "aprobado" | "rechazado";
   featured: boolean;
+  visible: boolean;
   views: number;
   contacts: number;
   created_at: string;
@@ -67,6 +79,25 @@ export type RadioItem = {
   published_at: string;
 };
 
+export type SiteSettings = {
+  id: string;
+  hero_subtitle: string;
+  hero_description: string;
+  hero_image_url: string | null;
+  updated_at: string;
+};
+
+export type Sponsor = {
+  id: string;
+  name: string;
+  logo_url: string | null;
+  website_url: string | null;
+  description: string | null;
+  level: string;
+  visible: boolean;
+  sort_order: number;
+};
+
 const CARD_SELECT =
   "*, categories:category_id(name,slug), comunas:comuna_id(name,slug)";
 
@@ -74,7 +105,12 @@ export type DirectoryFilters = {
   search?: string | undefined;
   categorySlug?: string | undefined;
   comunaSlug?: string | undefined;
-  sort?: "recientes" | "visitados" | "destacados" | "alfabetico" | undefined;
+  sort?:
+    | "recientes"
+    | "visitados"
+    | "destacados"
+    | "alfabetico"
+    | undefined;
 };
 
 export async function fetchCategories(): Promise<Category[]> {
@@ -82,7 +118,9 @@ export async function fetchCategories(): Promise<Category[]> {
     .from("categories")
     .select("id,name,slug,sort_order")
     .order("sort_order");
+
   if (error) throw error;
+
   return (data ?? []) as Category[];
 }
 
@@ -91,7 +129,9 @@ export async function fetchComunas(): Promise<Comuna[]> {
     .from("comunas")
     .select("id,name,slug,region")
     .order("name");
+
   if (error) throw error;
+
   return (data ?? []) as Comuna[];
 }
 
@@ -103,10 +143,12 @@ export async function fetchEntrepreneurs(
     .from("entrepreneurs")
     .select(CARD_SELECT)
     .eq("status", "aprobado")
+    .eq("visible", true)
     .limit(limit);
 
   if (filters.search && filters.search.trim().length > 0) {
     const term = `%${filters.search.trim().replace(/[%,]/g, "")}%`;
+
     query = query.or(
       `business_name.ilike.${term},owner_name.ilike.${term},short_description.ilike.${term},about.ilike.${term},value_prop.ilike.${term}`,
     );
@@ -116,44 +158,70 @@ export async function fetchEntrepreneurs(
     case "visitados":
       query = query.order("views", { ascending: false });
       break;
+
     case "alfabetico":
       query = query.order("business_name");
       break;
+
     case "destacados":
-      query = query.order("featured", { ascending: false }).order("views", { ascending: false });
+      query = query
+        .order("featured", { ascending: false })
+        .order("views", { ascending: false });
       break;
+
     default:
       query = query.order("created_at", { ascending: false });
   }
 
   const { data, error } = await query;
+
   if (error) throw error;
+
   let rows = (data ?? []) as unknown as Entrepreneur[];
 
-  if (filters.categorySlug) rows = rows.filter((r) => r.categories?.slug === filters.categorySlug);
-  if (filters.comunaSlug) rows = rows.filter((r) => r.comunas?.slug === filters.comunaSlug);
+  if (filters.categorySlug) {
+    rows = rows.filter(
+      (r) => r.categories?.slug === filters.categorySlug,
+    );
+  }
+
+  if (filters.comunaSlug) {
+    rows = rows.filter(
+      (r) => r.comunas?.slug === filters.comunaSlug,
+    );
+  }
+
   return rows;
 }
 
-export async function fetchFeatured(limit = 6): Promise<Entrepreneur[]> {
+export async function fetchFeatured(
+  limit = 6,
+): Promise<Entrepreneur[]> {
   const { data, error } = await supabase
     .from("entrepreneurs")
     .select(CARD_SELECT)
     .eq("status", "aprobado")
+    .eq("visible", true)
     .order("featured", { ascending: false })
     .order("views", { ascending: false })
     .limit(limit);
+
   if (error) throw error;
+
   return (data ?? []) as unknown as Entrepreneur[];
 }
 
-export async function fetchProducts(entrepreneurId: string): Promise<Product[]> {
+export async function fetchProducts(
+  entrepreneurId: string,
+): Promise<Product[]> {
   const { data, error } = await supabase
     .from("products")
     .select("*")
     .eq("entrepreneur_id", entrepreneurId)
     .order("sort_order");
+
   if (error) throw error;
+
   return (data ?? []) as Product[];
 }
 
@@ -163,7 +231,9 @@ export async function fetchEvents(): Promise<EventItem[]> {
     .select("*")
     .eq("published", true)
     .order("starts_at");
+
   if (error) throw error;
+
   return (data ?? []) as EventItem[];
 }
 
@@ -173,18 +243,24 @@ export async function fetchRadioItems(): Promise<RadioItem[]> {
     .select("*")
     .eq("published", true)
     .order("published_at", { ascending: false });
+
   if (error) throw error;
+
   return (data ?? []) as RadioItem[];
 }
 
 export async function fetchWeeklyFeature() {
   const { data, error } = await supabase
     .from("weekly_features")
-    .select(`id, week_start, story, media_url, entrepreneurs:entrepreneur_id(${CARD_SELECT})`)
+    .select(
+      `id, week_start, story, media_url, entrepreneurs:entrepreneur_id(${CARD_SELECT})`,
+    )
     .order("week_start", { ascending: false })
     .limit(1)
     .maybeSingle();
+
   if (error) throw error;
+
   return data as unknown as {
     id: string;
     week_start: string;
@@ -194,7 +270,34 @@ export async function fetchWeeklyFeature() {
   } | null;
 }
 
-export function logInteraction(entrepreneurId: string, kind: string) {
+export async function fetchSiteSettings(): Promise<SiteSettings | null> {
+  const { data, error } = await (supabase as any)
+    .from("site_settings")
+    .select("*")
+    .eq("id", "home")
+    .maybeSingle();
+
+  if (error) throw error;
+
+  return data as SiteSettings | null;
+}
+
+export async function fetchSponsors(): Promise<Sponsor[]> {
+  const { data, error } = await (supabase as any)
+    .from("sponsors")
+    .select("*")
+    .eq("visible", true)
+    .order("sort_order", { ascending: true });
+
+  if (error) throw error;
+
+  return (data ?? []) as Sponsor[];
+}
+
+export function logInteraction(
+  entrepreneurId: string,
+  kind: string,
+) {
   void supabase.rpc("log_interaction", {
     _entrepreneur_id: entrepreneurId,
     _kind: kind,
@@ -204,21 +307,31 @@ export function logInteraction(entrepreneurId: string, kind: string) {
 export const DEFAULT_WHATSAPP_MESSAGE =
   "Hola, vi tu emprendimiento en La Vitrina y me gustaría conocer más sobre tus productos/servicios.";
 
-export function whatsappLink(e: Pick<Entrepreneur, "whatsapp" | "whatsapp_message">) {
+export function whatsappLink(
+  e: Pick<Entrepreneur, "whatsapp" | "whatsapp_message">,
+) {
   if (!e.whatsapp) return null;
+
   const number = e.whatsapp.replace(/[^0-9]/g, "");
-  const text = encodeURIComponent(e.whatsapp_message?.trim() || DEFAULT_WHATSAPP_MESSAGE);
+
+  const text = encodeURIComponent(
+    e.whatsapp_message?.trim() || DEFAULT_WHATSAPP_MESSAGE,
+  );
+
   return `https://wa.me/${number}?text=${text}`;
 }
 
 export function instagramLink(handle: string | null) {
   if (!handle) return null;
+
   if (handle.startsWith("http")) return handle;
+
   return `https://instagram.com/${handle.replace(/^@/, "")}`;
 }
 
 export function websiteLink(url: string | null) {
   if (!url) return null;
+
   return url.startsWith("http") ? url : `https://${url}`;
 }
 

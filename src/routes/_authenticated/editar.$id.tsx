@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/select";
 
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth, useIsAdmin } from "@/hooks/use-auth";
 import { fetchCategories, fetchComunas } from "@/lib/vitrina";
 
 export const Route = createFileRoute("/_authenticated/editar/$id")({
@@ -27,6 +27,8 @@ export const Route = createFileRoute("/_authenticated/editar/$id")({
 function EditarEmprendimiento() {
   const { id } = Route.useParams();
   const { user } = useAuth();
+  const isAdmin = useIsAdmin(user?.id);
+
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -41,15 +43,19 @@ function EditarEmprendimiento() {
   });
 
   const entrepreneur = useQuery({
-    queryKey: ["entrepreneur-edit", id],
+    queryKey: ["entrepreneur-edit", id, user?.id, isAdmin],
     enabled: Boolean(user?.id),
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from("entrepreneurs")
         .select("*")
-        .eq("id", id)
-        .eq("user_id", user!.id)
-        .single();
+        .eq("id", id);
+
+      if (!isAdmin) {
+        query = query.eq("user_id", user!.id);
+      }
+
+      const { data, error } = await query.maybeSingle();
 
       if (error) throw error;
 
@@ -110,7 +116,10 @@ function EditarEmprendimiento() {
   }, [entrepreneur.data]);
 
   const set = (key: keyof typeof form) => (value: string) =>
-    setForm((prev) => ({ ...prev, [key]: value }));
+    setForm((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
 
   function selectPhoto(file?: File) {
     if (!file) return;
@@ -128,12 +137,18 @@ function EditarEmprendimiento() {
     setPhotoFile(file);
 
     const reader = new FileReader();
-    reader.onload = () => setPhotoPreview(String(reader.result));
+
+    reader.onload = () => {
+      setPhotoPreview(String(reader.result));
+    };
+
     reader.readAsDataURL(file);
   }
 
   async function uploadPhoto() {
-    if (!photoFile || !user) return form.photo_url || null;
+    if (!photoFile || !user) {
+      return form.photo_url || null;
+    }
 
     const extension =
       photoFile.name.split(".").pop()?.toLowerCase() || "jpg";
@@ -170,7 +185,7 @@ function EditarEmprendimiento() {
     try {
       const photoUrl = await uploadPhoto();
 
-      const { error } = await supabase
+      let query = supabase
         .from("entrepreneurs")
         .update({
           business_name: form.business_name,
@@ -196,8 +211,13 @@ function EditarEmprendimiento() {
           collaboration_offering:
             form.collaboration_offering || null,
         })
-        .eq("id", id)
-        .eq("user_id", user.id);
+        .eq("id", id);
+
+      if (!isAdmin) {
+        query = query.eq("user_id", user.id);
+      }
+
+      const { error } = await query;
 
       if (error) throw error;
 
@@ -206,12 +226,26 @@ function EditarEmprendimiento() {
       });
 
       await queryClient.invalidateQueries({
+        queryKey: ["admin-entrepreneurs"],
+      });
+
+      await queryClient.invalidateQueries({
         queryKey: ["entrepreneurs"],
+      });
+
+      await queryClient.invalidateQueries({
+        queryKey: ["featured"],
+      });
+
+      await queryClient.invalidateQueries({
+        queryKey: ["weekly"],
       });
 
       toast.success("Cambios guardados correctamente.");
 
-      navigate({ to: "/panel" });
+      navigate({
+        to: isAdmin ? "/admin" : "/panel",
+      });
     } catch (error) {
       console.error(error);
 
@@ -240,8 +274,14 @@ function EditarEmprendimiento() {
           No encontramos este emprendimiento
         </h1>
 
+        <p className="mt-3 text-muted-foreground">
+          Puede que no tengas permisos para editarlo o que ya no exista.
+        </p>
+
         <Button asChild className="mt-6">
-          <Link to="/panel">Volver al panel</Link>
+          <Link to={isAdmin ? "/admin" : "/panel"}>
+            Volver
+          </Link>
         </Button>
       </section>
     );
@@ -250,23 +290,26 @@ function EditarEmprendimiento() {
   return (
     <section className="container-page py-12">
       <Link
-        to="/panel"
+        to={isAdmin ? "/admin" : "/panel"}
         className="inline-flex items-center gap-2 text-sm text-muted-foreground"
       >
         <ArrowLeft className="h-4 w-4" />
-        Volver al panel
+        {isAdmin
+          ? "Volver a Administración"
+          : "Volver al panel"}
       </Link>
 
       <div className="mt-6">
-        <p className="eyebrow">Mi emprendimiento</p>
+        <p className="eyebrow">
+          {isAdmin ? "Administración" : "Mi emprendimiento"}
+        </p>
 
         <h1 className="mt-2 font-display text-3xl font-semibold">
           Editar {form.business_name}
         </h1>
 
         <p className="mt-2 text-muted-foreground">
-          Mantén tu información actualizada para que las personas puedan
-          conocerte y contactarte.
+          Actualiza la información que aparecerá públicamente en La Vitrina.
         </p>
       </div>
 
@@ -285,7 +328,7 @@ function EditarEmprendimiento() {
             />
           </Field>
 
-          <Field label="Tu nombre">
+          <Field label="Nombre del emprendedor">
             <Input
               required
               value={form.owner_name}
@@ -367,7 +410,9 @@ function EditarEmprendimiento() {
           <Textarea
             rows={5}
             value={form.about}
-            onChange={(e) => set("about")(e.target.value)}
+            onChange={(e) =>
+              set("about")(e.target.value)
+            }
           />
         </Field>
 
@@ -384,8 +429,10 @@ function EditarEmprendimiento() {
         <Field label="Etiquetas">
           <Input
             value={form.tags}
-            onChange={(e) => set("tags")(e.target.value)}
-            placeholder="repuestos, automotriz, accesorios"
+            onChange={(e) =>
+              set("tags")(e.target.value)
+            }
+            placeholder="artesanía, alimentos, servicios"
           />
         </Field>
 
@@ -474,7 +521,9 @@ function EditarEmprendimiento() {
           disabled={busy}
           className="justify-self-start"
         >
-          {busy ? "Guardando…" : "Guardar cambios"}
+          {busy
+            ? "Guardando…"
+            : "Guardar cambios"}
         </Button>
       </form>
     </section>

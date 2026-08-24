@@ -4,6 +4,7 @@ import { useState } from "react";
 import {
   ArrowRight,
   CalendarDays,
+  ExternalLink,
   Handshake,
   Radio,
   Search,
@@ -15,7 +16,15 @@ import heroImage from "@/assets/hero-vitrina.jpg";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { EntrepreneurCard } from "@/components/entrepreneur-card";
-import { fetchEvents, fetchFeatured, fetchWeeklyFeature } from "@/lib/vitrina";
+import {
+  fetchEvents,
+  fetchFeatured,
+  fetchSiteSettings,
+  fetchSponsors,
+  fetchWeeklyFeature,
+  websiteLink,
+  type Sponsor,
+} from "@/lib/vitrina";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -34,8 +43,7 @@ export const Route = createFileRoute("/")({
       },
       {
         property: "og:description",
-        content:
-          "Nos mostramos. Nos conectamos. Crecemos juntos.",
+        content: "Nos mostramos. Nos conectamos. Crecemos juntos.",
       },
     ],
     links: [{ rel: "canonical", href: "/" }],
@@ -62,6 +70,29 @@ function Index() {
     queryFn: fetchEvents,
   });
 
+  const settings = useQuery({
+    queryKey: ["site-settings"],
+    queryFn: fetchSiteSettings,
+  });
+
+  const sponsors = useQuery({
+    queryKey: ["sponsors"],
+    queryFn: fetchSponsors,
+  });
+
+  const heroSubtitle =
+    settings.data?.hero_subtitle ||
+    "La comunidad de emprendedores del Maule Sur";
+
+  const heroDescription =
+    settings.data?.hero_description ||
+    "Un espacio para mostrar tu emprendimiento, descubrir negocios locales, conectar con otras personas y encontrar nuevas oportunidades.";
+
+  const heroPhoto =
+    settings.data?.hero_image_url || heroImage;
+
+  const visibleEvents = (events.data ?? []).slice(0, 3);
+
   return (
     <>
       {/* HERO */}
@@ -75,13 +106,11 @@ function Index() {
             </h1>
 
             <p className="mt-3 font-display text-xl text-primary sm:text-2xl">
-              La comunidad de emprendedores del Maule Sur
+              {heroSubtitle}
             </p>
 
             <p className="mt-5 max-w-xl text-base text-foreground/80 sm:text-lg">
-              Un espacio para mostrar tu emprendimiento, descubrir negocios
-              locales, conectar con otras personas y encontrar nuevas
-              oportunidades.
+              {heroDescription}
             </p>
 
             <form
@@ -118,22 +147,34 @@ function Index() {
             </form>
 
             <div className="mt-5 flex flex-wrap gap-3">
-              <Button asChild size="lg" variant="outline" className="rounded-xl">
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="rounded-xl"
+              >
                 <Link to="/emprendedores">
                   Descubrir emprendedores
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>
 
-              <Button asChild size="lg" variant="soft" className="rounded-xl">
-                <Link to="/sumate">Sé parte de La Vitrina</Link>
+              <Button
+                asChild
+                size="lg"
+                variant="soft"
+                className="rounded-xl"
+              >
+                <Link to="/sumate">
+                  Sé parte de La Vitrina
+                </Link>
               </Button>
             </div>
           </div>
 
           <div className="relative">
             <img
-              src={heroImage}
+              src={heroPhoto}
               alt="Emprendedores del Maule Sur"
               width={1600}
               height={1104}
@@ -188,15 +229,21 @@ function Index() {
       </section>
 
       {/* EMPRENDEDOR DE LA SEMANA */}
-      {weekly.data?.entrepreneurs ? (
+      {weekly.data?.entrepreneurs &&
+      weekly.data.entrepreneurs.visible !== false &&
+      weekly.data.entrepreneurs.status === "aprobado" ? (
         <section className="border-y border-border bg-surface py-16">
           <div className="container-page grid gap-10 lg:grid-cols-[1fr_1.1fr] lg:items-center">
-            <img
-              src={weekly.data.entrepreneurs.photo_url ?? ""}
-              alt={`Emprendedor de la semana: ${weekly.data.entrepreneurs.business_name}`}
-              loading="lazy"
-              className="aspect-[4/3] w-full rounded-3xl object-cover shadow-card"
-            />
+            {weekly.data.entrepreneurs.photo_url ? (
+              <img
+                src={weekly.data.entrepreneurs.photo_url}
+                alt={`Emprendedor de la semana: ${weekly.data.entrepreneurs.business_name}`}
+                loading="lazy"
+                className="aspect-[4/3] w-full rounded-3xl object-cover shadow-card"
+              />
+            ) : (
+              <div className="aspect-[4/3] w-full rounded-3xl bg-muted" />
+            )}
 
             <div>
               <p className="eyebrow flex items-center gap-2">
@@ -209,13 +256,18 @@ function Index() {
               </h2>
 
               <p className="text-muted-foreground">
-                {weekly.data.entrepreneurs.owner_name} ·{" "}
-                {weekly.data.entrepreneurs.categories?.name} ·{" "}
-                {weekly.data.entrepreneurs.comunas?.name}
+                {weekly.data.entrepreneurs.owner_name}
+                {weekly.data.entrepreneurs.categories?.name
+                  ? ` · ${weekly.data.entrepreneurs.categories.name}`
+                  : ""}
+                {weekly.data.entrepreneurs.comunas?.name
+                  ? ` · ${weekly.data.entrepreneurs.comunas.name}`
+                  : ""}
               </p>
 
               <p className="mt-4 text-foreground/85">
-                {weekly.data.story}
+                {weekly.data.story ||
+                  weekly.data.entrepreneurs.short_description}
               </p>
 
               <div className="mt-6 flex flex-wrap gap-3">
@@ -324,13 +376,13 @@ function Index() {
             <p className="eyebrow">PARTE DE ALGO MÁS GRANDE</p>
 
             <h2 className="mt-2 font-display text-3xl font-semibold">
-              Tu aporte ayuda a mantener La Vitrina
+              Una vitrina construida entre todos
             </h2>
 
             <p className="mt-4 text-muted-foreground">
-              Formar parte de la comunidad tendrá un aporte simbólico. La idea
-              es que juntos podamos mantener este espacio, darle visibilidad a
-              los emprendedores y seguir llevando sus historias a la radio.
+              La Vitrina busca dar visibilidad al talento emprendedor del Maule
+              Sur, generar conexiones y crear nuevas oportunidades para la
+              comunidad.
             </p>
 
             <Button asChild variant="outline" className="mt-6">
@@ -350,31 +402,56 @@ function Index() {
             <p className="eyebrow">EMPRESAS QUE APOYAN</p>
 
             <h2 className="mt-2 font-display text-3xl font-semibold">
-              Los auspiciadores ayudan a hacer crecer la comunidad
+              Organizaciones que ayudan a fortalecer La Vitrina
             </h2>
 
             <p className="mt-4 text-muted-foreground">
-              Empresas y marcas pueden apoyar La Vitrina, participar en
-              campañas, eventos y acciones especiales, y tener una presencia
-              destacada dentro de la comunidad.
+              Empresas, instituciones y aliados pueden apoyar la visibilidad,
+              las actividades y el desarrollo de la comunidad emprendedora del
+              Maule Sur.
             </p>
           </div>
 
-          <div className="mt-8 grid gap-4 sm:grid-cols-3">
-            {["Auspiciador principal", "Empresa amiga", "Aliado de La Vitrina"].map(
-              (item) => (
+          {sponsors.isLoading ? (
+            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-48 animate-pulse rounded-2xl bg-muted"
+                />
+              ))}
+            </div>
+          ) : (sponsors.data?.length ?? 0) > 0 ? (
+            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {sponsors.data?.map((sponsor) => (
+                <SponsorCard
+                  key={sponsor.id}
+                  sponsor={sponsor}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="mt-8 grid gap-4 sm:grid-cols-3">
+              {[
+                "Auspiciador principal",
+                "Empresa amiga",
+                "Aliado de La Vitrina",
+              ].map((item) => (
                 <div
                   key={item}
                   className="rounded-2xl border border-dashed border-border p-6 text-center"
                 >
-                  <p className="font-display font-semibold">{item}</p>
+                  <p className="font-display font-semibold">
+                    {item}
+                  </p>
+
                   <p className="mt-2 text-sm text-muted-foreground">
                     Espacio disponible
                   </p>
                 </div>
-              ),
-            )}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -403,6 +480,43 @@ function Index() {
             </Link>
           </Button>
         </div>
+
+        {visibleEvents.length > 0 ? (
+          <div className="mt-8 grid gap-5 md:grid-cols-3">
+            {visibleEvents.map((event) => (
+              <article
+                key={event.id}
+                className="rounded-2xl border border-border bg-card p-6 shadow-card"
+              >
+                <CalendarDays className="h-5 w-5 text-primary" />
+
+                <p className="mt-4 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  {new Date(event.starts_at).toLocaleDateString("es-CL", {
+                    day: "numeric",
+                    month: "long",
+                    year: "numeric",
+                  })}
+                </p>
+
+                <h3 className="mt-2 font-display text-xl font-semibold">
+                  {event.title}
+                </h3>
+
+                {event.location ? (
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    {event.location}
+                  </p>
+                ) : null}
+
+                {event.description ? (
+                  <p className="mt-3 text-sm text-foreground/80">
+                    {event.description}
+                  </p>
+                ) : null}
+              </article>
+            ))}
+          </div>
+        ) : null}
       </section>
 
       {/* CTA FINAL */}
@@ -430,4 +544,80 @@ function Index() {
       </section>
     </>
   );
+}
+
+function SponsorCard({
+  sponsor,
+}: {
+  sponsor: Sponsor;
+}) {
+  const url = websiteLink(sponsor.website_url);
+
+  const content = (
+    <div className="flex h-full flex-col items-center rounded-2xl border border-border p-6 text-center transition-shadow hover:shadow-card">
+      {sponsor.logo_url ? (
+        <div className="flex h-24 w-full items-center justify-center">
+          <img
+            src={sponsor.logo_url}
+            alt={sponsor.name}
+            loading="lazy"
+            className="max-h-20 max-w-[180px] object-contain"
+          />
+        </div>
+      ) : (
+        <div className="flex h-24 items-center justify-center">
+          <Handshake className="h-9 w-9 text-primary" />
+        </div>
+      )}
+
+      <p className="mt-3 text-xs font-medium uppercase tracking-wide text-primary">
+        {sponsorLevel(sponsor.level)}
+      </p>
+
+      <h3 className="mt-1 font-display text-xl font-semibold">
+        {sponsor.name}
+      </h3>
+
+      {sponsor.description ? (
+        <p className="mt-2 text-sm text-muted-foreground">
+          {sponsor.description}
+        </p>
+      ) : null}
+
+      {url ? (
+        <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary">
+          Conocer
+          <ExternalLink className="h-3.5 w-3.5" />
+        </span>
+      ) : null}
+    </div>
+  );
+
+  if (!url) {
+    return content;
+  }
+
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noreferrer"
+      className="block"
+    >
+      {content}
+    </a>
+  );
+}
+
+function sponsorLevel(level: string) {
+  switch (level) {
+    case "principal":
+      return "Auspiciador principal";
+
+    case "empresa-amiga":
+      return "Empresa amiga";
+
+    default:
+      return "Aliado de La Vitrina";
+  }
 }
