@@ -65,6 +65,7 @@ function AuthPage() {
     setBusy(false);
     if (error) { toast.error(error.message); return; }
     toast.success("Cuenta creada. Revisa tu correo si te pedimos confirmación.");
+navigate({ to: "/sumate" });
   }
 
   async function google() {

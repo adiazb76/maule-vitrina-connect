@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ComunidadRouteImport } from './routes/comunidad'
 import { Route as EventosRouteImport } from './routes/eventos'
@@ -21,6 +22,7 @@ import { Route as AuthenticatedPanelRouteImport } from './routes/_authenticated/
 import { Route as CategoriasIndexRouteImport } from './routes/categorias.index'
 import { Route as EmprendedoresIndexRouteImport } from './routes/emprendedores.index'
 import { Route as EmprendedoresSlugRouteImport } from './routes/emprendedores.$slug'
+import { Route as AuthenticatedEditarIdRouteImport } from './routes/_authenticated/editar.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -29,6 +31,11 @@ const IndexRoute = IndexRouteImport.update({
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -81,9 +88,15 @@ const EmprendedoresSlugRoute = EmprendedoresSlugRouteImport.update({
   path: '/emprendedores/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedEditarIdRoute = AuthenticatedEditarIdRouteImport.update({
+  id: '/editar/$id',
+  path: '/editar/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/comunidad': typeof ComunidadRoute
   '/eventos': typeof EventosRoute
@@ -94,9 +107,11 @@ export interface FileRoutesByFullPath {
   '/emprendedores/$slug': typeof EmprendedoresSlugRoute
   '/categorias/': typeof CategoriasIndexRoute
   '/emprendedores/': typeof EmprendedoresIndexRoute
+  '/editar/$id': typeof AuthenticatedEditarIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/comunidad': typeof ComunidadRoute
   '/eventos': typeof EventosRoute
@@ -107,11 +122,13 @@ export interface FileRoutesByTo {
   '/emprendedores/$slug': typeof EmprendedoresSlugRoute
   '/categorias': typeof CategoriasIndexRoute
   '/emprendedores': typeof EmprendedoresIndexRoute
+  '/editar/$id': typeof AuthenticatedEditarIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/comunidad': typeof ComunidadRoute
   '/eventos': typeof EventosRoute
@@ -122,11 +139,13 @@ export interface FileRoutesById {
   '/emprendedores/$slug': typeof EmprendedoresSlugRoute
   '/categorias/': typeof CategoriasIndexRoute
   '/emprendedores/': typeof EmprendedoresIndexRoute
+  '/_authenticated/editar/$id': typeof AuthenticatedEditarIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/auth'
     | '/comunidad'
     | '/eventos'
@@ -137,9 +156,11 @@ export interface FileRouteTypes {
     | '/emprendedores/$slug'
     | '/categorias/'
     | '/emprendedores/'
+    | '/editar/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
     | '/auth'
     | '/comunidad'
     | '/eventos'
@@ -150,10 +171,12 @@ export interface FileRouteTypes {
     | '/emprendedores/$slug'
     | '/categorias'
     | '/emprendedores'
+    | '/editar/$id'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/admin'
     | '/auth'
     | '/comunidad'
     | '/eventos'
@@ -164,11 +187,13 @@ export interface FileRouteTypes {
     | '/emprendedores/$slug'
     | '/categorias/'
     | '/emprendedores/'
+    | '/_authenticated/editar/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AdminRoute: typeof AdminRoute
   AuthRoute: typeof AuthRoute
   ComunidadRoute: typeof ComunidadRoute
   EventosRoute: typeof EventosRoute
@@ -194,6 +219,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -266,15 +298,24 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EmprendedoresSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/editar/$id': {
+      id: '/_authenticated/editar/$id'
+      path: '/editar/$id'
+      fullPath: '/editar/$id'
+      preLoaderRoute: typeof AuthenticatedEditarIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedPanelRoute: typeof AuthenticatedPanelRoute
+  AuthenticatedEditarIdRoute: typeof AuthenticatedEditarIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedPanelRoute: AuthenticatedPanelRoute,
+  AuthenticatedEditarIdRoute: AuthenticatedEditarIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -283,6 +324,7 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,
   ComunidadRoute: ComunidadRoute,
   EventosRoute: EventosRoute,

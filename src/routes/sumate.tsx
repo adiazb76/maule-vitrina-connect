@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+﻿import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -25,12 +25,7 @@ export const Route = createFileRoute("/sumate")({
       {
         name: "description",
         content:
-          "Registra gratis tu emprendimiento del Maule Sur: cuéntanos qué haces, dónde estás y cómo te pueden contactar.",
-      },
-      { property: "og:title", content: "Publica tu emprendimiento en La Vitrina" },
-      {
-        property: "og:description",
-        content: "Formulario de registro para emprendedores del Maule Sur. Revisión en 48 horas.",
+          "Registra tu emprendimiento del Maule Sur: cuéntanos qué haces, dónde estás y cómo te pueden contactar.",
       },
     ],
   }),
@@ -40,9 +35,20 @@ export const Route = createFileRoute("/sumate")({
 function SumatePage() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
-  const categories = useQuery({ queryKey: ["categories"], queryFn: fetchCategories });
-  const comunas = useQuery({ queryKey: ["comunas"], queryFn: fetchComunas });
+
+  const categories = useQuery({
+    queryKey: ["categories"],
+    queryFn: fetchCategories,
+  });
+
+  const comunas = useQuery({
+    queryKey: ["comunas"],
+    queryFn: fetchComunas,
+  });
+
   const [busy, setBusy] = useState(false);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState("");
 
   const [form, setForm] = useState({
     business_name: "",
@@ -52,7 +58,6 @@ function SumatePage() {
     short_description: "",
     about: "",
     value_prop: "",
-    photo_url: "",
     tags: "",
     whatsapp: "",
     phone: "",
@@ -67,42 +72,119 @@ function SumatePage() {
   const set = (key: keyof typeof form) => (value: string) =>
     setForm((prev) => ({ ...prev, [key]: value }));
 
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!user) return;
-    setBusy(true);
-    const slug = `${slugify(form.business_name)}-${Math.random().toString(36).slice(2, 6)}`;
-    const { error } = await supabase.from("entrepreneurs").insert({
-      user_id: user.id,
-      slug,
-      business_name: form.business_name,
-      owner_name: form.owner_name,
-      category_id: form.category_id || null,
-      comuna_id: form.comuna_id || null,
-      short_description: form.short_description,
-      about: form.about || null,
-      value_prop: form.value_prop || null,
-      photo_url: form.photo_url || null,
-      tags: form.tags
-        .split(",")
-        .map((t) => t.trim())
-        .filter(Boolean),
-      whatsapp: form.whatsapp || null,
-      phone: form.phone || null,
-      email: form.email || user.email || null,
-      instagram: form.instagram || null,
-      facebook: form.facebook || null,
-      website: form.website || null,
-      collaboration_seeking: form.collaboration_seeking || null,
-      collaboration_offering: form.collaboration_offering || null,
-    });
-    setBusy(false);
-    if (error) {
-      toast.error(error.message);
+  function selectPhoto(file?: File) {
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Selecciona un archivo de imagen.");
       return;
     }
-    toast.success("¡Listo! Tu emprendimiento quedó en revisión.");
-    navigate({ to: "/panel" });
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("La imagen no puede superar los 5 MB.");
+      return;
+    }
+
+    setPhotoFile(file);
+
+    const reader = new FileReader();
+    reader.onload = () => setPhotoPreview(String(reader.result));
+    reader.readAsDataURL(file);
+  }
+
+  async function uploadPhoto() {
+    if (!photoFile || !user) return null;
+
+    const extension =
+      photoFile.name.split(".").pop()?.toLowerCase() || "jpg";
+
+    const fileName =
+      `${user.id}/${Date.now()}-${Math.random()
+        .toString(36)
+        .slice(2, 8)}.${extension}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("Entrepreneur-images")
+      .upload(fileName, photoFile, {
+        cacheControl: "3600",
+        upsert: false,
+        contentType: photoFile.type,
+      });
+
+    if (uploadError) throw uploadError;
+
+    const { data } = supabase.storage
+      .from("Entrepreneur-images")
+      .getPublicUrl(fileName);
+
+    return data.publicUrl;
+  }
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+
+    if (!user) return;
+
+    if (!form.category_id || !form.comuna_id) {
+      toast.error("Selecciona categoría y comuna.");
+      return;
+    }
+
+    setBusy(true);
+
+    try {
+      const photoUrl = await uploadPhoto();
+
+      const slug =
+        `${slugify(form.business_name)}-${Math.random()
+          .toString(36)
+          .slice(2, 6)}`;
+
+      const { error } = await supabase.from("entrepreneurs").insert({
+        user_id: user.id,
+        slug,
+        business_name: form.business_name,
+        owner_name: form.owner_name,
+        category_id: form.category_id,
+        comuna_id: form.comuna_id,
+        short_description: form.short_description,
+        about: form.about || null,
+        value_prop: form.value_prop || null,
+        photo_url: photoUrl,
+        tags: form.tags
+          .split(",")
+          .map((t) => t.trim())
+          .filter(Boolean),
+        whatsapp: form.whatsapp || null,
+        phone: form.phone || null,
+        email: form.email || user.email || null,
+        instagram: form.instagram || null,
+        facebook: form.facebook || null,
+        website: form.website || null,
+        collaboration_seeking:
+          form.collaboration_seeking || null,
+        collaboration_offering:
+          form.collaboration_offering || null,
+      });
+
+      if (error) throw error;
+
+      toast.success(
+        "¡Listo! Tu emprendimiento quedó en revisión.",
+      );
+
+      navigate({ to: "/panel" });
+    } catch (error) {
+      console.error(error);
+
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "No pudimos guardar el emprendimiento.",
+      );
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
@@ -110,12 +192,14 @@ function SumatePage() {
       <section className="border-b border-border bg-surface">
         <div className="container-page py-12">
           <p className="eyebrow">Súmate</p>
+
           <h1 className="mt-2 font-display text-4xl font-semibold">
             Publica tu emprendimiento en La Vitrina
           </h1>
+
           <p className="mt-3 max-w-2xl text-muted-foreground">
-            Completa el formulario y nuestro equipo revisará tu perfil dentro de 48 horas. Es
-            gratis y siempre lo será para emprendedores del Maule Sur.
+            Completa el formulario y nuestro equipo revisará tu perfil
+            dentro de 48 horas.
           </p>
         </div>
       </section>
@@ -125,36 +209,54 @@ function SumatePage() {
           <div className="h-40 animate-pulse rounded-2xl bg-muted" />
         ) : !user ? (
           <div className="mx-auto max-w-md rounded-2xl border border-dashed border-border p-10 text-center">
-            <p className="font-display text-xl">Primero crea tu cuenta</p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Necesitamos una cuenta para que puedas editar tu perfil y ver tus métricas.
+            <p className="font-display text-xl">
+              Primero crea tu cuenta
             </p>
+
+            <p className="mt-2 text-sm text-muted-foreground">
+              Necesitamos una cuenta para que puedas editar tu perfil
+              y ver tus métricas.
+            </p>
+
             <Button asChild className="mt-5">
               <Link to="/auth">Ingresar o registrarme</Link>
             </Button>
           </div>
         ) : (
-          <form className="mx-auto grid max-w-3xl gap-6" onSubmit={submit}>
+          <form
+            className="mx-auto grid max-w-3xl gap-6"
+            onSubmit={submit}
+          >
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Nombre del emprendimiento" required>
                 <Input
                   required
                   value={form.business_name}
-                  onChange={(e) => set("business_name")(e.target.value)}
+                  onChange={(e) =>
+                    set("business_name")(e.target.value)
+                  }
                 />
               </Field>
+
               <Field label="Tu nombre" required>
                 <Input
                   required
                   value={form.owner_name}
-                  onChange={(e) => set("owner_name")(e.target.value)}
+                  onChange={(e) =>
+                    set("owner_name")(e.target.value)
+                  }
                 />
               </Field>
+
               <Field label="Categoría" required>
-                <Select value={form.category_id} onValueChange={set("category_id")}>
+                <Select
+                  value={form.category_id}
+                  onValueChange={set("category_id")}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Selecciona un rubro" />
                   </SelectTrigger>
+
                   <SelectContent>
                     {categories.data?.map((c) => (
                       <SelectItem key={c.id} value={c.id}>
@@ -164,11 +266,16 @@ function SumatePage() {
                   </SelectContent>
                 </Select>
               </Field>
+
               <Field label="Comuna" required>
-                <Select value={form.comuna_id} onValueChange={set("comuna_id")}>
+                <Select
+                  value={form.comuna_id}
+                  onValueChange={set("comuna_id")}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Selecciona tu comuna" />
                   </SelectTrigger>
+
                   <SelectContent>
                     {comunas.data?.map((c) => (
                       <SelectItem key={c.id} value={c.id}>
@@ -185,8 +292,47 @@ function SumatePage() {
                 required
                 maxLength={160}
                 value={form.short_description}
-                onChange={(e) => set("short_description")(e.target.value)}
+                onChange={(e) =>
+                  set("short_description")(e.target.value)
+                }
               />
+            </Field>
+
+            <Field label="Foto de portada">
+              <Input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={(e) =>
+                  selectPhoto(e.target.files?.[0])
+                }
+              />
+
+              <p className="text-xs text-muted-foreground">
+                JPG, PNG o WebP. Máximo 5 MB.
+              </p>
+
+              {photoPreview ? (
+                <div className="mt-3">
+                  <img
+                    src={photoPreview}
+                    alt="Vista previa de la portada"
+                    className="aspect-[4/3] w-full max-w-md rounded-2xl border border-border object-cover"
+                  />
+
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="mt-2"
+                    onClick={() => {
+                      setPhotoFile(null);
+                      setPhotoPreview("");
+                    }}
+                  >
+                    Quitar foto
+                  </Button>
+                </div>
+              ) : null}
             </Field>
 
             <Field label="Tu historia">
@@ -202,35 +348,38 @@ function SumatePage() {
               <Textarea
                 rows={3}
                 value={form.value_prop}
-                onChange={(e) => set("value_prop")(e.target.value)}
+                onChange={(e) =>
+                  set("value_prop")(e.target.value)
+                }
+              />
+            </Field>
+
+            <Field label="Etiquetas (separadas por coma)">
+              <Input
+                value={form.tags}
+                onChange={(e) => set("tags")(e.target.value)}
+                placeholder="artesanía, alimentos, servicios"
               />
             </Field>
 
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Foto de portada (URL)">
-                <Input
-                  value={form.photo_url}
-                  onChange={(e) => set("photo_url")(e.target.value)}
-                  placeholder="https://…"
-                />
-              </Field>
-              <Field label="Etiquetas (separadas por coma)">
-                <Input
-                  value={form.tags}
-                  onChange={(e) => set("tags")(e.target.value)}
-                  placeholder="artesanía, telar, regalos"
-                />
-              </Field>
               <Field label="WhatsApp">
                 <Input
                   value={form.whatsapp}
-                  onChange={(e) => set("whatsapp")(e.target.value)}
-                  placeholder="+56 9 …"
+                  onChange={(e) =>
+                    set("whatsapp")(e.target.value)
+                  }
+                  placeholder="+56 9..."
                 />
               </Field>
+
               <Field label="Teléfono">
-                <Input value={form.phone} onChange={(e) => set("phone")(e.target.value)} />
+                <Input
+                  value={form.phone}
+                  onChange={(e) => set("phone")(e.target.value)}
+                />
               </Field>
+
               <Field label="Correo de contacto">
                 <Input
                   type="email"
@@ -238,18 +387,33 @@ function SumatePage() {
                   onChange={(e) => set("email")(e.target.value)}
                 />
               </Field>
+
               <Field label="Instagram">
                 <Input
                   value={form.instagram}
-                  onChange={(e) => set("instagram")(e.target.value)}
+                  onChange={(e) =>
+                    set("instagram")(e.target.value)
+                  }
                   placeholder="@tuemprendimiento"
                 />
               </Field>
+
               <Field label="Facebook">
-                <Input value={form.facebook} onChange={(e) => set("facebook")(e.target.value)} />
+                <Input
+                  value={form.facebook}
+                  onChange={(e) =>
+                    set("facebook")(e.target.value)
+                  }
+                />
               </Field>
+
               <Field label="Sitio web">
-                <Input value={form.website} onChange={(e) => set("website")(e.target.value)} />
+                <Input
+                  value={form.website}
+                  onChange={(e) =>
+                    set("website")(e.target.value)
+                  }
+                />
               </Field>
             </div>
 
@@ -258,20 +422,32 @@ function SumatePage() {
                 <Textarea
                   rows={3}
                   value={form.collaboration_seeking}
-                  onChange={(e) => set("collaboration_seeking")(e.target.value)}
+                  onChange={(e) =>
+                    set("collaboration_seeking")(e.target.value)
+                  }
                 />
               </Field>
+
               <Field label="Puedo aportar…">
                 <Textarea
                   rows={3}
                   value={form.collaboration_offering}
-                  onChange={(e) => set("collaboration_offering")(e.target.value)}
+                  onChange={(e) =>
+                    set("collaboration_offering")(e.target.value)
+                  }
                 />
               </Field>
             </div>
 
-            <Button type="submit" size="lg" disabled={busy} className="justify-self-start">
-              {busy ? "Enviando…" : "Enviar para revisión"}
+            <Button
+              type="submit"
+              size="lg"
+              disabled={busy}
+              className="justify-self-start"
+            >
+              {busy
+                ? "Subiendo y enviando…"
+                : "Enviar para revisión"}
             </Button>
           </form>
         )}
@@ -293,8 +469,11 @@ function Field({
     <div className="space-y-2">
       <Label>
         {label}
-        {required ? <span className="text-primary"> *</span> : null}
+        {required ? (
+          <span className="text-primary"> *</span>
+        ) : null}
       </Label>
+
       {children}
     </div>
   );
