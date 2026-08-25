@@ -3,39 +3,56 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import {
   ArrowRight,
-  CalendarDays,
-  ExternalLink,
-  Handshake,
-  Radio,
+  BarChart3,
+  Newspaper,
   Search,
   Sparkles,
-  Users,
+  TrendingUp,
 } from "lucide-react";
 
 import heroImage from "@/assets/hero-vitrina.jpg";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { EntrepreneurCard } from "@/components/entrepreneur-card";
+
 import {
-  fetchEvents,
   fetchFeatured,
+  fetchNewsItems,
   fetchSiteSettings,
   fetchSponsors,
   fetchWeeklyFeature,
   websiteLink,
+  type NewsItem,
   type Sponsor,
 } from "@/lib/vitrina";
+
+type IndicatorValue = {
+  codigo: string;
+  nombre: string;
+  unidad_medida: string;
+  fecha: string;
+  valor: number;
+};
+
+type EconomicIndicators = {
+  fecha: string;
+  uf?: IndicatorValue;
+  utm?: IndicatorValue;
+  dolar?: IndicatorValue;
+  euro?: IndicatorValue;
+};
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       {
-        title: "La Vitrina | Comunidad de Emprendedores del Maule Sur",
+        title: "La Vitrina | Emprendedores del Maule Sur",
       },
       {
         name: "description",
         content:
-          "La comunidad de emprendedores del Maule Sur. Descubre negocios locales, conecta, participa y haz visible tu emprendimiento.",
+          "Emprendedores, historias, noticias y oportunidades del Maule Sur en un solo lugar.",
       },
       {
         property: "og:title",
@@ -43,21 +60,52 @@ export const Route = createFileRoute("/")({
       },
       {
         property: "og:description",
-        content: "Nos mostramos. Nos conectamos. Crecemos juntos.",
+        content:
+          "Descubre, conecta y conoce lo que está pasando en la comunidad emprendedora del Maule Sur.",
       },
     ],
-    links: [{ rel: "canonical", href: "/" }],
+
+    links: [
+      {
+        rel: "canonical",
+        href: "/",
+      },
+    ],
   }),
-  component: Index,
+
+  component: IndexPage,
 });
 
-function Index() {
+async function fetchEconomicIndicators(): Promise<EconomicIndicators> {
+  const response = await fetch("https://mindicador.cl/api");
+
+  if (!response.ok) {
+    throw new Error(
+      "No pudimos obtener los indicadores económicos.",
+    );
+  }
+
+  return response.json();
+}
+
+function IndexPage() {
   const navigate = useNavigate();
+
   const [term, setTerm] = useState("");
+
+  const settings = useQuery({
+    queryKey: ["site-settings"],
+    queryFn: fetchSiteSettings,
+  });
+
+  const news = useQuery({
+    queryKey: ["news-items"],
+    queryFn: () => fetchNewsItems(3),
+  });
 
   const featured = useQuery({
     queryKey: ["featured"],
-    queryFn: () => fetchFeatured(6),
+    queryFn: () => fetchFeatured(4),
   });
 
   const weekly = useQuery({
@@ -65,62 +113,126 @@ function Index() {
     queryFn: fetchWeeklyFeature,
   });
 
-  const events = useQuery({
-    queryKey: ["events"],
-    queryFn: fetchEvents,
-  });
-
-  const settings = useQuery({
-    queryKey: ["site-settings"],
-    queryFn: fetchSiteSettings,
-  });
-
   const sponsors = useQuery({
     queryKey: ["sponsors"],
     queryFn: fetchSponsors,
   });
 
+  const indicators = useQuery({
+    queryKey: ["economic-indicators"],
+    queryFn: fetchEconomicIndicators,
+    staleTime: 1000 * 60 * 30,
+    retry: 1,
+  });
+
   const heroSubtitle =
     settings.data?.hero_subtitle ||
-    "La comunidad de emprendedores del Maule Sur";
+    "Emprendedores del Maule Sur";
 
   const heroDescription =
     settings.data?.hero_description ||
-    "Un espacio para mostrar tu emprendimiento, descubrir negocios locales, conectar con otras personas y encontrar nuevas oportunidades.";
+    "Descubre emprendimientos, historias, oportunidades y contenido útil de nuestra comunidad.";
 
   const heroPhoto =
-    settings.data?.hero_image_url || heroImage;
+    settings.data?.hero_image_url ||
+    heroImage;
 
-  const visibleEvents = (events.data ?? []).slice(0, 3);
+  const highlighted =
+    weekly.data?.entrepreneurs &&
+    weekly.data.entrepreneurs.status === "aprobado" &&
+    weekly.data.entrepreneurs.visible !== false
+      ? weekly.data.entrepreneurs
+      : null;
+
+  const mainNews =
+    news.data?.[0] ?? null;
+
+  const secondaryNews =
+    news.data?.slice(1, 3) ?? [];
 
   return (
     <>
-      {/* HERO */}
-      <section className="relative overflow-hidden border-b border-border bg-surface">
-        <div className="container-page grid items-center gap-10 py-14 lg:grid-cols-[1.05fr_1fr] lg:py-20">
-          <div>
-            <p className="eyebrow">MAULE SUR · CHILE</p>
+      {/* INDICADORES ECONÓMICOS */}
 
-            <h1 className="mt-3 font-display text-4xl font-semibold leading-[1.05] sm:text-5xl lg:text-6xl">
+      {indicators.data ? (
+        <section className="border-b border-border bg-secondary/20">
+          <div className="container-page">
+            <div className="flex items-center gap-5 overflow-x-auto py-2">
+              <div className="flex shrink-0 items-center gap-2 pr-1">
+                <TrendingUp className="h-3.5 w-3.5 text-primary" />
+
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  Indicadores
+                </span>
+              </div>
+
+              <div className="h-5 w-px shrink-0 bg-border" />
+
+              <Indicator
+                label="UF"
+                value={indicators.data.uf?.valor}
+                decimals={2}
+              />
+
+              <Indicator
+                label="UTM"
+                value={indicators.data.utm?.valor}
+                decimals={0}
+              />
+
+              <Indicator
+                label="Dólar"
+                value={indicators.data.dolar?.valor}
+                decimals={2}
+              />
+
+              <Indicator
+                label="Euro"
+                value={indicators.data.euro?.valor}
+                decimals={2}
+              />
+
+              <span className="ml-auto shrink-0 text-[9px] text-muted-foreground">
+                Valores referenciales
+              </span>
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      {/* HERO */}
+
+      <section className="border-b border-border bg-surface">
+        <div className="container-page grid gap-6 py-7 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:py-9">
+          <div>
+            <p className="eyebrow">
+              MAULE SUR · CHILE
+            </p>
+
+            <h1 className="mt-1 font-display text-4xl font-semibold leading-tight sm:text-5xl">
               LA VITRINA
             </h1>
 
-            <p className="mt-3 font-display text-xl text-primary sm:text-2xl">
+            <p className="mt-2 font-display text-xl text-primary">
               {heroSubtitle}
             </p>
 
-            <p className="mt-5 max-w-xl text-base text-foreground/80 sm:text-lg">
+            <p className="mt-3 max-w-xl text-sm leading-relaxed text-foreground/75 sm:text-base">
               {heroDescription}
             </p>
 
             <form
-              className="mt-7 flex w-full max-w-xl flex-col gap-2 sm:flex-row"
+              className="mt-5 flex max-w-xl gap-2"
               onSubmit={(event) => {
                 event.preventDefault();
 
                 navigate({
-                  to: "/emprendedores",
-                  search: term ? { q: term } : {},
+                  to: "/comunidad",
+                  search: {
+                    q:
+                      term.trim() ||
+                      undefined,
+                  },
                 });
               }}
             >
@@ -129,265 +241,311 @@ function Index() {
 
                 <Input
                   value={term}
-                  onChange={(e) => setTerm(e.target.value)}
-                  placeholder="Busca un producto, servicio o emprendimiento"
-                  aria-label="Buscar emprendedores"
-                  className="h-12 rounded-xl bg-card pl-9"
+                  onChange={(event) =>
+                    setTerm(
+                      event.target.value,
+                    )
+                  }
+                  placeholder="¿Qué estás buscando?"
+                  className="h-11 bg-card pl-9"
                 />
               </div>
 
               <Button
                 type="submit"
-                size="lg"
-                variant="hero"
-                className="h-12 rounded-xl"
+                className="h-11"
               >
                 Buscar
               </Button>
             </form>
 
-            <div className="mt-5 flex flex-wrap gap-3">
+            <div className="mt-4 flex flex-wrap gap-2">
               <Button
                 asChild
-                size="lg"
                 variant="outline"
-                className="rounded-xl"
+                size="sm"
               >
-                <Link to="/emprendedores">
-                  Descubrir emprendedores
+                <Link to="/comunidad">
+                  Explorar comunidad
+                </Link>
+              </Button>
+
+              <Button
+                asChild
+                variant="ghost"
+                size="sm"
+              >
+                <Link to="/diagnostico">
+                  Diagnóstico
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>
 
               <Button
                 asChild
-                size="lg"
-                variant="soft"
-                className="rounded-xl"
+                variant="ghost"
+                size="sm"
               >
                 <Link to="/sumate">
-                  Sé parte de La Vitrina
+                  Quiero ser parte
                 </Link>
               </Button>
             </div>
           </div>
 
-          <div className="relative">
+          <div>
             <img
               src={heroPhoto}
-              alt="Emprendedores del Maule Sur"
-              width={1600}
-              height={1104}
-              className="aspect-[4/3] w-full rounded-3xl object-cover shadow-lift"
+              alt="La Vitrina - Emprendedores del Maule Sur"
+              className="aspect-[16/10] w-full rounded-2xl object-cover shadow-card"
             />
+          </div>
+        </div>
+      </section>
 
-            <div className="absolute -bottom-5 left-5 hidden rounded-2xl border border-border bg-card px-5 py-4 shadow-card sm:block">
-              <p className="font-display text-base font-semibold">
-                Tu emprendimiento tiene un lugar en La Vitrina.
+      {/* ACTUALIDAD + EMPRENDEDOR DESTACADO */}
+
+      <section className="container-page py-8">
+        <div className="grid gap-5 lg:grid-cols-2">
+
+          {/* HOY EN LA VITRINA */}
+
+          <article className="overflow-hidden rounded-2xl border border-border bg-card">
+            <div className="border-b border-border px-5 py-4">
+              <p className="eyebrow inline-flex items-center gap-2">
+                <Newspaper className="h-4 w-4" />
+                ACTUALIDAD
               </p>
+
+              <h2 className="mt-1 font-display text-2xl font-semibold">
+                Hoy en La Vitrina
+              </h2>
             </div>
-          </div>
-        </div>
-      </section>
 
-      {/* EMPRENDEDORES */}
-      <section className="container-page py-16">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <p className="eyebrow">CONOCE LA COMUNIDAD</p>
+            {news.isLoading ? (
+              <div className="h-80 animate-pulse bg-muted" />
+            ) : mainNews ? (
+              <>
+                {mainNews.image_url ? (
+                  <img
+                    src={mainNews.image_url}
+                    alt={mainNews.title}
+                    className="aspect-[16/7] w-full object-cover"
+                  />
+                ) : null}
 
-            <h2 className="mt-1 font-display text-3xl font-semibold">
-              Emprendedores que están haciendo crecer el Maule Sur
-            </h2>
+                <div className="p-5">
+                  {mainNews.featured ? (
+                    <p className="text-xs font-semibold uppercase tracking-wide text-primary">
+                      Destacado
+                    </p>
+                  ) : null}
 
-            <p className="mt-2 max-w-xl text-muted-foreground">
-              Descubre negocios locales, conoce sus historias y contacta
-              directamente con quienes están detrás de cada emprendimiento.
-            </p>
-          </div>
+                  <h3 className="mt-1 font-display text-xl font-semibold leading-snug">
+                    {mainNews.title}
+                  </h3>
 
-          <Button asChild variant="outline">
-            <Link to="/emprendedores">
-              Ver todos
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </Button>
-        </div>
+                  {mainNews.summary ? (
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      {mainNews.summary}
+                    </p>
+                  ) : null}
 
-        <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {featured.isLoading
-            ? Array.from({ length: 6 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="h-96 animate-pulse rounded-2xl bg-muted"
-                />
-              ))
-            : featured.data?.map((e) => (
-                <EntrepreneurCard key={e.id} e={e} />
-              ))}
-        </div>
-      </section>
+                  {mainNews.external_url ? (
+                    <a
+                      href={mainNews.external_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary"
+                    >
+                      Leer más
+                      <ArrowRight className="h-4 w-4" />
+                    </a>
+                  ) : null}
+                </div>
 
-      {/* EMPRENDEDOR DE LA SEMANA */}
-      {weekly.data?.entrepreneurs &&
-      weekly.data.entrepreneurs.visible !== false &&
-      weekly.data.entrepreneurs.status === "aprobado" ? (
-        <section className="border-y border-border bg-surface py-16">
-          <div className="container-page grid gap-10 lg:grid-cols-[1fr_1.1fr] lg:items-center">
-            {weekly.data.entrepreneurs.photo_url ? (
-              <img
-                src={weekly.data.entrepreneurs.photo_url}
-                alt={`Emprendedor de la semana: ${weekly.data.entrepreneurs.business_name}`}
-                loading="lazy"
-                className="aspect-[4/3] w-full rounded-3xl object-cover shadow-card"
-              />
+                {secondaryNews.length > 0 ? (
+                  <div className="border-t border-border">
+                    {secondaryNews.map(
+                      (item) => (
+                        <SmallNews
+                          key={item.id}
+                          item={item}
+                        />
+                      ),
+                    )}
+                  </div>
+                ) : null}
+              </>
             ) : (
-              <div className="aspect-[4/3] w-full rounded-3xl bg-muted" />
+              <div className="p-8 text-center text-sm text-muted-foreground">
+                Pronto encontrarás aquí las novedades de La Vitrina.
+              </div>
             )}
+          </article>
 
-            <div>
-              <p className="eyebrow flex items-center gap-2">
+          {/* EMPRENDEDOR DESTACADO */}
+
+          <article className="overflow-hidden rounded-2xl border border-border bg-card">
+            <div className="border-b border-border px-5 py-4">
+              <p className="eyebrow inline-flex items-center gap-2">
                 <Sparkles className="h-4 w-4" />
-                EMPRENDEDOR DE LA SEMANA
+                PROTAGONISTA
               </p>
 
-              <h2 className="mt-2 font-display text-3xl font-semibold">
-                {weekly.data.entrepreneurs.business_name}
+              <h2 className="mt-1 font-display text-2xl font-semibold">
+                Emprendedor destacado
+              </h2>
+            </div>
+
+            {weekly.isLoading ? (
+              <div className="h-80 animate-pulse bg-muted" />
+            ) : highlighted ? (
+              <>
+                {highlighted.photo_url ? (
+                  <img
+                    src={highlighted.photo_url}
+                    alt={highlighted.business_name}
+                    className="aspect-[16/7] w-full object-cover"
+                  />
+                ) : null}
+
+                <div className="p-5">
+                  <p className="text-xs text-muted-foreground">
+                    {highlighted.owner_name}
+
+                    {highlighted.categories?.name
+                      ? ` · ${highlighted.categories.name}`
+                      : ""}
+
+                    {highlighted.comunas?.name
+                      ? ` · ${highlighted.comunas.name}`
+                      : ""}
+                  </p>
+
+                  <h3 className="mt-1 font-display text-xl font-semibold">
+                    {highlighted.business_name}
+                  </h3>
+
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    {weekly.data?.story ||
+                      highlighted.short_description}
+                  </p>
+
+                  <Button
+                    asChild
+                    size="sm"
+                    className="mt-4"
+                  >
+                    <Link
+                      to="/emprendedores/$slug"
+                      params={{
+                        slug:
+                          highlighted.slug,
+                      }}
+                    >
+                      Conocer su historia
+                      <ArrowRight className="h-4 w-4" />
+                    </Link>
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <div className="p-8 text-center text-sm text-muted-foreground">
+                Próximamente conocerás aquí a un emprendedor destacado.
+              </div>
+            )}
+          </article>
+        </div>
+      </section>
+
+      {/* COMUNIDAD */}
+
+      <section className="border-y border-border bg-surface">
+        <div className="container-page py-8">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <p className="eyebrow">
+                COMUNIDAD
+              </p>
+
+              <h2 className="mt-1 font-display text-2xl font-semibold">
+                Descubre el Maule que emprende
               </h2>
 
-              <p className="text-muted-foreground">
-                {weekly.data.entrepreneurs.owner_name}
-                {weekly.data.entrepreneurs.categories?.name
-                  ? ` · ${weekly.data.entrepreneurs.categories.name}`
-                  : ""}
-                {weekly.data.entrepreneurs.comunas?.name
-                  ? ` · ${weekly.data.entrepreneurs.comunas.name}`
-                  : ""}
+              <p className="mt-1 text-sm text-muted-foreground">
+                Productos, servicios, historias y personas de nuestra comunidad.
               </p>
-
-              <p className="mt-4 text-foreground/85">
-                {weekly.data.story ||
-                  weekly.data.entrepreneurs.short_description}
-              </p>
-
-              <div className="mt-6 flex flex-wrap gap-3">
-                <Button asChild>
-                  <Link
-                    to="/emprendedores/$slug"
-                    params={{
-                      slug: weekly.data.entrepreneurs.slug,
-                    }}
-                  >
-                    Ver perfil
-                  </Link>
-                </Button>
-
-                <Button asChild variant="outline">
-                  <Link to="/radio">
-                    Escuchar en La Vitrina Radio
-                  </Link>
-                </Button>
-              </div>
             </div>
-          </div>
-        </section>
-      ) : null}
 
-      {/* PROPUESTA DE VALOR */}
-      <section className="container-page py-16">
-        <div className="grid gap-6 md:grid-cols-3">
-          {[
-            {
-              icon: Users,
-              title: "Una comunidad",
-              text: "Emprendedores del Maule Sur conectados en un mismo espacio.",
-              to: "/comunidad" as const,
-              cta: "Conocer la comunidad",
-            },
-            {
-              icon: Radio,
-              title: "Una voz en la radio",
-              text: "Historias, entrevistas y cápsulas que ayudan a visibilizar el emprendimiento local.",
-              to: "/radio" as const,
-              cta: "Conocer La Vitrina Radio",
-            },
-            {
-              icon: Handshake,
-              title: "Más oportunidades",
-              text: "Eventos, campañas y conexiones que pueden transformar una conversación en una oportunidad.",
-              to: "/eventos" as const,
-              cta: "Ver actividades",
-            },
-          ].map((card) => (
-            <div
-              key={card.title}
-              className="flex flex-col rounded-2xl border border-border bg-card p-7 shadow-card"
+            <Button
+              asChild
+              size="sm"
+              variant="outline"
             >
-              <card.icon className="h-6 w-6 text-primary" />
-
-              <h3 className="mt-4 font-display text-xl font-semibold">
-                {card.title}
-              </h3>
-
-              <p className="mt-2 flex-1 text-sm text-muted-foreground">
-                {card.text}
-              </p>
-
-              <Link
-                to={card.to}
-                className="mt-5 inline-flex items-center gap-1 text-sm font-medium text-primary"
-              >
-                {card.cta}
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* RADIO + COMUNIDAD */}
-      <section className="border-y border-border bg-surface py-16">
-        <div className="container-page grid gap-10 lg:grid-cols-2">
-          <div>
-            <p className="eyebrow flex items-center gap-2">
-              <Radio className="h-4 w-4" />
-              LA VITRINA EN RADIO
-            </p>
-
-            <h2 className="mt-2 font-display text-3xl font-semibold">
-              Una comunidad que también tiene voz
-            </h2>
-
-            <p className="mt-4 max-w-xl text-muted-foreground">
-              La Vitrina nació desde la radio para conversar sobre
-              emprendimiento, compartir historias y dar visibilidad a quienes
-              están construyendo sus propios proyectos.
-            </p>
-
-            <Button asChild className="mt-6">
-              <Link to="/radio">
-                Conocer el programa
+              <Link to="/comunidad">
+                Ver comunidad
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
           </div>
 
-          <div>
-            <p className="eyebrow">PARTE DE ALGO MÁS GRANDE</p>
+          <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {featured.isLoading
+              ? Array.from({
+                  length: 4,
+                }).map(
+                  (_, index) => (
+                    <div
+                      key={index}
+                      className="h-80 animate-pulse rounded-2xl bg-muted"
+                    />
+                  ),
+                )
+              : featured.data?.map(
+                  (entrepreneur) => (
+                    <EntrepreneurCard
+                      key={
+                        entrepreneur.id
+                      }
+                      e={
+                        entrepreneur
+                      }
+                    />
+                  ),
+                )}
+          </div>
+        </div>
+      </section>
 
-            <h2 className="mt-2 font-display text-3xl font-semibold">
-              Una vitrina construida entre todos
-            </h2>
+      {/* DIAGNÓSTICO */}
 
-            <p className="mt-4 text-muted-foreground">
-              La Vitrina busca dar visibilidad al talento emprendedor del Maule
-              Sur, generar conexiones y crear nuevas oportunidades para la
-              comunidad.
-            </p>
+      <section className="container-page py-8">
+        <div className="grid gap-5 overflow-hidden rounded-2xl border border-border bg-card md:grid-cols-[1fr_auto] md:items-center">
+          <div className="flex gap-4 p-6">
+            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-secondary">
+              <BarChart3 className="h-5 w-5 text-primary" />
+            </div>
 
-            <Button asChild variant="outline" className="mt-6">
-              <Link to="/sumate">
-                Quiero ser parte
+            <div>
+              <p className="eyebrow">
+                DIAGNÓSTICO DEL EMPRENDEDOR
+              </p>
+
+              <h2 className="mt-1 font-display text-xl font-semibold">
+                ¿Cómo está tu emprendimiento?
+              </h2>
+
+              <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+                Descubre tus fortalezas, brechas y las principales áreas donde puedes avanzar.
+              </p>
+            </div>
+          </div>
+
+          <div className="px-6 pb-6 md:pb-0">
+            <Button asChild>
+              <Link to="/diagnostico">
+                Hacer diagnóstico
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>
@@ -396,153 +554,136 @@ function Index() {
       </section>
 
       {/* AUSPICIADORES */}
-      <section className="container-page py-16">
-        <div className="rounded-3xl border border-border bg-card p-8 shadow-card sm:p-10">
-          <div className="max-w-2xl">
-            <p className="eyebrow">EMPRESAS QUE APOYAN</p>
 
-            <h2 className="mt-2 font-display text-3xl font-semibold">
-              Organizaciones que ayudan a fortalecer La Vitrina
-            </h2>
-
-            <p className="mt-4 text-muted-foreground">
-              Empresas, instituciones y aliados pueden apoyar la visibilidad,
-              las actividades y el desarrollo de la comunidad emprendedora del
-              Maule Sur.
+      <section className="border-t border-border bg-surface">
+        <div className="container-page py-7">
+          <div>
+            <p className="eyebrow">
+              NOS APOYAN
             </p>
+
+            <h2 className="mt-1 font-display text-lg font-semibold">
+              Auspiciadores de La Vitrina
+            </h2>
           </div>
 
           {sponsors.isLoading ? (
-            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="h-48 animate-pulse rounded-2xl bg-muted"
-                />
-              ))}
+            <div className="mt-4 grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+              {Array.from({
+                length: 5,
+              }).map(
+                (_, index) => (
+                  <div
+                    key={index}
+                    className="h-20 animate-pulse rounded-xl bg-muted"
+                  />
+                ),
+              )}
             </div>
-          ) : (sponsors.data?.length ?? 0) > 0 ? (
-            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {sponsors.data?.map((sponsor) => (
-                <SponsorCard
-                  key={sponsor.id}
-                  sponsor={sponsor}
-                />
-              ))}
+          ) : (sponsors.data?.length ??
+              0) > 0 ? (
+            <div className="mt-4 grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+              {sponsors.data?.map(
+                (sponsor) => (
+                  <SponsorCard
+                    key={sponsor.id}
+                    sponsor={sponsor}
+                  />
+                ),
+              )}
             </div>
           ) : (
-            <div className="mt-8 grid gap-4 sm:grid-cols-3">
-              {[
-                "Auspiciador principal",
-                "Empresa amiga",
-                "Aliado de La Vitrina",
-              ].map((item) => (
-                <div
-                  key={item}
-                  className="rounded-2xl border border-dashed border-border p-6 text-center"
-                >
-                  <p className="font-display font-semibold">
-                    {item}
-                  </p>
-
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    Espacio disponible
-                  </p>
-                </div>
-              ))}
+            <div className="mt-4 rounded-xl border border-dashed border-border p-5 text-center text-sm text-muted-foreground">
+              Próximamente conocerás aquí a quienes apoyan La Vitrina.
             </div>
           )}
         </div>
       </section>
-
-      {/* EVENTOS */}
-      <section className="container-page pb-16">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <p className="eyebrow flex items-center gap-2">
-              <CalendarDays className="h-4 w-4" />
-              ACTIVIDADES
-            </p>
-
-            <h2 className="mt-2 font-display text-3xl font-semibold">
-              Eventos y campañas
-            </h2>
-
-            <p className="mt-2 text-muted-foreground">
-              Ferias, encuentros, campañas y oportunidades para participar.
-            </p>
-          </div>
-
-          <Button asChild variant="outline">
-            <Link to="/eventos">
-              Ver eventos
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </Button>
-        </div>
-
-        {visibleEvents.length > 0 ? (
-          <div className="mt-8 grid gap-5 md:grid-cols-3">
-            {visibleEvents.map((event) => (
-              <article
-                key={event.id}
-                className="rounded-2xl border border-border bg-card p-6 shadow-card"
-              >
-                <CalendarDays className="h-5 w-5 text-primary" />
-
-                <p className="mt-4 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  {new Date(event.starts_at).toLocaleDateString("es-CL", {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                  })}
-                </p>
-
-                <h3 className="mt-2 font-display text-xl font-semibold">
-                  {event.title}
-                </h3>
-
-                {event.location ? (
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    {event.location}
-                  </p>
-                ) : null}
-
-                {event.description ? (
-                  <p className="mt-3 text-sm text-foreground/80">
-                    {event.description}
-                  </p>
-                ) : null}
-              </article>
-            ))}
-          </div>
-        ) : null}
-      </section>
-
-      {/* CTA FINAL */}
-      <section className="container-page pb-20">
-        <div className="rounded-3xl bg-primary px-8 py-14 text-center text-primary-foreground">
-          <h2 className="font-display text-3xl font-semibold sm:text-4xl">
-            Nos mostramos. Nos conectamos. Crecemos juntos.
-          </h2>
-
-          <p className="mx-auto mt-3 max-w-xl opacity-90">
-            El Maule Sur tiene talento. Hagámoslo visible.
-          </p>
-
-          <Button
-            asChild
-            size="lg"
-            variant="secondary"
-            className="mt-7 rounded-xl"
-          >
-            <Link to="/sumate">
-              Quiero ser parte de La Vitrina
-            </Link>
-          </Button>
-        </div>
-      </section>
     </>
+  );
+}
+
+function Indicator({
+  label,
+  value,
+  decimals = 2,
+}: {
+  label: string;
+  value?: number;
+  decimals?: number;
+}) {
+  if (
+    typeof value !== "number"
+  ) {
+    return null;
+  }
+
+  const formatted =
+    new Intl.NumberFormat(
+      "es-CL",
+      {
+        minimumFractionDigits:
+          decimals,
+        maximumFractionDigits:
+          decimals,
+      },
+    ).format(value);
+
+  return (
+    <div className="flex shrink-0 items-baseline gap-1.5">
+      <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+        {label}
+      </span>
+
+      <span className="text-xs font-semibold">
+        ${formatted}
+      </span>
+    </div>
+  );
+}
+
+function SmallNews({
+  item,
+}: {
+  item: NewsItem;
+}) {
+  const content = (
+    <div className="flex gap-3 px-5 py-4 transition-colors hover:bg-secondary/20">
+      {item.image_url ? (
+        <img
+          src={item.image_url}
+          alt={item.title}
+          className="h-14 w-20 shrink-0 rounded-lg object-cover"
+        />
+      ) : null}
+
+      <div className="min-w-0">
+        <p className="font-display text-sm font-semibold leading-snug">
+          {item.title}
+        </p>
+
+        {item.summary ? (
+          <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
+            {item.summary}
+          </p>
+        ) : null}
+      </div>
+    </div>
+  );
+
+  if (!item.external_url) {
+    return content;
+  }
+
+  return (
+    <a
+      href={item.external_url}
+      target="_blank"
+      rel="noreferrer"
+      className="block border-t border-border first:border-t-0"
+    >
+      {content}
+    </a>
   );
 }
 
@@ -551,45 +692,24 @@ function SponsorCard({
 }: {
   sponsor: Sponsor;
 }) {
-  const url = websiteLink(sponsor.website_url);
+  const url =
+    websiteLink(
+      sponsor.website_url,
+    );
 
   const content = (
-    <div className="flex h-full flex-col items-center rounded-2xl border border-border p-6 text-center transition-shadow hover:shadow-card">
+    <div className="flex h-20 items-center justify-center rounded-xl border border-border bg-card p-4">
       {sponsor.logo_url ? (
-        <div className="flex h-24 w-full items-center justify-center">
-          <img
-            src={sponsor.logo_url}
-            alt={sponsor.name}
-            loading="lazy"
-            className="max-h-20 max-w-[180px] object-contain"
-          />
-        </div>
+        <img
+          src={sponsor.logo_url}
+          alt={sponsor.name}
+          className="max-h-12 max-w-full object-contain"
+        />
       ) : (
-        <div className="flex h-24 items-center justify-center">
-          <Handshake className="h-9 w-9 text-primary" />
-        </div>
-      )}
-
-      <p className="mt-3 text-xs font-medium uppercase tracking-wide text-primary">
-        {sponsorLevel(sponsor.level)}
-      </p>
-
-      <h3 className="mt-1 font-display text-xl font-semibold">
-        {sponsor.name}
-      </h3>
-
-      {sponsor.description ? (
-        <p className="mt-2 text-sm text-muted-foreground">
-          {sponsor.description}
+        <p className="text-center font-display text-sm font-semibold">
+          {sponsor.name}
         </p>
-      ) : null}
-
-      {url ? (
-        <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary">
-          Conocer
-          <ExternalLink className="h-3.5 w-3.5" />
-        </span>
-      ) : null}
+      )}
     </div>
   );
 
@@ -602,22 +722,9 @@ function SponsorCard({
       href={url}
       target="_blank"
       rel="noreferrer"
-      className="block"
+      aria-label={`Visitar ${sponsor.name}`}
     >
       {content}
     </a>
   );
-}
-
-function sponsorLevel(level: string) {
-  switch (level) {
-    case "principal":
-      return "Auspiciador principal";
-
-    case "empresa-amiga":
-      return "Empresa amiga";
-
-    default:
-      return "Aliado de La Vitrina";
-  }
 }

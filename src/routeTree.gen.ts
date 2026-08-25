@@ -14,6 +14,8 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ComunidadRouteImport } from './routes/comunidad'
+import { Route as DiagnosticoRouteImport } from './routes/diagnostico'
+import { Route as EducaRouteImport } from './routes/educa'
 import { Route as EventosRouteImport } from './routes/eventos'
 import { Route as RadioRouteImport } from './routes/radio'
 import { Route as SobreRouteImport } from './routes/sobre'
@@ -46,6 +48,16 @@ const AuthRoute = AuthRouteImport.update({
 const ComunidadRoute = ComunidadRouteImport.update({
   id: '/comunidad',
   path: '/comunidad',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DiagnosticoRoute = DiagnosticoRouteImport.update({
+  id: '/diagnostico',
+  path: '/diagnostico',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EducaRoute = EducaRouteImport.update({
+  id: '/educa',
+  path: '/educa',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EventosRoute = EventosRouteImport.update({
@@ -99,6 +111,8 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/comunidad': typeof ComunidadRoute
+  '/diagnostico': typeof DiagnosticoRoute
+  '/educa': typeof EducaRoute
   '/eventos': typeof EventosRoute
   '/radio': typeof RadioRoute
   '/sobre': typeof SobreRoute
@@ -114,6 +128,8 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/comunidad': typeof ComunidadRoute
+  '/diagnostico': typeof DiagnosticoRoute
+  '/educa': typeof EducaRoute
   '/eventos': typeof EventosRoute
   '/radio': typeof RadioRoute
   '/sobre': typeof SobreRoute
@@ -131,6 +147,8 @@ export interface FileRoutesById {
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
   '/comunidad': typeof ComunidadRoute
+  '/diagnostico': typeof DiagnosticoRoute
+  '/educa': typeof EducaRoute
   '/eventos': typeof EventosRoute
   '/radio': typeof RadioRoute
   '/sobre': typeof SobreRoute
@@ -148,6 +166,8 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/comunidad'
+    | '/diagnostico'
+    | '/educa'
     | '/eventos'
     | '/radio'
     | '/sobre'
@@ -163,6 +183,8 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/comunidad'
+    | '/diagnostico'
+    | '/educa'
     | '/eventos'
     | '/radio'
     | '/sobre'
@@ -179,6 +201,8 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/comunidad'
+    | '/diagnostico'
+    | '/educa'
     | '/eventos'
     | '/radio'
     | '/sobre'
@@ -196,6 +220,8 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRoute
   AuthRoute: typeof AuthRoute
   ComunidadRoute: typeof ComunidadRoute
+  DiagnosticoRoute: typeof DiagnosticoRoute
+  EducaRoute: typeof EducaRoute
   EventosRoute: typeof EventosRoute
   RadioRoute: typeof RadioRoute
   SobreRoute: typeof SobreRoute
@@ -240,6 +266,20 @@ declare module '@tanstack/react-router' {
       path: '/comunidad'
       fullPath: '/comunidad'
       preLoaderRoute: typeof ComunidadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/diagnostico': {
+      id: '/diagnostico'
+      path: '/diagnostico'
+      fullPath: '/diagnostico'
+      preLoaderRoute: typeof DiagnosticoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/educa': {
+      id: '/educa'
+      path: '/educa'
+      fullPath: '/educa'
+      preLoaderRoute: typeof EducaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/eventos': {
@@ -327,6 +367,8 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,
   ComunidadRoute: ComunidadRoute,
+  DiagnosticoRoute: DiagnosticoRoute,
+  EducaRoute: EducaRoute,
   EventosRoute: EventosRoute,
   RadioRoute: RadioRoute,
   SobreRoute: SobreRoute,

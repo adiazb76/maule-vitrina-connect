@@ -84,6 +84,15 @@ export type SiteSettings = {
   hero_subtitle: string;
   hero_description: string;
   hero_image_url: string | null;
+
+  phone: string | null;
+  whatsapp: string | null;
+  whatsapp_message: string | null;
+  instagram: string | null;
+  facebook: string | null;
+  email: string | null;
+  website: string | null;
+
   updated_at: string;
 };
 
@@ -98,19 +107,52 @@ export type Sponsor = {
   sort_order: number;
 };
 
+export type NewsItem = {
+  id: string;
+  title: string;
+  summary: string | null;
+  body: string | null;
+  image_url: string | null;
+  external_url: string | null;
+  instagram_url: string | null;
+  whatsapp_text: string | null;
+  radio_note: string | null;
+  visible: boolean;
+  featured: boolean;
+  sort_order: number;
+  published_at: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export type EducationItem = {
+  id: string;
+  kind: string;
+  category: string | null;
+  title: string;
+  summary: string | null;
+  author_name: string | null;
+  author_role: string | null;
+  image_url: string | null;
+  media_url: string | null;
+  external_url: string | null;
+  tool_type: string | null;
+  visible: boolean;
+  featured: boolean;
+  sort_order: number;
+  published_at: string;
+  created_at: string;
+  updated_at: string;
+};
+
 const CARD_SELECT =
   "*, categories:category_id(name,slug), comunas:comuna_id(name,slug)";
 
 export type DirectoryFilters = {
-  search?: string | undefined;
-  categorySlug?: string | undefined;
-  comunaSlug?: string | undefined;
-  sort?:
-    | "recientes"
-    | "visitados"
-    | "destacados"
-    | "alfabetico"
-    | undefined;
+  search?: string;
+  categorySlug?: string;
+  comunaSlug?: string;
+  sort?: "recientes" | "visitados" | "destacados" | "alfabetico";
 };
 
 export async function fetchCategories(): Promise<Category[]> {
@@ -146,7 +188,7 @@ export async function fetchEntrepreneurs(
     .eq("visible", true)
     .limit(limit);
 
-  if (filters.search && filters.search.trim().length > 0) {
+  if (filters.search?.trim()) {
     const term = `%${filters.search.trim().replace(/[%,]/g, "")}%`;
 
     query = query.or(
@@ -181,13 +223,13 @@ export async function fetchEntrepreneurs(
 
   if (filters.categorySlug) {
     rows = rows.filter(
-      (r) => r.categories?.slug === filters.categorySlug,
+      (row) => row.categories?.slug === filters.categorySlug,
     );
   }
 
   if (filters.comunaSlug) {
     rows = rows.filter(
-      (r) => r.comunas?.slug === filters.comunaSlug,
+      (row) => row.comunas?.slug === filters.comunaSlug,
     );
   }
 
@@ -294,6 +336,66 @@ export async function fetchSponsors(): Promise<Sponsor[]> {
   return (data ?? []) as Sponsor[];
 }
 
+export async function fetchNewsItems(
+  limit = 12,
+): Promise<NewsItem[]> {
+  const { data, error } = await (supabase as any)
+    .from("news_items")
+    .select("*")
+    .eq("visible", true)
+    .order("featured", { ascending: false })
+    .order("sort_order", { ascending: true })
+    .order("published_at", { ascending: false })
+    .limit(limit);
+
+  if (error) throw error;
+
+  return (data ?? []) as NewsItem[];
+}
+
+export async function fetchEducationItems(): Promise<EducationItem[]> {
+  const { data, error } = await (supabase as any)
+    .from("education_items")
+    .select("*")
+    .eq("visible", true)
+    .order("featured", { ascending: false })
+    .order("sort_order", { ascending: true })
+    .order("published_at", { ascending: false });
+
+  if (error) throw error;
+
+  return (data ?? []) as EducationItem[];
+}
+
+export function siteWhatsappLink(
+  settings: Pick<
+    SiteSettings,
+    "whatsapp" | "whatsapp_message"
+  > | null,
+) {
+  if (!settings?.whatsapp) return null;
+
+  const number = settings.whatsapp.replace(/[^0-9]/g, "");
+
+  const message =
+    settings.whatsapp_message?.trim() ||
+    "Hola, llegué desde La Vitrina y quisiera hacer una consulta.";
+
+  return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+}
+
+export function phoneLink(phone: string | null) {
+  if (!phone) return null;
+
+  return `tel:${phone.replace(/[^0-9+]/g, "")}`;
+}
+
+export function emailLink(email: string | null) {
+  if (!email) return null;
+
+  return `mailto:${email.trim()}`;
+}
+
 export function logInteraction(
   entrepreneurId: string,
   kind: string,
@@ -327,6 +429,14 @@ export function instagramLink(handle: string | null) {
   if (handle.startsWith("http")) return handle;
 
   return `https://instagram.com/${handle.replace(/^@/, "")}`;
+}
+
+export function facebookLink(value: string | null) {
+  if (!value) return null;
+
+  if (value.startsWith("http")) return value;
+
+  return `https://facebook.com/${value.replace(/^@/, "")}`;
 }
 
 export function websiteLink(url: string | null) {
