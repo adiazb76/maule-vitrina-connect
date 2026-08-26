@@ -4,18 +4,29 @@ import {
   useNavigate,
 } from "@tanstack/react-router";
 
-import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import {
+  useQuery,
+} from "@tanstack/react-query";
 
 import {
-  Handshake,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+
+import {
   Search,
   SlidersHorizontal,
   Sparkles,
 } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import {
+  Button,
+} from "@/components/ui/button";
+
+import {
+  Input,
+} from "@/components/ui/input";
 
 import {
   Select,
@@ -25,73 +36,110 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { EntrepreneurCard } from "@/components/entrepreneur-card";
+import {
+  EntrepreneurCard,
+} from "@/components/entrepreneur-card";
 
 import {
+  fetchActivities,
   fetchCategories,
   fetchComunas,
   fetchEntrepreneurs,
   fetchWeeklyFeature,
-  whatsappLink,
   type DirectoryFilters,
 } from "@/lib/vitrina";
 
 type SearchParams = {
   q?: string;
   categoria?: string;
+  actividad?: string;
   comuna?: string;
   orden?: DirectoryFilters["sort"];
 };
 
-export const Route = createFileRoute("/comunidad")({
-  validateSearch: (
-    search: Record<string, unknown>,
-  ): SearchParams => ({
-    q:
-      typeof search["q"] === "string"
-        ? search["q"]
+export const Route =
+  createFileRoute(
+    "/comunidad",
+  )({
+    validateSearch: (
+      search:
+        Record<
+          string,
+          unknown
+        >,
+    ): SearchParams => ({
+      q:
+        typeof search["q"] ===
+        "string"
+          ? search["q"]
+          : undefined,
+
+      categoria:
+        typeof search[
+          "categoria"
+        ] ===
+        "string"
+          ? search[
+              "categoria"
+            ]
+          : undefined,
+
+      actividad:
+        typeof search[
+          "actividad"
+        ] ===
+        "string"
+          ? search[
+              "actividad"
+            ]
+          : undefined,
+
+      comuna:
+        typeof search[
+          "comuna"
+        ] ===
+        "string"
+          ? search[
+              "comuna"
+            ]
+          : undefined,
+
+      orden: [
+        "recientes",
+        "visitados",
+        "destacados",
+        "alfabetico",
+      ].includes(
+        String(
+          search["orden"],
+        ),
+      )
+        ? (search[
+            "orden"
+          ] as DirectoryFilters["sort"])
         : undefined,
+    }),
 
-    categoria:
-      typeof search["categoria"] === "string"
-        ? search["categoria"]
-        : undefined,
+    head: () => ({
+      meta: [
+        {
+          title:
+            "Comunidad de emprendedores del Maule Sur | La Vitrina",
+        },
 
-    comuna:
-      typeof search["comuna"] === "string"
-        ? search["comuna"]
-        : undefined,
+        {
+          name:
+            "description",
 
-    orden: [
-      "recientes",
-      "visitados",
-      "destacados",
-      "alfabetico",
-    ].includes(
-      String(search["orden"]),
-    )
-      ? (search[
-          "orden"
-        ] as DirectoryFilters["sort"])
-      : undefined,
-  }),
+          content:
+            "Descubre emprendedores del Maule Sur por rubro, actividad y comuna.",
+        },
+      ],
+    }),
 
-  head: () => ({
-    meta: [
-      {
-        title:
-          "Comunidad de emprendedores del Maule Sur | La Vitrina",
-      },
-      {
-        name: "description",
-        content:
-          "Descubre, busca y conecta con emprendedores del Maule Sur por categoría, comuna y oportunidades de colaboración.",
-      },
-    ],
-  }),
-
-  component: ComunidadPage,
-});
+    component:
+      ComunidadPage,
+  });
 
 function ComunidadPage() {
   const search =
@@ -99,17 +147,23 @@ function ComunidadPage() {
 
   const navigate =
     useNavigate({
-      from: "/comunidad",
+      from:
+        "/comunidad",
     });
 
-  const [term, setTerm] =
+  const [
+    term,
+    setTerm,
+  ] =
     useState(
-      search.q ?? "",
+      search.q ??
+        "",
     );
 
   useEffect(() => {
     setTerm(
-      search.q ?? "",
+      search.q ??
+        "",
     );
   }, [search.q]);
 
@@ -143,6 +197,43 @@ function ComunidadPage() {
         fetchWeeklyFeature,
     });
 
+  const selectedCategory =
+    useMemo(
+      () =>
+        categories.data?.find(
+          (
+            category,
+          ) =>
+            category.slug ===
+            search.categoria,
+        ) ??
+        null,
+
+      [
+        categories.data,
+        search.categoria,
+      ],
+    );
+
+  const activities =
+    useQuery({
+      queryKey: [
+        "activities",
+        selectedCategory?.id ??
+          "all",
+      ],
+
+      queryFn: () =>
+        fetchActivities(
+          selectedCategory?.id,
+        ),
+
+      enabled:
+        Boolean(
+          selectedCategory?.id,
+        ),
+    });
+
   const filters:
     DirectoryFilters = {
       search:
@@ -150,6 +241,9 @@ function ComunidadPage() {
 
       categorySlug:
         search.categoria,
+
+      activitySlug:
+        search.actividad,
 
       comunaSlug:
         search.comuna,
@@ -173,19 +267,6 @@ function ComunidadPage() {
         ),
     });
 
-  const all =
-    useQuery({
-      queryKey: [
-        "community-all-entrepreneurs",
-      ],
-
-      queryFn: () =>
-        fetchEntrepreneurs(
-          {},
-          200,
-        ),
-    });
-
   const update = (
     patch:
       Partial<SearchParams>,
@@ -199,17 +280,6 @@ function ComunidadPage() {
         ...patch,
       }),
     });
-
-  const collaborators =
-    (
-      all.data ?? []
-    ).filter(
-      (
-        entrepreneur,
-      ) =>
-        entrepreneur.collaboration_offering ||
-        entrepreneur.collaboration_seeking,
-    );
 
   const featured =
     weekly.data
@@ -233,7 +303,10 @@ function ComunidadPage() {
               </h1>
 
               <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-                Emprendedores, productos y servicios del Maule Sur.
+                Emprendedores,
+                productos y
+                servicios del
+                Maule Sur.
               </p>
             </div>
 
@@ -268,7 +341,9 @@ function ComunidadPage() {
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 
               <Input
-                value={term}
+                value={
+                  term
+                }
                 onChange={(
                   event,
                 ) =>
@@ -297,30 +372,36 @@ function ComunidadPage() {
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
 
+            {/* RUBRO */}
+
             <Select
               value={
                 search.categoria ??
-                "todas"
+                "todos"
               }
+
               onValueChange={(
                 value,
-              ) =>
+              ) => {
                 update({
                   categoria:
                     value ===
-                    "todas"
+                    "todos"
                       ? undefined
                       : value,
-                })
-              }
+
+                  actividad:
+                    undefined,
+                });
+              }}
             >
-              <SelectTrigger className="h-9 w-[175px] bg-card text-xs">
-                <SelectValue placeholder="Categoría" />
+              <SelectTrigger className="h-9 w-[180px] bg-card text-xs">
+                <SelectValue placeholder="Rubro" />
               </SelectTrigger>
 
               <SelectContent>
-                <SelectItem value="todas">
-                  Todas las categorías
+                <SelectItem value="todos">
+                  Todos los rubros
                 </SelectItem>
 
                 {categories.data?.map(
@@ -344,11 +425,74 @@ function ComunidadPage() {
               </SelectContent>
             </Select>
 
+            {/* ACTIVIDAD */}
+
+            <Select
+              value={
+                search.actividad ??
+                "todas"
+              }
+
+              disabled={
+                !selectedCategory
+              }
+
+              onValueChange={(
+                value,
+              ) =>
+                update({
+                  actividad:
+                    value ===
+                    "todas"
+                      ? undefined
+                      : value,
+                })
+              }
+            >
+              <SelectTrigger className="h-9 w-[220px] bg-card text-xs">
+                <SelectValue
+                  placeholder={
+                    selectedCategory
+                      ? "Actividad"
+                      : "Primero elige un rubro"
+                  }
+                />
+              </SelectTrigger>
+
+              <SelectContent>
+                <SelectItem value="todas">
+                  Todas las actividades
+                </SelectItem>
+
+                {activities.data?.map(
+                  (
+                    activity,
+                  ) => (
+                    <SelectItem
+                      key={
+                        activity.id
+                      }
+                      value={
+                        activity.slug
+                      }
+                    >
+                      {
+                        activity.name
+                      }
+                    </SelectItem>
+                  ),
+                )}
+              </SelectContent>
+            </Select>
+
+            {/* COMUNA */}
+
             <Select
               value={
                 search.comuna ??
                 "todas"
               }
+
               onValueChange={(
                 value,
               ) =>
@@ -391,11 +535,14 @@ function ComunidadPage() {
               </SelectContent>
             </Select>
 
+            {/* ORDEN */}
+
             <Select
               value={
                 search.orden ??
                 "destacados"
               }
+
               onValueChange={(
                 value,
               ) =>
@@ -430,8 +577,10 @@ function ComunidadPage() {
 
             {search.q ||
             search.categoria ||
+            search.actividad ||
             search.comuna ? (
               <Button
+                type="button"
                 variant="ghost"
                 size="sm"
                 className="h-9 text-xs"
@@ -442,6 +591,9 @@ function ComunidadPage() {
                         undefined,
 
                       categoria:
+                        undefined,
+
+                      actividad:
                         undefined,
 
                       comuna:
@@ -480,6 +632,7 @@ function ComunidadPage() {
             <div className="min-w-0 flex-1 p-4">
               <p className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-primary">
                 <Sparkles className="h-3.5 w-3.5" />
+
                 Destacado
               </p>
 
@@ -546,7 +699,8 @@ function ComunidadPage() {
         <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {list.isLoading
             ? Array.from({
-                length: 6,
+                length:
+                  6,
               }).map(
                 (
                   _,
@@ -586,154 +740,37 @@ function ComunidadPage() {
             </p>
 
             <p className="mt-1 text-xs text-muted-foreground">
-              Prueba con otra búsqueda, categoría o comuna.
+              Prueba con otro rubro,
+              actividad o comuna.
             </p>
           </div>
         ) : null}
       </section>
 
-      {/* COLABORACIÓN */}
-
-      <section className="border-y border-border bg-secondary/20">
-        <div className="container-page py-7">
-          <div>
-            <p className="eyebrow">
-              CONECTA
-            </p>
-
-            <h2 className="mt-1 inline-flex items-center gap-2 font-display text-xl font-semibold">
-              <Handshake className="h-4 w-4 text-primary" />
-              Oportunidades de colaboración
-            </h2>
-          </div>
-
-          {collaborators.length ===
-            0 &&
-          !all.isLoading ? (
-            <div className="mt-4 rounded-xl border border-dashed border-border bg-background p-6 text-center text-xs text-muted-foreground">
-              Aún no hay oportunidades publicadas.
-            </div>
-          ) : (
-            <div className="mt-4 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-              {collaborators
-                .slice(
-                  0,
-                  6,
-                )
-                .map(
-                  (
-                    entrepreneur,
-                  ) => {
-                    const whatsapp =
-                      whatsappLink(
-                        entrepreneur,
-                      );
-
-                    return (
-                      <article
-                        key={
-                          entrepreneur.id
-                        }
-                        className="rounded-xl border border-border bg-card p-4"
-                      >
-                        <h3 className="line-clamp-1 font-display text-sm font-semibold">
-                          <Link
-                            to="/emprendedores/$slug"
-                            params={{
-                              slug:
-                                entrepreneur.slug,
-                            }}
-                          >
-                            {
-                              entrepreneur.business_name
-                            }
-                          </Link>
-                        </h3>
-
-                        <p className="mt-0.5 text-[10px] text-muted-foreground">
-                          {entrepreneur
-                            .categories
-                            ?.name ??
-                            "Emprendimiento"}
-
-                          {entrepreneur
-                            .comunas
-                            ?.name
-                            ? ` · ${entrepreneur.comunas.name}`
-                            : ""}
-                        </p>
-
-                        {entrepreneur.collaboration_seeking ? (
-                          <p className="mt-2 line-clamp-2 text-xs">
-                            <strong>
-                              Busca:
-                            </strong>{" "}
-                            {
-                              entrepreneur.collaboration_seeking
-                            }
-                          </p>
-                        ) : null}
-
-                        {entrepreneur.collaboration_offering ? (
-                          <p className="mt-1 line-clamp-2 text-xs">
-                            <strong>
-                              Ofrece:
-                            </strong>{" "}
-                            {
-                              entrepreneur.collaboration_offering
-                            }
-                          </p>
-                        ) : null}
-
-                        {whatsapp ? (
-                          <Button
-                            asChild
-                            size="sm"
-                            variant="whatsapp"
-                            className="mt-3 h-7 px-2.5 text-[11px]"
-                          >
-                            <a
-                              href={
-                                whatsapp
-                              }
-                              target="_blank"
-                              rel="noreferrer"
-                            >
-                              Contactar
-                            </a>
-                          </Button>
-                        ) : null}
-                      </article>
-                    );
-                  },
-                )}
-            </div>
-          )}
-        </div>
-      </section>
-
       {/* CIERRE */}
 
-      <section className="container-page py-7">
-        <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-5 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h2 className="font-display text-lg font-semibold">
-              ¿Tienes un emprendimiento?
-            </h2>
+      <section className="border-t border-border">
+        <div className="container-page py-7">
+          <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-5 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="font-display text-lg font-semibold">
+                ¿Tienes un emprendimiento?
+              </h2>
 
-            <p className="mt-0.5 text-xs text-muted-foreground">
-              Súmate a La Vitrina y hazte visible.
-            </p>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                Súmate a La Vitrina y hazte visible.
+              </p>
+            </div>
+
+            <Button
+              asChild
+              size="sm"
+            >
+              <Link to="/sumate">
+                Quiero ser parte
+              </Link>
+            </Button>
           </div>
-
-          <Button
-            asChild
-            size="sm"
-          >
-            <Link to="/sumate">
-              Quiero ser parte
-            </Link>
-          </Button>
         </div>
       </section>
     </>

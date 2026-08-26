@@ -1,10 +1,17 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useEffect } from "react";
+import {
+  createFileRoute,
+  Link,
+  notFound,
+} from "@tanstack/react-router";
+
+import {
+  useEffect,
+} from "react";
+
 import {
   ArrowLeft,
   Facebook,
   Globe,
-  Handshake,
   Instagram,
   Mail,
   MapPin,
@@ -12,10 +19,24 @@ import {
   Phone,
 } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { getEntrepreneurBySlug } from "@/lib/entrepreneurs.functions";
 import {
+  Badge,
+} from "@/components/ui/badge";
+
+import {
+  Button,
+} from "@/components/ui/button";
+
+import {
+  LikeButton,
+} from "@/components/like-button";
+
+import {
+  getEntrepreneurBySlug,
+} from "@/lib/entrepreneurs.functions";
+
+import {
+  facebookLink,
   instagramLink,
   logInteraction,
   websiteLink,
@@ -24,400 +45,646 @@ import {
   type Product,
 } from "@/lib/vitrina";
 
-export const Route = createFileRoute("/emprendedores/$slug")({
-  loader: async ({ params }) => {
-    const result = await getEntrepreneurBySlug({
-      data: { slug: params.slug },
-    });
+export const Route =
+  createFileRoute(
+    "/emprendedores/$slug",
+  )({
+    loader:
+      async ({
+        params,
+      }) => {
+        const result =
+          await getEntrepreneurBySlug({
+            data: {
+              slug:
+                params.slug,
+            },
+          });
 
-    if (!result) throw notFound();
+        if (!result) {
+          throw notFound();
+        }
 
-    return result as unknown as {
-      entrepreneur: Entrepreneur;
-      products: Product[];
-    };
-  },
+        return result as unknown as {
+          entrepreneur:
+            Entrepreneur;
 
-  head: ({ loaderData }) => {
-    if (!loaderData) {
-      return {
-        meta: [
+          products:
+            Product[];
+        };
+      },
+
+    head:
+      ({
+        loaderData,
+      }) => {
+        if (!loaderData) {
+          return {
+            meta: [
+              {
+                title:
+                  "Emprendimiento no encontrado | La Vitrina",
+              },
+
+              {
+                name:
+                  "robots",
+
+                content:
+                  "noindex",
+              },
+            ],
+          };
+        }
+
+        const e =
+          loaderData.entrepreneur;
+
+        const title =
+          `${e.business_name} | La Vitrina Maule Sur`;
+
+        const description =
+          e.short_description
+            ?.slice(
+              0,
+              155,
+            ) ||
+          `Conoce a ${e.business_name} en La Vitrina.`;
+
+        const meta:
+          Array<
+            Record<
+              string,
+              string
+            >
+          > = [
           {
-            title: "Emprendimiento no encontrado | La Vitrina",
+            title,
           },
+
           {
-            name: "robots",
-            content: "noindex",
+            name:
+              "description",
+
+            content:
+              description,
           },
-        ],
-      };
-    }
 
-    const e = loaderData.entrepreneur;
+          {
+            property:
+              "og:title",
 
-    const title = `${e.business_name} | Emprendedor del Maule Sur | La Vitrina`;
+            content:
+              title,
+          },
 
-    const description =
-      e.short_description?.slice(0, 155) ||
-      `Conoce a ${e.business_name} en La Vitrina.`;
+          {
+            property:
+              "og:description",
 
-    const meta: Array<Record<string, string>> = [
-      { title },
-      {
-        name: "description",
-        content: description,
+            content:
+              description,
+          },
+        ];
+
+        if (
+          e.photo_url &&
+          e.photo_url.startsWith(
+            "https://",
+          )
+        ) {
+          meta.push({
+            property:
+              "og:image",
+
+            content:
+              e.photo_url,
+          });
+
+          meta.push({
+            name:
+              "twitter:image",
+
+            content:
+              e.photo_url,
+          });
+        }
+
+        return {
+          meta,
+        };
       },
-      {
-        property: "og:title",
-        content: title,
-      },
-      {
-        property: "og:description",
-        content: description,
-      },
-    ];
 
-    if (e.photo_url && e.photo_url.startsWith("https://")) {
-      meta.push({
-        property: "og:image",
-        content: e.photo_url,
-      });
+    component:
+      EntrepreneurProfile,
 
-      meta.push({
-        name: "twitter:image",
-        content: e.photo_url,
-      });
-    }
+    notFoundComponent:
+      ProfileNotFound,
+  });
 
-    return { meta };
-  },
-
-  component: EntrepreneurProfile,
-  notFoundComponent: ProfileNotFound,
-});
 
 function ProfileNotFound() {
   return (
-    <div className="container-page py-24 text-center">
-      <h1 className="font-display text-3xl font-semibold">
+    <div className="container-page py-14 text-center">
+      <h1 className="page-title">
         Emprendimiento no encontrado
       </h1>
 
-      <p className="mt-3 text-muted-foreground">
-        Puede que todavía no esté aprobado o que el enlace haya cambiado.
+      <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
+        Puede que todavía no esté publicado o que el enlace haya cambiado.
       </p>
 
-      <Button asChild className="mt-6">
-        <Link to="/emprendedores">
-          Ver emprendedores
+      <Button
+        asChild
+        size="sm"
+        className="mt-5"
+      >
+        <Link to="/comunidad">
+          Volver a Comunidad
         </Link>
       </Button>
     </div>
   );
 }
 
+
 function EntrepreneurProfile() {
-  const { entrepreneur: e, products } = Route.useLoaderData();
+  const {
+    entrepreneur:
+      e,
 
-  const wa = whatsappLink(e);
-  const ig = instagramLink(e.instagram);
-  const web = websiteLink(e.website);
+    products,
+  } =
+    Route.useLoaderData();
 
-  useEffect(() => {
-    logInteraction(e.id, "view");
-  }, [e.id]);
+  const wa =
+    whatsappLink(
+      e,
+    );
+
+  const ig =
+    instagramLink(
+      e.instagram,
+    );
+
+  const fb =
+    facebookLink(
+      e.facebook,
+    );
+
+  const web =
+    websiteLink(
+      e.website,
+    );
+
+  useEffect(
+    () => {
+      logInteraction(
+        e.id,
+        "view",
+      );
+    },
+    [
+      e.id,
+    ],
+  );
 
   return (
-    <div className="pb-20">
-      {/* IMAGEN PRINCIPAL */}
-      <div className="relative h-56 w-full overflow-hidden bg-muted sm:h-72 md:h-80">
-        {e.photo_url ? (
-          <img
-            src={e.photo_url}
-            alt={`Imagen de ${e.business_name}`}
-            className="h-full w-full object-cover"
-          />
-        ) : null}
+    <div className="pb-10">
+      {/* RETORNO */}
 
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+      <div className="container-page pt-4">
+        <Link
+          to="/comunidad"
+          className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground transition-colors hover:text-primary"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" />
+
+          Volver a Comunidad
+        </Link>
       </div>
 
-      <div className="container-page relative -mt-16">
-        <Link
-          to="/emprendedores"
-          className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Volver a la comunidad
-        </Link>
+      {/* CABECERA PRINCIPAL */}
 
-        {/* CABECERA */}
-        <div className="rounded-2xl border border-border bg-card p-6 shadow-card sm:p-8">
-          <div className="flex flex-wrap items-center gap-2 text-xs">
-            {e.categories?.name ? (
-              <Badge
-                variant="secondary"
-                className="rounded-full"
-              >
-                {e.categories.name}
-              </Badge>
-            ) : null}
+      <section className="container-page pt-3">
+        <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+          <div className="grid md:grid-cols-[280px_1fr] lg:grid-cols-[340px_1fr]">
+            {/* FOTO */}
 
-            {e.comunas?.name ? (
-              <span className="inline-flex items-center gap-1 text-muted-foreground">
-                <MapPin className="h-3.5 w-3.5" />
-                {e.comunas.name}
-              </span>
-            ) : null}
-
-            {e.featured ? (
-              <Badge className="rounded-full">
-                Emprendedor destacado
-              </Badge>
-            ) : null}
-          </div>
-
-          <h1 className="mt-3 font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-            {e.business_name}
-          </h1>
-
-          <p className="mt-1 text-muted-foreground">
-            Por {e.owner_name}
-          </p>
-
-          <p className="mt-4 max-w-3xl text-lg text-foreground/85">
-            {e.short_description}
-          </p>
-
-          {/* CONTACTO PRINCIPAL */}
-          <div className="mt-7 flex flex-wrap gap-2">
-            {wa ? (
-              <Button
-                asChild
-                size="lg"
-                variant="whatsapp"
-              >
-                <a
-                  href={wa}
-                  target="_blank"
-                  rel="noreferrer"
-                  onClick={() =>
-                    logInteraction(e.id, "whatsapp")
+            <div className="bg-muted">
+              {e.photo_url ? (
+                <img
+                  src={
+                    e.photo_url
                   }
-                >
-                  <MessageCircle className="h-4 w-4" />
-                  Contactar por WhatsApp
-                </a>
-              </Button>
-            ) : null}
-
-            {e.phone ? (
-              <Button asChild size="lg" variant="outline">
-                <a
-                  href={`tel:${e.phone}`}
-                  onClick={() =>
-                    logInteraction(e.id, "phone")
+                  alt={
+                    e.business_name
                   }
-                >
-                  <Phone className="h-4 w-4" />
-                  Llamar
-                </a>
-              </Button>
-            ) : null}
+                  className="aspect-[16/9] h-full max-h-64 w-full object-cover md:aspect-auto md:max-h-none"
+                />
+              ) : (
+                <div className="grid min-h-48 place-items-center text-xs text-muted-foreground">
+                  Sin imagen
+                </div>
+              )}
+            </div>
 
-            {ig ? (
-              <Button asChild variant="outline">
-                <a
-                  href={ig}
-                  target="_blank"
-                  rel="noreferrer"
-                  onClick={() =>
-                    logInteraction(e.id, "instagram")
-                  }
-                >
-                  <Instagram className="h-4 w-4" />
-                  Instagram
-                </a>
-              </Button>
-            ) : null}
+            {/* INFORMACIÓN */}
 
-            {e.facebook ? (
-              <Button asChild variant="outline">
-                <a
-                  href={e.facebook}
-                  target="_blank"
-                  rel="noreferrer"
-                  onClick={() =>
-                    logInteraction(e.id, "facebook")
-                  }
-                >
-                  <Facebook className="h-4 w-4" />
-                  Facebook
-                </a>
-              </Button>
-            ) : null}
+            <div className="p-5 sm:p-6">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  {/* CLASIFICACIÓN */}
 
-            {web ? (
-              <Button asChild variant="outline">
-                <a
-                  href={web}
-                  target="_blank"
-                  rel="noreferrer"
-                  onClick={() =>
-                    logInteraction(e.id, "website")
-                  }
-                >
-                  <Globe className="h-4 w-4" />
-                  Sitio web
-                </a>
-              </Button>
-            ) : null}
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    {e.categories
+                      ?.name ? (
+                      <Badge
+                        variant="secondary"
+                        className="h-5 rounded-full px-2 text-[10px]"
+                      >
+                        {
+                          e.categories
+                            .name
+                        }
+                      </Badge>
+                    ) : null}
 
-            {e.email ? (
-              <Button asChild variant="outline">
-                <a
-                  href={`mailto:${e.email}`}
-                  onClick={() =>
-                    logInteraction(e.id, "email")
+                    {e.activities
+                      ?.name ? (
+                      <Badge
+                        variant="outline"
+                        className="h-5 rounded-full px-2 text-[10px]"
+                      >
+                        {
+                          e.activities
+                            .name
+                        }
+                      </Badge>
+                    ) : null}
+
+                    {e.comunas
+                      ?.name ? (
+                      <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
+                        <MapPin className="h-3 w-3" />
+
+                        {
+                          e.comunas
+                            .name
+                        }
+                      </span>
+                    ) : null}
+                  </div>
+
+                  {/* NOMBRE */}
+
+                  <h1 className="mt-2 page-title">
+                    {
+                      e.business_name
+                    }
+                  </h1>
+
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    {
+                      e.owner_name
+                    }
+                  </p>
+                </div>
+
+                {/* CORAZÓN */}
+
+                <LikeButton
+                  contentType="entrepreneur"
+                  contentId={
+                    e.id
                   }
-                >
-                  <Mail className="h-4 w-4" />
-                  Email
-                </a>
-              </Button>
-            ) : null}
+                  compact
+                />
+              </div>
+
+              {/* DESCRIPCIÓN */}
+
+              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-foreground/80">
+                {
+                  e.short_description
+                }
+              </p>
+
+              {/* CONTACTO PRINCIPAL */}
+
+              <div className="mt-4 flex flex-wrap gap-2">
+                {wa ? (
+                  <Button
+                    asChild
+                    size="sm"
+                    variant="whatsapp"
+                    className="h-8 text-xs"
+                  >
+                    <a
+                      href={
+                        wa
+                      }
+                      target="_blank"
+                      rel="noreferrer"
+                      onClick={() =>
+                        logInteraction(
+                          e.id,
+                          "whatsapp",
+                        )
+                      }
+                    >
+                      <MessageCircle className="h-3.5 w-3.5" />
+
+                      WhatsApp
+                    </a>
+                  </Button>
+                ) : null}
+
+                {e.phone ? (
+                  <Button
+                    asChild
+                    size="sm"
+                    variant="outline"
+                    className="h-8 text-xs"
+                  >
+                    <a
+                      href={`tel:${e.phone}`}
+                      onClick={() =>
+                        logInteraction(
+                          e.id,
+                          "phone",
+                        )
+                      }
+                    >
+                      <Phone className="h-3.5 w-3.5" />
+
+                      Llamar
+                    </a>
+                  </Button>
+                ) : null}
+
+                {ig ? (
+                  <Button
+                    asChild
+                    size="sm"
+                    variant="outline"
+                    className="h-8 px-2.5 text-xs"
+                  >
+                    <a
+                      href={
+                        ig
+                      }
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label="Instagram"
+                      onClick={() =>
+                        logInteraction(
+                          e.id,
+                          "instagram",
+                        )
+                      }
+                    >
+                      <Instagram className="h-3.5 w-3.5" />
+
+                      Instagram
+                    </a>
+                  </Button>
+                ) : null}
+
+                {fb ? (
+                  <Button
+                    asChild
+                    size="sm"
+                    variant="outline"
+                    className="h-8 px-2.5 text-xs"
+                  >
+                    <a
+                      href={
+                        fb
+                      }
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label="Facebook"
+                      onClick={() =>
+                        logInteraction(
+                          e.id,
+                          "facebook",
+                        )
+                      }
+                    >
+                      <Facebook className="h-3.5 w-3.5" />
+
+                      Facebook
+                    </a>
+                  </Button>
+                ) : null}
+
+                {web ? (
+                  <Button
+                    asChild
+                    size="sm"
+                    variant="outline"
+                    className="h-8 px-2.5 text-xs"
+                  >
+                    <a
+                      href={
+                        web
+                      }
+                      target="_blank"
+                      rel="noreferrer"
+                      onClick={() =>
+                        logInteraction(
+                          e.id,
+                          "website",
+                        )
+                      }
+                    >
+                      <Globe className="h-3.5 w-3.5" />
+
+                      Sitio web
+                    </a>
+                  </Button>
+                ) : null}
+
+                {e.email ? (
+                  <Button
+                    asChild
+                    size="sm"
+                    variant="outline"
+                    className="h-8 px-2.5 text-xs"
+                  >
+                    <a
+                      href={`mailto:${e.email}`}
+                      onClick={() =>
+                        logInteraction(
+                          e.id,
+                          "email",
+                        )
+                      }
+                    >
+                      <Mail className="h-3.5 w-3.5" />
+
+                      Correo
+                    </a>
+                  </Button>
+                ) : null}
+              </div>
+            </div>
           </div>
         </div>
+      </section>
 
-        {/* CONTENIDO */}
-        <div className="mt-8 grid gap-8 lg:grid-cols-[2fr_1fr]">
-          <div className="space-y-8">
+      {/* CONTENIDO */}
+
+      <section className="container-page mt-4">
+        <div className="grid gap-4 lg:grid-cols-[1.5fr_0.75fr]">
+          {/* IZQUIERDA */}
+
+          <div className="space-y-4">
             {e.about ? (
-              <section className="rounded-2xl border border-border bg-card p-6">
-                <h2 className="font-display text-xl font-semibold">
+              <section className="rounded-xl border border-border bg-card p-5">
+                <p className="eyebrow">
+                  CONÓCENOS
+                </p>
+
+                <h2 className="mt-1 section-title">
                   Nuestra historia
                 </h2>
 
-                <p className="mt-3 whitespace-pre-line text-foreground/85">
-                  {e.about}
+                <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-foreground/80">
+                  {
+                    e.about
+                  }
                 </p>
               </section>
             ) : null}
 
-            {products.length > 0 ? (
-              <section>
-                <h2 className="font-display text-xl font-semibold">
-                  Productos y servicios
-                </h2>
+            {products.length >
+            0 ? (
+              <section className="rounded-xl border border-border bg-card p-5">
+                <p className="eyebrow">
+                  OFERTA
+                </p>
 
-                <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                  {products.map((p) => (
-                    <article
-                      key={p.id}
-                      className="overflow-hidden rounded-2xl border border-border bg-card"
-                    >
-                      {p.image_url ? (
-                        <img
-                          src={p.image_url}
-                          alt={p.name}
-                          loading="lazy"
-                          className="aspect-[4/3] w-full object-cover"
-                        />
-                      ) : null}
+                <div className="flex items-end justify-between gap-3">
+                  <h2 className="mt-1 section-title">
+                    Productos y servicios
+                  </h2>
 
-                      <div className="p-4">
-                        <h3 className="font-medium">
-                          {p.name}
-                        </h3>
+                  <span className="text-[10px] text-muted-foreground">
+                    {
+                      products.length
+                    }{" "}
+                    disponibles
+                  </span>
+                </div>
 
-                        {p.description ? (
-                          <p className="mt-1 text-sm text-muted-foreground">
-                            {p.description}
-                          </p>
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  {products.map(
+                    (
+                      product,
+                    ) => (
+                      <article
+                        key={
+                          product.id
+                        }
+                        className="flex overflow-hidden rounded-lg border border-border bg-background"
+                      >
+                        {product.image_url ? (
+                          <img
+                            src={
+                              product.image_url
+                            }
+                            alt={
+                              product.name
+                            }
+                            loading="lazy"
+                            className="h-24 w-24 shrink-0 object-cover"
+                          />
                         ) : null}
 
-                        {p.info ? (
-                          <p className="mt-2 text-sm font-medium text-primary">
-                            {p.info}
-                          </p>
-                        ) : null}
-                      </div>
-                    </article>
-                  ))}
+                        <div className="min-w-0 p-3">
+                          <h3 className="line-clamp-1 text-sm font-semibold">
+                            {
+                              product.name
+                            }
+                          </h3>
+
+                          {product.description ? (
+                            <p className="mt-1 line-clamp-2 text-[11px] leading-relaxed text-muted-foreground">
+                              {
+                                product.description
+                              }
+                            </p>
+                          ) : null}
+
+                          {product.info ? (
+                            <p className="mt-1 text-[11px] font-medium text-primary">
+                              {
+                                product.info
+                              }
+                            </p>
+                          ) : null}
+                        </div>
+                      </article>
+                    ),
+                  )}
                 </div>
               </section>
             ) : null}
           </div>
 
-          {/* COLUMNA DERECHA */}
-          <aside className="space-y-6">
+          {/* DERECHA */}
+
+          <aside className="space-y-4">
             {e.value_prop ? (
-              <section className="rounded-2xl border border-border bg-secondary/40 p-6">
-                <h2 className="font-display text-lg font-semibold">
+              <section className="rounded-xl border border-border bg-secondary/20 p-4">
+                <p className="eyebrow">
+                  DIFERENCIAL
+                </p>
+
+                <h2 className="mt-1 text-sm font-semibold">
                   Lo que nos hace únicos
                 </h2>
 
-                <p className="mt-2 text-sm text-foreground/85">
-                  {e.value_prop}
+                <p className="mt-1.5 text-xs leading-relaxed text-foreground/80">
+                  {
+                    e.value_prop
+                  }
                 </p>
               </section>
             ) : null}
 
-            {e.collaboration_seeking ||
-            e.collaboration_offering ? (
-              <section className="rounded-2xl border border-border bg-card p-6">
-                <h2 className="inline-flex items-center gap-2 font-display text-lg font-semibold">
-                  <Handshake className="h-5 w-5 text-primary" />
-                  Conecta con otros emprendedores
-                </h2>
+            {e.tags?.length >
+            0 ? (
+              <section className="rounded-xl border border-border bg-card p-4">
+                <p className="eyebrow">
+                  PALABRAS CLAVE
+                </p>
 
-                {e.collaboration_offering ? (
-                  <div className="mt-3">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                      Puede ofrecer
-                    </p>
-
-                    <p className="text-sm text-foreground/85">
-                      {e.collaboration_offering}
-                    </p>
-                  </div>
-                ) : null}
-
-                {e.collaboration_seeking ? (
-                  <div className="mt-3">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                      Está buscando
-                    </p>
-
-                    <p className="text-sm text-foreground/85">
-                      {e.collaboration_seeking}
-                    </p>
-                  </div>
-                ) : null}
-              </section>
-            ) : null}
-
-            {e.tags.length > 0 ? (
-              <section className="rounded-2xl border border-border bg-card p-6">
-                <h2 className="font-display text-lg font-semibold">
-                  Etiquetas
-                </h2>
-
-                <div className="mt-3 flex flex-wrap gap-1.5">
-                  {e.tags.map((t) => (
-                    <span
-                      key={t}
-                      className="rounded-full border border-border px-2.5 py-1 text-xs text-muted-foreground"
-                    >
-                      {t}
-                    </span>
-                  ))}
+                <div className="mt-2.5 flex flex-wrap gap-1.5">
+                  {e.tags.map(
+                    (
+                      tag,
+                    ) => (
+                      <span
+                        key={
+                          tag
+                        }
+                        className="rounded-full border border-border bg-background px-2 py-1 text-[10px] text-muted-foreground"
+                      >
+                        {
+                          tag
+                        }
+                      </span>
+                    ),
+                  )}
                 </div>
               </section>
             ) : null}
           </aside>
         </div>
-      </div>
+      </section>
     </div>
   );
 }

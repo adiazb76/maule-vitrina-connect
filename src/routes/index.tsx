@@ -1,23 +1,26 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import {
+  createFileRoute,
+  Link,
+} from "@tanstack/react-router";
+
+import {
+  useQuery,
+} from "@tanstack/react-query";
+
 import {
   ArrowRight,
-  BarChart3,
   Newspaper,
-  Search,
   Sparkles,
   TrendingUp,
 } from "lucide-react";
 
 import heroImage from "@/assets/hero-vitrina.jpg";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { EntrepreneurCard } from "@/components/entrepreneur-card";
+import {
+  Button,
+} from "@/components/ui/button";
 
 import {
-  fetchFeatured,
   fetchNewsItems,
   fetchSiteSettings,
   fetchSponsors,
@@ -43,41 +46,60 @@ type EconomicIndicators = {
   euro?: IndicatorValue;
 };
 
-export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      {
-        title: "La Vitrina | Emprendedores del Maule Sur",
-      },
-      {
-        name: "description",
-        content:
-          "Emprendedores, historias, noticias y oportunidades del Maule Sur en un solo lugar.",
-      },
-      {
-        property: "og:title",
-        content: "La Vitrina | Emprendedores del Maule Sur",
-      },
-      {
-        property: "og:description",
-        content:
-          "Descubre, conecta y conoce lo que está pasando en la comunidad emprendedora del Maule Sur.",
-      },
-    ],
+export const Route =
+  createFileRoute("/")({
+    head: () => ({
+      meta: [
+        {
+          title:
+            "La Vitrina | Emprendedores del Maule Sur",
+        },
 
-    links: [
-      {
-        rel: "canonical",
-        href: "/",
-      },
-    ],
-  }),
+        {
+          name:
+            "description",
 
-  component: IndexPage,
-});
+          content:
+            "Emprendedores, noticias, eventos y herramientas del Maule Sur en un solo lugar.",
+        },
+
+        {
+          property:
+            "og:title",
+
+          content:
+            "La Vitrina | Emprendedores del Maule Sur",
+        },
+
+        {
+          property:
+            "og:description",
+
+          content:
+            "Descubre lo que está pasando en la comunidad emprendedora del Maule Sur.",
+        },
+      ],
+
+      links: [
+        {
+          rel:
+            "canonical",
+
+          href:
+            "/",
+        },
+      ],
+    }),
+
+    component:
+      IndexPage,
+  });
 
 async function fetchEconomicIndicators(): Promise<EconomicIndicators> {
-  const response = await fetch("https://mindicador.cl/api");
+  const response =
+    await fetch(
+      "https://mindicador.cl/api",
+    );
 
   if (!response.ok) {
     throw new Error(
@@ -89,111 +111,170 @@ async function fetchEconomicIndicators(): Promise<EconomicIndicators> {
 }
 
 function IndexPage() {
-  const navigate = useNavigate();
+  const settings =
+    useQuery({
+      queryKey: [
+        "site-settings",
+      ],
 
-  const [term, setTerm] = useState("");
+      queryFn:
+        fetchSiteSettings,
+    });
 
-  const settings = useQuery({
-    queryKey: ["site-settings"],
-    queryFn: fetchSiteSettings,
-  });
+  const news =
+    useQuery({
+      queryKey: [
+        "news-items",
+      ],
 
-  const news = useQuery({
-    queryKey: ["news-items"],
-    queryFn: () => fetchNewsItems(3),
-  });
+      queryFn: () =>
+        fetchNewsItems(
+          3,
+        ),
+    });
 
-  const featured = useQuery({
-    queryKey: ["featured"],
-    queryFn: () => fetchFeatured(4),
-  });
+  const weekly =
+    useQuery({
+      queryKey: [
+        "weekly",
+      ],
 
-  const weekly = useQuery({
-    queryKey: ["weekly"],
-    queryFn: fetchWeeklyFeature,
-  });
+      queryFn:
+        fetchWeeklyFeature,
+    });
 
-  const sponsors = useQuery({
-    queryKey: ["sponsors"],
-    queryFn: fetchSponsors,
-  });
+  const sponsors =
+    useQuery({
+      queryKey: [
+        "sponsors",
+      ],
 
-  const indicators = useQuery({
-    queryKey: ["economic-indicators"],
-    queryFn: fetchEconomicIndicators,
-    staleTime: 1000 * 60 * 30,
-    retry: 1,
-  });
+      queryFn:
+        fetchSponsors,
+    });
+
+  const indicators =
+    useQuery({
+      queryKey: [
+        "economic-indicators",
+      ],
+
+      queryFn:
+        fetchEconomicIndicators,
+
+      staleTime:
+        1000 *
+        60 *
+        30,
+
+      retry:
+        1,
+    });
 
   const heroSubtitle =
-    settings.data?.hero_subtitle ||
+    settings.data
+      ?.hero_subtitle ||
     "Emprendedores del Maule Sur";
 
   const heroDescription =
-    settings.data?.hero_description ||
-    "Descubre emprendimientos, historias, oportunidades y contenido útil de nuestra comunidad.";
+    settings.data
+      ?.hero_description ||
+    "Un espacio para descubrir emprendedores, conocer lo que está pasando y encontrar herramientas para avanzar.";
 
   const heroPhoto =
-    settings.data?.hero_image_url ||
+    settings.data
+      ?.hero_image_url ||
     heroImage;
 
   const highlighted =
-    weekly.data?.entrepreneurs &&
-    weekly.data.entrepreneurs.status === "aprobado" &&
-    weekly.data.entrepreneurs.visible !== false
-      ? weekly.data.entrepreneurs
+    weekly.data
+      ?.entrepreneurs &&
+    weekly.data
+      .entrepreneurs
+      .status ===
+      "aprobado" &&
+    weekly.data
+      .entrepreneurs
+      .visible !==
+      false
+      ? weekly.data
+          .entrepreneurs
       : null;
 
   const mainNews =
-    news.data?.[0] ?? null;
+    news.data?.[0] ??
+    null;
 
   const secondaryNews =
-    news.data?.slice(1, 3) ?? [];
+    news.data?.slice(
+      1,
+      3,
+    ) ?? [];
 
   return (
     <>
-      {/* INDICADORES ECONÓMICOS */}
+      {/* INDICADORES */}
 
       {indicators.data ? (
         <section className="border-b border-border bg-secondary/20">
           <div className="container-page">
             <div className="flex items-center gap-5 overflow-x-auto py-2">
-              <div className="flex shrink-0 items-center gap-2 pr-1">
+              <div className="flex shrink-0 items-center gap-1.5">
                 <TrendingUp className="h-3.5 w-3.5 text-primary" />
 
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
                   Indicadores
                 </span>
               </div>
 
-              <div className="h-5 w-px shrink-0 bg-border" />
+              <div className="h-4 w-px shrink-0 bg-border" />
 
               <Indicator
                 label="UF"
-                value={indicators.data.uf?.valor}
+                value={
+                  indicators
+                    .data
+                    .uf
+                    ?.valor
+                }
                 decimals={2}
               />
 
               <Indicator
                 label="UTM"
-                value={indicators.data.utm?.valor}
+                value={
+                  indicators
+                    .data
+                    .utm
+                    ?.valor
+                }
                 decimals={0}
               />
 
               <Indicator
                 label="Dólar"
-                value={indicators.data.dolar?.valor}
+                value={
+                  indicators
+                    .data
+                    .dolar
+                    ?.valor
+                }
                 decimals={2}
               />
 
               <Indicator
                 label="Euro"
-                value={indicators.data.euro?.valor}
+                value={
+                  indicators
+                    .data
+                    .euro
+                    ?.valor
+                }
                 decimals={2}
               />
 
               <span className="ml-auto shrink-0 text-[9px] text-muted-foreground">
-                Valores referenciales
+                Referenciales
               </span>
             </div>
           </div>
@@ -203,66 +284,29 @@ function IndexPage() {
       {/* HERO */}
 
       <section className="border-b border-border bg-surface">
-        <div className="container-page grid gap-6 py-7 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:py-9">
+        <div className="container-page grid gap-5 py-6 md:grid-cols-[1.05fr_0.95fr] md:items-center lg:py-7">
           <div>
             <p className="eyebrow">
               MAULE SUR · CHILE
             </p>
 
-            <h1 className="mt-1 font-display text-4xl font-semibold leading-tight sm:text-5xl">
+            <h1 className="mt-1 font-display text-3xl font-semibold leading-tight sm:text-4xl">
               LA VITRINA
             </h1>
 
-            <p className="mt-2 font-display text-xl text-primary">
+            <p className="mt-1.5 font-display text-lg font-medium text-primary sm:text-xl">
               {heroSubtitle}
             </p>
 
-            <p className="mt-3 max-w-xl text-sm leading-relaxed text-foreground/75 sm:text-base">
+            <p className="mt-2 max-w-xl text-sm leading-relaxed text-foreground/75">
               {heroDescription}
             </p>
 
-            <form
-              className="mt-5 flex max-w-xl gap-2"
-              onSubmit={(event) => {
-                event.preventDefault();
+            {/* ÚNICOS 3 CTA PRINCIPALES */}
 
-                navigate({
-                  to: "/comunidad",
-                  search: {
-                    q:
-                      term.trim() ||
-                      undefined,
-                  },
-                });
-              }}
-            >
-              <div className="relative flex-1">
-                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-
-                <Input
-                  value={term}
-                  onChange={(event) =>
-                    setTerm(
-                      event.target.value,
-                    )
-                  }
-                  placeholder="¿Qué estás buscando?"
-                  className="h-11 bg-card pl-9"
-                />
-              </div>
-
-              <Button
-                type="submit"
-                className="h-11"
-              >
-                Buscar
-              </Button>
-            </form>
-
-            <div className="mt-4 flex flex-wrap gap-2">
+            <div className="mt-5 flex flex-wrap gap-2">
               <Button
                 asChild
-                variant="outline"
                 size="sm"
               >
                 <Link to="/comunidad">
@@ -272,19 +316,18 @@ function IndexPage() {
 
               <Button
                 asChild
-                variant="ghost"
                 size="sm"
+                className="bg-primary text-primary-foreground"
               >
                 <Link to="/diagnostico">
                   Diagnóstico
-                  <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>
 
               <Button
                 asChild
-                variant="ghost"
                 size="sm"
+                className="bg-primary text-primary-foreground"
               >
                 <Link to="/sumate">
                   Quiero ser parte
@@ -295,163 +338,195 @@ function IndexPage() {
 
           <div>
             <img
-              src={heroPhoto}
+              src={
+                heroPhoto
+              }
               alt="La Vitrina - Emprendedores del Maule Sur"
-              className="aspect-[16/10] w-full rounded-2xl object-cover shadow-card"
+              className="aspect-[16/9] w-full rounded-xl object-cover shadow-sm"
             />
           </div>
         </div>
       </section>
 
-      {/* ACTUALIDAD + EMPRENDEDOR DESTACADO */}
+      {/* ACTUALIDAD + PROTAGONISTA */}
 
-      <section className="container-page py-8">
-        <div className="grid gap-5 lg:grid-cols-2">
+      <section className="container-page py-6">
+        <div className="grid gap-4 lg:grid-cols-2">
+          {/* ACTUALIDAD */}
 
-          {/* HOY EN LA VITRINA */}
+          <article className="overflow-hidden rounded-xl border border-border bg-card">
+            <div className="flex items-center justify-between border-b border-border px-4 py-3">
+              <div>
+                <p className="inline-flex items-center gap-1.5 text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  <Newspaper className="h-3.5 w-3.5 text-primary" />
 
-          <article className="overflow-hidden rounded-2xl border border-border bg-card">
-            <div className="border-b border-border px-5 py-4">
-              <p className="eyebrow inline-flex items-center gap-2">
-                <Newspaper className="h-4 w-4" />
-                ACTUALIDAD
-              </p>
+                  Actualidad
+                </p>
 
-              <h2 className="mt-1 font-display text-2xl font-semibold">
-                Hoy en La Vitrina
-              </h2>
+                <h2 className="mt-0.5 font-display text-base font-semibold">
+                  Hoy en La Vitrina
+                </h2>
+              </div>
             </div>
 
             {news.isLoading ? (
-              <div className="h-80 animate-pulse bg-muted" />
+              <div className="h-48 animate-pulse bg-muted" />
             ) : mainNews ? (
-              <>
-                {mainNews.image_url ? (
-                  <img
-                    src={mainNews.image_url}
-                    alt={mainNews.title}
-                    className="aspect-[16/7] w-full object-cover"
-                  />
-                ) : null}
-
-                <div className="p-5">
-                  {mainNews.featured ? (
-                    <p className="text-xs font-semibold uppercase tracking-wide text-primary">
-                      Destacado
-                    </p>
+              <div>
+                <div className="flex gap-3 p-4">
+                  {mainNews.image_url ? (
+                    <img
+                      src={
+                        mainNews.image_url
+                      }
+                      alt={
+                        mainNews.title
+                      }
+                      className="h-24 w-28 shrink-0 rounded-lg object-cover sm:h-28 sm:w-36"
+                    />
                   ) : null}
 
-                  <h3 className="mt-1 font-display text-xl font-semibold leading-snug">
-                    {mainNews.title}
-                  </h3>
+                  <div className="min-w-0">
+                    {mainNews.featured ? (
+                      <p className="text-[9px] font-semibold uppercase tracking-wide text-primary">
+                        Destacado
+                      </p>
+                    ) : null}
 
-                  {mainNews.summary ? (
-                    <p className="mt-2 text-sm text-muted-foreground">
-                      {mainNews.summary}
-                    </p>
-                  ) : null}
+                    <h3 className="mt-0.5 line-clamp-2 font-display text-sm font-semibold leading-snug sm:text-base">
+                      {
+                        mainNews.title
+                      }
+                    </h3>
 
-                  {mainNews.external_url ? (
-                    <a
-                      href={mainNews.external_url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary"
-                    >
-                      Leer más
-                      <ArrowRight className="h-4 w-4" />
-                    </a>
-                  ) : null}
+                    {mainNews.summary ? (
+                      <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
+                        {
+                          mainNews.summary
+                        }
+                      </p>
+                    ) : null}
+
+                    {mainNews.external_url ? (
+                      <a
+                        href={
+                          mainNews.external_url
+                        }
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-primary"
+                      >
+                        Leer más
+
+                        <ArrowRight className="h-3.5 w-3.5" />
+                      </a>
+                    ) : null}
+                  </div>
                 </div>
 
-                {secondaryNews.length > 0 ? (
+                {secondaryNews.length >
+                0 ? (
                   <div className="border-t border-border">
                     {secondaryNews.map(
-                      (item) => (
+                      (
+                        item,
+                      ) => (
                         <SmallNews
-                          key={item.id}
-                          item={item}
+                          key={
+                            item.id
+                          }
+                          item={
+                            item
+                          }
                         />
                       ),
                     )}
                   </div>
                 ) : null}
-              </>
+              </div>
             ) : (
-              <div className="p-8 text-center text-sm text-muted-foreground">
+              <div className="p-6 text-center text-xs text-muted-foreground">
                 Pronto encontrarás aquí las novedades de La Vitrina.
               </div>
             )}
           </article>
 
-          {/* EMPRENDEDOR DESTACADO */}
+          {/* PROTAGONISTA */}
 
-          <article className="overflow-hidden rounded-2xl border border-border bg-card">
-            <div className="border-b border-border px-5 py-4">
-              <p className="eyebrow inline-flex items-center gap-2">
-                <Sparkles className="h-4 w-4" />
-                PROTAGONISTA
+          <article className="overflow-hidden rounded-xl border border-border bg-card">
+            <div className="border-b border-border px-4 py-3">
+              <p className="inline-flex items-center gap-1.5 text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
+                <Sparkles className="h-3.5 w-3.5 text-primary" />
+
+                Protagonista
               </p>
 
-              <h2 className="mt-1 font-display text-2xl font-semibold">
+              <h2 className="mt-0.5 font-display text-base font-semibold">
                 Emprendedor destacado
               </h2>
             </div>
 
             {weekly.isLoading ? (
-              <div className="h-80 animate-pulse bg-muted" />
+              <div className="h-48 animate-pulse bg-muted" />
             ) : highlighted ? (
-              <>
+              <div className="flex gap-3 p-4">
                 {highlighted.photo_url ? (
                   <img
-                    src={highlighted.photo_url}
-                    alt={highlighted.business_name}
-                    className="aspect-[16/7] w-full object-cover"
+                    src={
+                      highlighted.photo_url
+                    }
+                    alt={
+                      highlighted.business_name
+                    }
+                    className="h-28 w-28 shrink-0 rounded-lg object-cover sm:h-32 sm:w-36"
                   />
                 ) : null}
 
-                <div className="p-5">
-                  <p className="text-xs text-muted-foreground">
-                    {highlighted.owner_name}
+                <div className="min-w-0">
+                  <p className="line-clamp-1 text-[10px] text-muted-foreground">
+                    {
+                      highlighted.owner_name
+                    }
 
-                    {highlighted.categories?.name
+                    {highlighted.categories
+                      ?.name
                       ? ` · ${highlighted.categories.name}`
                       : ""}
 
-                    {highlighted.comunas?.name
-                      ? ` · ${highlighted.comunas.name}`
+                    {highlighted.activities
+                      ?.name
+                      ? ` · ${highlighted.activities.name}`
                       : ""}
                   </p>
 
-                  <h3 className="mt-1 font-display text-xl font-semibold">
-                    {highlighted.business_name}
+                  <h3 className="mt-1 line-clamp-1 font-display text-base font-semibold">
+                    {
+                      highlighted.business_name
+                    }
                   </h3>
 
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    {weekly.data?.story ||
+                  <p className="mt-1 line-clamp-3 text-xs leading-relaxed text-muted-foreground">
+                    {weekly.data
+                      ?.story ||
                       highlighted.short_description}
                   </p>
 
-                  <Button
-                    asChild
-                    size="sm"
-                    className="mt-4"
+                  <Link
+                    to="/emprendedores/$slug"
+                    params={{
+                      slug:
+                        highlighted.slug,
+                    }}
+                    className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-primary"
                   >
-                    <Link
-                      to="/emprendedores/$slug"
-                      params={{
-                        slug:
-                          highlighted.slug,
-                      }}
-                    >
-                      Conocer su historia
-                      <ArrowRight className="h-4 w-4" />
-                    </Link>
-                  </Button>
+                    Ver perfil
+
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
                 </div>
-              </>
+              </div>
             ) : (
-              <div className="p-8 text-center text-sm text-muted-foreground">
+              <div className="p-6 text-center text-xs text-muted-foreground">
                 Próximamente conocerás aquí a un emprendedor destacado.
               </div>
             )}
@@ -459,145 +534,89 @@ function IndexPage() {
         </div>
       </section>
 
-      {/* COMUNIDAD */}
+      {/* ACCESOS COMPLEMENTARIOS */}
 
-      <section className="border-y border-border bg-surface">
-        <div className="container-page py-8">
-          <div className="flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <p className="eyebrow">
-                COMUNIDAD
-              </p>
+      <section className="border-y border-border bg-secondary/10">
+        <div className="container-page flex flex-wrap items-center gap-x-5 gap-y-2 py-3">
+          <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+            También en La Vitrina
+          </span>
 
-              <h2 className="mt-1 font-display text-2xl font-semibold">
-                Descubre el Maule que emprende
-              </h2>
+          <TextLink
+            to="/eventos"
+            label="Eventos"
+          />
 
-              <p className="mt-1 text-sm text-muted-foreground">
-                Productos, servicios, historias y personas de nuestra comunidad.
-              </p>
-            </div>
+          <TextLink
+            to="/educa"
+            label="Educa"
+          />
 
-            <Button
-              asChild
-              size="sm"
-              variant="outline"
-            >
-              <Link to="/comunidad">
-                Ver comunidad
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
+          <TextLink
+            to="/radio"
+            label="Radio"
+          />
 
-          <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {featured.isLoading
-              ? Array.from({
-                  length: 4,
-                }).map(
-                  (_, index) => (
-                    <div
-                      key={index}
-                      className="h-80 animate-pulse rounded-2xl bg-muted"
-                    />
-                  ),
-                )
-              : featured.data?.map(
-                  (entrepreneur) => (
-                    <EntrepreneurCard
-                      key={
-                        entrepreneur.id
-                      }
-                      e={
-                        entrepreneur
-                      }
-                    />
-                  ),
-                )}
-          </div>
-        </div>
-      </section>
-
-      {/* DIAGNÓSTICO */}
-
-      <section className="container-page py-8">
-        <div className="grid gap-5 overflow-hidden rounded-2xl border border-border bg-card md:grid-cols-[1fr_auto] md:items-center">
-          <div className="flex gap-4 p-6">
-            <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-secondary">
-              <BarChart3 className="h-5 w-5 text-primary" />
-            </div>
-
-            <div>
-              <p className="eyebrow">
-                DIAGNÓSTICO DEL EMPRENDEDOR
-              </p>
-
-              <h2 className="mt-1 font-display text-xl font-semibold">
-                ¿Cómo está tu emprendimiento?
-              </h2>
-
-              <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-                Descubre tus fortalezas, brechas y las principales áreas donde puedes avanzar.
-              </p>
-            </div>
-          </div>
-
-          <div className="px-6 pb-6 md:pb-0">
-            <Button asChild>
-              <Link to="/diagnostico">
-                Hacer diagnóstico
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-          </div>
+          <TextLink
+            to="/compraventa"
+            label="Compra-venta"
+          />
         </div>
       </section>
 
       {/* AUSPICIADORES */}
 
-      <section className="border-t border-border bg-surface">
-        <div className="container-page py-7">
+      <section className="container-page py-6">
+        <div className="flex items-end justify-between gap-3">
           <div>
-            <p className="eyebrow">
-              NOS APOYAN
+            <p className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
+              Nos apoyan
             </p>
 
-            <h2 className="mt-1 font-display text-lg font-semibold">
-              Auspiciadores de La Vitrina
+            <h2 className="mt-0.5 font-display text-base font-semibold">
+              Auspiciadores y aliados
             </h2>
           </div>
-
-          {sponsors.isLoading ? (
-            <div className="mt-4 grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
-              {Array.from({
-                length: 5,
-              }).map(
-                (_, index) => (
-                  <div
-                    key={index}
-                    className="h-20 animate-pulse rounded-xl bg-muted"
-                  />
-                ),
-              )}
-            </div>
-          ) : (sponsors.data?.length ??
-              0) > 0 ? (
-            <div className="mt-4 grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
-              {sponsors.data?.map(
-                (sponsor) => (
-                  <SponsorCard
-                    key={sponsor.id}
-                    sponsor={sponsor}
-                  />
-                ),
-              )}
-            </div>
-          ) : (
-            <div className="mt-4 rounded-xl border border-dashed border-border p-5 text-center text-sm text-muted-foreground">
-              Próximamente conocerás aquí a quienes apoyan La Vitrina.
-            </div>
-          )}
         </div>
+
+        {sponsors.isLoading ? (
+          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {Array.from({
+              length:
+                4,
+            }).map(
+              (
+                _,
+                index,
+              ) => (
+                <div
+                  key={
+                    index
+                  }
+                  className="h-20 animate-pulse rounded-xl bg-muted"
+                />
+              ),
+            )}
+          </div>
+        ) : (
+          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+            {(sponsors.data ??
+              []).map(
+              (
+                sponsor,
+              ) => (
+                <SponsorCard
+                  key={
+                    sponsor.id
+                  }
+                  sponsor={
+                    sponsor
+                  }
+                />
+              ),
+            )}
+          </div>
+        )}
       </section>
     </>
   );
@@ -606,37 +625,39 @@ function IndexPage() {
 function Indicator({
   label,
   value,
-  decimals = 2,
+  decimals,
 }: {
   label: string;
   value?: number;
-  decimals?: number;
+  decimals: number;
 }) {
   if (
-    typeof value !== "number"
+    value ===
+    undefined
   ) {
     return null;
   }
 
-  const formatted =
-    new Intl.NumberFormat(
-      "es-CL",
-      {
-        minimumFractionDigits:
-          decimals,
-        maximumFractionDigits:
-          decimals,
-      },
-    ).format(value);
-
   return (
     <div className="flex shrink-0 items-baseline gap-1.5">
-      <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+      <span className="text-[9px] font-semibold uppercase text-muted-foreground">
         {label}
       </span>
 
       <span className="text-xs font-semibold">
-        ${formatted}
+        $
+        {new Intl.NumberFormat(
+          "es-CL",
+          {
+            minimumFractionDigits:
+              decimals,
+
+            maximumFractionDigits:
+              decimals,
+          },
+        ).format(
+          value,
+        )}
       </span>
     </div>
   );
@@ -648,83 +669,134 @@ function SmallNews({
   item: NewsItem;
 }) {
   const content = (
-    <div className="flex gap-3 px-5 py-4 transition-colors hover:bg-secondary/20">
+    <div className="flex items-center gap-3 px-4 py-3">
       {item.image_url ? (
         <img
-          src={item.image_url}
-          alt={item.title}
-          className="h-14 w-20 shrink-0 rounded-lg object-cover"
+          src={
+            item.image_url
+          }
+          alt=""
+          className="h-10 w-12 shrink-0 rounded-md object-cover"
         />
       ) : null}
 
-      <div className="min-w-0">
-        <p className="font-display text-sm font-semibold leading-snug">
-          {item.title}
+      <div className="min-w-0 flex-1">
+        <p className="line-clamp-1 text-xs font-medium">
+          {
+            item.title
+          }
         </p>
 
         {item.summary ? (
-          <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
-            {item.summary}
+          <p className="mt-0.5 line-clamp-1 text-[10px] text-muted-foreground">
+            {
+              item.summary
+            }
           </p>
         ) : null}
       </div>
+
+      <ArrowRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
     </div>
   );
 
-  if (!item.external_url) {
-    return content;
+  if (
+    item.external_url
+  ) {
+    return (
+      <a
+        href={
+          item.external_url
+        }
+        target="_blank"
+        rel="noreferrer"
+        className="block border-b border-border last:border-b-0 hover:bg-secondary/20"
+      >
+        {content}
+      </a>
+    );
   }
 
   return (
-    <a
-      href={item.external_url}
-      target="_blank"
-      rel="noreferrer"
-      className="block border-t border-border first:border-t-0"
-    >
+    <div className="border-b border-border last:border-b-0">
       {content}
-    </a>
+    </div>
+  );
+}
+
+function TextLink({
+  to,
+  label,
+}: {
+  to:
+    "/eventos" |
+    "/educa" |
+    "/radio" |
+    "/compraventa";
+
+  label:
+    string;
+}) {
+  return (
+    <Link
+      to={to}
+      className="inline-flex items-center gap-1 text-xs font-medium text-foreground/75 hover:text-primary"
+    >
+      {label}
+
+      <ArrowRight className="h-3 w-3" />
+    </Link>
   );
 }
 
 function SponsorCard({
   sponsor,
 }: {
-  sponsor: Sponsor;
+  sponsor:
+    Sponsor;
 }) {
-  const url =
+  const web =
     websiteLink(
       sponsor.website_url,
     );
 
   const content = (
-    <div className="flex h-20 items-center justify-center rounded-xl border border-border bg-card p-4">
+    <div className="flex h-full min-h-20 items-center justify-center rounded-xl border border-border bg-card p-3">
       {sponsor.logo_url ? (
         <img
-          src={sponsor.logo_url}
-          alt={sponsor.name}
-          className="max-h-12 max-w-full object-contain"
+          src={
+            sponsor.logo_url
+          }
+          alt={
+            sponsor.name
+          }
+          loading="lazy"
+          className="max-h-10 max-w-full object-contain"
         />
       ) : (
-        <p className="text-center font-display text-sm font-semibold">
-          {sponsor.name}
-        </p>
+        <span className="text-center text-xs font-semibold">
+          {
+            sponsor.name
+          }
+        </span>
       )}
     </div>
   );
 
-  if (!url) {
-    return content;
+  if (web) {
+    return (
+      <a
+        href={web}
+        target="_blank"
+        rel="noreferrer"
+        aria-label={
+          sponsor.name
+        }
+      >
+        {content}
+      </a>
+    );
   }
 
-  return (
-    <a
-      href={url}
-      target="_blank"
-      rel="noreferrer"
-      aria-label={`Visitar ${sponsor.name}`}
-    >
-      {content}
-    </a>
-  );
+  return content;
 }

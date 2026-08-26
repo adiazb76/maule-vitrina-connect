@@ -7,6 +7,15 @@ export type Category = {
   sort_order: number;
 };
 
+export type Activity = {
+  id: string;
+  category_id: string;
+  name: string;
+  slug: string;
+  sort_order: number;
+  visible: boolean;
+};
+
 export type Comuna = {
   id: string;
   name: string;
@@ -21,6 +30,7 @@ export type Entrepreneur = {
   business_name: string;
   owner_name: string;
   category_id: string | null;
+  activity_id: string | null;
   comuna_id: string | null;
   short_description: string;
   about: string | null;
@@ -43,8 +53,21 @@ export type Entrepreneur = {
   views: number;
   contacts: number;
   created_at: string;
-  categories?: { name: string; slug: string } | null;
-  comunas?: { name: string; slug: string } | null;
+
+  categories?: {
+    name: string;
+    slug: string;
+  } | null;
+
+  activities?: {
+    name: string;
+    slug: string;
+  } | null;
+
+  comunas?: {
+    name: string;
+    slug: string;
+  } | null;
 };
 
 export type Product = {
@@ -59,14 +82,19 @@ export type Product = {
 
 export type EventItem = {
   id: string;
+  entrepreneur_id?: string | null;
   slug: string;
   title: string;
   description: string | null;
   image_url: string | null;
   starts_at: string;
+  ends_at?: string | null;
   location: string | null;
   organizer: string | null;
   registration_url: string | null;
+  status?: string;
+  visible?: boolean;
+  published?: boolean;
 };
 
 export type RadioItem = {
@@ -81,6 +109,7 @@ export type RadioItem = {
 
 export type SiteSettings = {
   id: string;
+
   hero_subtitle: string;
   hero_description: string;
   hero_image_url: string | null;
@@ -146,91 +175,263 @@ export type EducationItem = {
 };
 
 const CARD_SELECT =
-  "*, categories:category_id(name,slug), comunas:comuna_id(name,slug)";
+  "*, categories:category_id(name,slug), activities:activity_id(name,slug), comunas:comuna_id(name,slug)";
 
 export type DirectoryFilters = {
   search?: string;
   categorySlug?: string;
+  activitySlug?: string;
   comunaSlug?: string;
-  sort?: "recientes" | "visitados" | "destacados" | "alfabetico";
+
+  sort?:
+    | "recientes"
+    | "visitados"
+    | "destacados"
+    | "alfabetico";
 };
 
 export async function fetchCategories(): Promise<Category[]> {
-  const { data, error } = await supabase
-    .from("categories")
-    .select("id,name,slug,sort_order")
-    .order("sort_order");
+  const { data, error } =
+    await supabase
+      .from("categories")
+      .select(
+        "id,name,slug,sort_order",
+      )
+      .order(
+        "sort_order",
+      );
 
-  if (error) throw error;
+  if (error) {
+    throw error;
+  }
 
-  return (data ?? []) as Category[];
+  return (
+    data ?? []
+  ) as Category[];
+}
+
+export async function fetchActivities(
+  categoryId?: string,
+): Promise<Activity[]> {
+  let query =
+    (supabase as any)
+      .from("activities")
+      .select(
+        "id,category_id,name,slug,sort_order,visible",
+      )
+      .eq(
+        "visible",
+        true,
+      )
+      .order(
+        "sort_order",
+        {
+          ascending:
+            true,
+        },
+      )
+      .order(
+        "name",
+        {
+          ascending:
+            true,
+        },
+      );
+
+  if (categoryId) {
+    query =
+      query.eq(
+        "category_id",
+        categoryId,
+      );
+  }
+
+  const {
+    data,
+    error,
+  } =
+    await query;
+
+  if (error) {
+    throw error;
+  }
+
+  return (
+    data ?? []
+  ) as Activity[];
 }
 
 export async function fetchComunas(): Promise<Comuna[]> {
-  const { data, error } = await supabase
-    .from("comunas")
-    .select("id,name,slug,region")
-    .order("name");
+  const {
+    data,
+    error,
+  } =
+    await supabase
+      .from("comunas")
+      .select(
+        "id,name,slug,region",
+      )
+      .order(
+        "name",
+      );
 
-  if (error) throw error;
+  if (error) {
+    throw error;
+  }
 
-  return (data ?? []) as Comuna[];
+  return (
+    data ?? []
+  ) as Comuna[];
 }
 
 export async function fetchEntrepreneurs(
   filters: DirectoryFilters = {},
   limit = 60,
 ): Promise<Entrepreneur[]> {
-  let query = supabase
-    .from("entrepreneurs")
-    .select(CARD_SELECT)
-    .eq("status", "aprobado")
-    .eq("visible", true)
-    .limit(limit);
+  let query =
+    supabase
+      .from("entrepreneurs")
+      .select(
+        CARD_SELECT,
+      )
+      .eq(
+        "status",
+        "aprobado",
+      )
+      .eq(
+        "visible",
+        true,
+      )
+      .limit(
+        limit,
+      );
 
-  if (filters.search?.trim()) {
-    const term = `%${filters.search.trim().replace(/[%,]/g, "")}%`;
+  if (
+    filters.search?.trim()
+  ) {
+    const term =
+      `%${filters.search
+        .trim()
+        .replace(
+          /[%,]/g,
+          "",
+        )}%`;
 
-    query = query.or(
-      `business_name.ilike.${term},owner_name.ilike.${term},short_description.ilike.${term},about.ilike.${term},value_prop.ilike.${term}`,
-    );
+    query =
+      query.or(
+        `business_name.ilike.${term},owner_name.ilike.${term},short_description.ilike.${term},about.ilike.${term},value_prop.ilike.${term}`,
+      );
   }
 
-  switch (filters.sort) {
+  switch (
+    filters.sort
+  ) {
     case "visitados":
-      query = query.order("views", { ascending: false });
+      query =
+        query.order(
+          "views",
+          {
+            ascending:
+              false,
+          },
+        );
+
       break;
 
     case "alfabetico":
-      query = query.order("business_name");
+      query =
+        query.order(
+          "business_name",
+        );
+
       break;
 
     case "destacados":
-      query = query
-        .order("featured", { ascending: false })
-        .order("views", { ascending: false });
+      query =
+        query
+          .order(
+            "featured",
+            {
+              ascending:
+                false,
+            },
+          )
+          .order(
+            "views",
+            {
+              ascending:
+                false,
+            },
+          );
+
       break;
 
     default:
-      query = query.order("created_at", { ascending: false });
+      query =
+        query.order(
+          "created_at",
+          {
+            ascending:
+              false,
+          },
+        );
   }
 
-  const { data, error } = await query;
+  const {
+    data,
+    error,
+  } =
+    await query;
 
-  if (error) throw error;
-
-  let rows = (data ?? []) as unknown as Entrepreneur[];
-
-  if (filters.categorySlug) {
-    rows = rows.filter(
-      (row) => row.categories?.slug === filters.categorySlug,
-    );
+  if (error) {
+    throw error;
   }
 
-  if (filters.comunaSlug) {
-    rows = rows.filter(
-      (row) => row.comunas?.slug === filters.comunaSlug,
-    );
+  let rows =
+    (
+      data ?? []
+    ) as unknown as Entrepreneur[];
+
+  if (
+    filters.categorySlug
+  ) {
+    rows =
+      rows.filter(
+        (
+          row,
+        ) =>
+          row.categories
+            ?.slug ===
+          filters.categorySlug,
+      );
+  }
+
+  if (
+    filters.activitySlug
+  ) {
+    rows =
+      rows.filter(
+        (
+          row,
+        ) =>
+          row.activities
+            ?.slug ===
+          filters.activitySlug,
+      );
+  }
+
+  if (
+    filters.comunaSlug
+  ) {
+    rows =
+      rows.filter(
+        (
+          row,
+        ) =>
+          row.comunas
+            ?.slug ===
+          filters.comunaSlug,
+      );
   }
 
   return rows;
@@ -239,69 +440,162 @@ export async function fetchEntrepreneurs(
 export async function fetchFeatured(
   limit = 6,
 ): Promise<Entrepreneur[]> {
-  const { data, error } = await supabase
-    .from("entrepreneurs")
-    .select(CARD_SELECT)
-    .eq("status", "aprobado")
-    .eq("visible", true)
-    .order("featured", { ascending: false })
-    .order("views", { ascending: false })
-    .limit(limit);
+  const {
+    data,
+    error,
+  } =
+    await supabase
+      .from("entrepreneurs")
+      .select(
+        CARD_SELECT,
+      )
+      .eq(
+        "status",
+        "aprobado",
+      )
+      .eq(
+        "visible",
+        true,
+      )
+      .order(
+        "featured",
+        {
+          ascending:
+            false,
+        },
+      )
+      .order(
+        "views",
+        {
+          ascending:
+            false,
+        },
+      )
+      .limit(
+        limit,
+      );
 
-  if (error) throw error;
+  if (error) {
+    throw error;
+  }
 
-  return (data ?? []) as unknown as Entrepreneur[];
+  return (
+    data ?? []
+  ) as unknown as Entrepreneur[];
 }
 
 export async function fetchProducts(
   entrepreneurId: string,
 ): Promise<Product[]> {
-  const { data, error } = await supabase
-    .from("products")
-    .select("*")
-    .eq("entrepreneur_id", entrepreneurId)
-    .order("sort_order");
+  const {
+    data,
+    error,
+  } =
+    await supabase
+      .from("products")
+      .select("*")
+      .eq(
+        "entrepreneur_id",
+        entrepreneurId,
+      )
+      .order(
+        "sort_order",
+      );
 
-  if (error) throw error;
+  if (error) {
+    throw error;
+  }
 
-  return (data ?? []) as Product[];
+  return (
+    data ?? []
+  ) as Product[];
 }
 
 export async function fetchEvents(): Promise<EventItem[]> {
-  const { data, error } = await supabase
-    .from("events")
-    .select("*")
-    .eq("published", true)
-    .order("starts_at");
+  const {
+    data,
+    error,
+  } =
+    await supabase
+      .from("events")
+      .select("*")
+      .eq(
+        "published",
+        true,
+      )
+      .eq(
+        "visible",
+        true,
+      )
+      .order(
+        "starts_at",
+      );
 
-  if (error) throw error;
+  if (error) {
+    throw error;
+  }
 
-  return (data ?? []) as EventItem[];
+  return (
+    data ?? []
+  ) as EventItem[];
 }
 
 export async function fetchRadioItems(): Promise<RadioItem[]> {
-  const { data, error } = await supabase
-    .from("radio_items")
-    .select("*")
-    .eq("published", true)
-    .order("published_at", { ascending: false });
+  const {
+    data,
+    error,
+  } =
+    await supabase
+      .from("radio_items")
+      .select("*")
+      .eq(
+        "published",
+        true,
+      )
+      .order(
+        "published_at",
+        {
+          ascending:
+            false,
+        },
+      );
 
-  if (error) throw error;
+  if (error) {
+    throw error;
+  }
 
-  return (data ?? []) as RadioItem[];
+  return (
+    data ?? []
+  ) as RadioItem[];
 }
 
 export async function fetchWeeklyFeature() {
-  const { data, error } = await supabase
-    .from("weekly_features")
-    .select(
-      `id, week_start, story, media_url, entrepreneurs:entrepreneur_id(${CARD_SELECT})`,
-    )
-    .order("week_start", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+  const {
+    data,
+    error,
+  } =
+    await supabase
+      .from(
+        "weekly_features",
+      )
+      .select(
+        `id, week_start, story, media_url, entrepreneurs:entrepreneur_id(${CARD_SELECT})`,
+      )
+      .order(
+        "week_start",
+        {
+          ascending:
+            false,
+        },
+      )
+      .limit(
+        1,
+      )
+      .maybeSingle();
 
-  if (error) throw error;
+  if (error) {
+    throw error;
+  }
 
   return data as unknown as {
     id: string;
@@ -313,85 +607,205 @@ export async function fetchWeeklyFeature() {
 }
 
 export async function fetchSiteSettings(): Promise<SiteSettings | null> {
-  const { data, error } = await (supabase as any)
-    .from("site_settings")
-    .select("*")
-    .eq("id", "home")
-    .maybeSingle();
+  const {
+    data,
+    error,
+  } =
+    await (supabase as any)
+      .from(
+        "site_settings",
+      )
+      .select("*")
+      .eq(
+        "id",
+        "home",
+      )
+      .maybeSingle();
 
-  if (error) throw error;
+  if (error) {
+    throw error;
+  }
 
   return data as SiteSettings | null;
 }
 
 export async function fetchSponsors(): Promise<Sponsor[]> {
-  const { data, error } = await (supabase as any)
-    .from("sponsors")
-    .select("*")
-    .eq("visible", true)
-    .order("sort_order", { ascending: true });
+  const {
+    data,
+    error,
+  } =
+    await (supabase as any)
+      .from(
+        "sponsors",
+      )
+      .select("*")
+      .eq(
+        "visible",
+        true,
+      )
+      .order(
+        "sort_order",
+        {
+          ascending:
+            true,
+        },
+      );
 
-  if (error) throw error;
+  if (error) {
+    throw error;
+  }
 
-  return (data ?? []) as Sponsor[];
+  return (
+    data ?? []
+  ) as Sponsor[];
 }
 
 export async function fetchNewsItems(
   limit = 12,
 ): Promise<NewsItem[]> {
-  const { data, error } = await (supabase as any)
-    .from("news_items")
-    .select("*")
-    .eq("visible", true)
-    .order("featured", { ascending: false })
-    .order("sort_order", { ascending: true })
-    .order("published_at", { ascending: false })
-    .limit(limit);
+  const {
+    data,
+    error,
+  } =
+    await (supabase as any)
+      .from(
+        "news_items",
+      )
+      .select("*")
+      .eq(
+        "visible",
+        true,
+      )
+      .order(
+        "featured",
+        {
+          ascending:
+            false,
+        },
+      )
+      .order(
+        "sort_order",
+        {
+          ascending:
+            true,
+        },
+      )
+      .order(
+        "published_at",
+        {
+          ascending:
+            false,
+        },
+      )
+      .limit(
+        limit,
+      );
 
-  if (error) throw error;
+  if (error) {
+    throw error;
+  }
 
-  return (data ?? []) as NewsItem[];
+  return (
+    data ?? []
+  ) as NewsItem[];
 }
 
 export async function fetchEducationItems(): Promise<EducationItem[]> {
-  const { data, error } = await (supabase as any)
-    .from("education_items")
-    .select("*")
-    .eq("visible", true)
-    .order("featured", { ascending: false })
-    .order("sort_order", { ascending: true })
-    .order("published_at", { ascending: false });
+  const {
+    data,
+    error,
+  } =
+    await (supabase as any)
+      .from(
+        "education_items",
+      )
+      .select("*")
+      .eq(
+        "visible",
+        true,
+      )
+      .order(
+        "featured",
+        {
+          ascending:
+            false,
+        },
+      )
+      .order(
+        "sort_order",
+        {
+          ascending:
+            true,
+        },
+      )
+      .order(
+        "published_at",
+        {
+          ascending:
+            false,
+        },
+      );
 
-  if (error) throw error;
+  if (error) {
+    throw error;
+  }
 
-  return (data ?? []) as EducationItem[];
+  return (
+    data ?? []
+  ) as EducationItem[];
 }
 
 export function siteWhatsappLink(
-  settings: Pick<
-    SiteSettings,
-    "whatsapp" | "whatsapp_message"
-  > | null,
+  settings:
+    Pick<
+      SiteSettings,
+      "whatsapp" |
+      "whatsapp_message"
+    > |
+    null,
 ) {
-  if (!settings?.whatsapp) return null;
+  if (
+    !settings
+      ?.whatsapp
+  ) {
+    return null;
+  }
 
-  const number = settings.whatsapp.replace(/[^0-9]/g, "");
+  const number =
+    settings.whatsapp.replace(
+      /[^0-9]/g,
+      "",
+    );
 
   const message =
-    settings.whatsapp_message?.trim() ||
+    settings.whatsapp_message
+      ?.trim() ||
     "Hola, llegué desde La Vitrina y quisiera hacer una consulta.";
 
-  return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+  return `https://wa.me/${number}?text=${encodeURIComponent(
+    message,
+  )}`;
 }
 
-export function phoneLink(phone: string | null) {
-  if (!phone) return null;
+export function phoneLink(
+  phone: string | null,
+) {
+  if (!phone) {
+    return null;
+  }
 
-  return `tel:${phone.replace(/[^0-9+]/g, "")}`;
+  return `tel:${phone.replace(
+    /[^0-9+]/g,
+    "",
+  )}`;
 }
 
-export function emailLink(email: string | null) {
-  if (!email) return null;
+export function emailLink(
+  email: string | null,
+) {
+  if (!email) {
+    return null;
+  }
 
   return `mailto:${email.trim()}`;
 }
@@ -400,57 +814,127 @@ export function logInteraction(
   entrepreneurId: string,
   kind: string,
 ) {
-  void supabase.rpc("log_interaction", {
-    _entrepreneur_id: entrepreneurId,
-    _kind: kind,
-  });
+  void supabase.rpc(
+    "log_interaction",
+    {
+      _entrepreneur_id:
+        entrepreneurId,
+
+      _kind:
+        kind,
+    },
+  );
 }
 
 export const DEFAULT_WHATSAPP_MESSAGE =
   "Hola, vi tu emprendimiento en La Vitrina y me gustaría conocer más sobre tus productos/servicios.";
 
 export function whatsappLink(
-  e: Pick<Entrepreneur, "whatsapp" | "whatsapp_message">,
+  e:
+    Pick<
+      Entrepreneur,
+      "whatsapp" |
+      "whatsapp_message"
+    >,
 ) {
-  if (!e.whatsapp) return null;
+  if (
+    !e.whatsapp
+  ) {
+    return null;
+  }
 
-  const number = e.whatsapp.replace(/[^0-9]/g, "");
+  const number =
+    e.whatsapp.replace(
+      /[^0-9]/g,
+      "",
+    );
 
-  const text = encodeURIComponent(
-    e.whatsapp_message?.trim() || DEFAULT_WHATSAPP_MESSAGE,
-  );
+  const text =
+    encodeURIComponent(
+      e.whatsapp_message
+        ?.trim() ||
+      DEFAULT_WHATSAPP_MESSAGE,
+    );
 
   return `https://wa.me/${number}?text=${text}`;
 }
 
-export function instagramLink(handle: string | null) {
-  if (!handle) return null;
+export function instagramLink(
+  handle: string | null,
+) {
+  if (!handle) {
+    return null;
+  }
 
-  if (handle.startsWith("http")) return handle;
+  if (
+    handle.startsWith(
+      "http",
+    )
+  ) {
+    return handle;
+  }
 
-  return `https://instagram.com/${handle.replace(/^@/, "")}`;
+  return `https://instagram.com/${handle.replace(
+    /^@/,
+    "",
+  )}`;
 }
 
-export function facebookLink(value: string | null) {
-  if (!value) return null;
+export function facebookLink(
+  value: string | null,
+) {
+  if (!value) {
+    return null;
+  }
 
-  if (value.startsWith("http")) return value;
+  if (
+    value.startsWith(
+      "http",
+    )
+  ) {
+    return value;
+  }
 
-  return `https://facebook.com/${value.replace(/^@/, "")}`;
+  return `https://facebook.com/${value.replace(
+    /^@/,
+    "",
+  )}`;
 }
 
-export function websiteLink(url: string | null) {
-  if (!url) return null;
+export function websiteLink(
+  url: string | null,
+) {
+  if (!url) {
+    return null;
+  }
 
-  return url.startsWith("http") ? url : `https://${url}`;
+  return url.startsWith(
+    "http",
+  )
+    ? url
+    : `https://${url}`;
 }
 
-export function slugify(value: string) {
+export function slugify(
+  value: string,
+) {
   return value
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
+    .replace(
+      /[\u0300-\u036f]/g,
+      "",
+    )
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "")
-    .slice(0, 60);
+    .replace(
+      /[^a-z0-9]+/g,
+      "-",
+    )
+    .replace(
+      /(^-|-$)/g,
+      "",
+    )
+    .slice(
+      0,
+      60,
+    );
 }

@@ -18,6 +18,7 @@ import { Route as ComunidadRouteImport } from './routes/comunidad'
 import { Route as DiagnosticoRouteImport } from './routes/diagnostico'
 import { Route as EducaRouteImport } from './routes/educa'
 import { Route as EventosRouteImport } from './routes/eventos'
+import { Route as MetricasRouteImport } from './routes/metricas'
 import { Route as RadioRouteImport } from './routes/radio'
 import { Route as SobreRouteImport } from './routes/sobre'
 import { Route as SumateRouteImport } from './routes/sumate'
@@ -71,6 +72,11 @@ const EventosRoute = EventosRouteImport.update({
   path: '/eventos',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MetricasRoute = MetricasRouteImport.update({
+  id: '/metricas',
+  path: '/metricas',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RadioRoute = RadioRouteImport.update({
   id: '/radio',
   path: '/radio',
@@ -121,6 +127,7 @@ export interface FileRoutesByFullPath {
   '/diagnostico': typeof DiagnosticoRoute
   '/educa': typeof EducaRoute
   '/eventos': typeof EventosRoute
+  '/metricas': typeof MetricasRoute
   '/radio': typeof RadioRoute
   '/sobre': typeof SobreRoute
   '/sumate': typeof SumateRoute
@@ -139,6 +146,7 @@ export interface FileRoutesByTo {
   '/diagnostico': typeof DiagnosticoRoute
   '/educa': typeof EducaRoute
   '/eventos': typeof EventosRoute
+  '/metricas': typeof MetricasRoute
   '/radio': typeof RadioRoute
   '/sobre': typeof SobreRoute
   '/sumate': typeof SumateRoute
@@ -159,6 +167,7 @@ export interface FileRoutesById {
   '/diagnostico': typeof DiagnosticoRoute
   '/educa': typeof EducaRoute
   '/eventos': typeof EventosRoute
+  '/metricas': typeof MetricasRoute
   '/radio': typeof RadioRoute
   '/sobre': typeof SobreRoute
   '/sumate': typeof SumateRoute
@@ -179,6 +188,7 @@ export interface FileRouteTypes {
     | '/diagnostico'
     | '/educa'
     | '/eventos'
+    | '/metricas'
     | '/radio'
     | '/sobre'
     | '/sumate'
@@ -197,6 +207,7 @@ export interface FileRouteTypes {
     | '/diagnostico'
     | '/educa'
     | '/eventos'
+    | '/metricas'
     | '/radio'
     | '/sobre'
     | '/sumate'
@@ -216,6 +227,7 @@ export interface FileRouteTypes {
     | '/diagnostico'
     | '/educa'
     | '/eventos'
+    | '/metricas'
     | '/radio'
     | '/sobre'
     | '/sumate'
@@ -236,6 +248,7 @@ export interface RootRouteChildren {
   DiagnosticoRoute: typeof DiagnosticoRoute
   EducaRoute: typeof EducaRoute
   EventosRoute: typeof EventosRoute
+  MetricasRoute: typeof MetricasRoute
   RadioRoute: typeof RadioRoute
   SobreRoute: typeof SobreRoute
   SumateRoute: typeof SumateRoute
@@ -307,6 +320,13 @@ declare module '@tanstack/react-router' {
       path: '/eventos'
       fullPath: '/eventos'
       preLoaderRoute: typeof EventosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/metricas': {
+      id: '/metricas'
+      path: '/metricas'
+      fullPath: '/metricas'
+      preLoaderRoute: typeof MetricasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/radio': {
@@ -391,6 +411,7 @@ const rootRouteChildren: RootRouteChildren = {
   DiagnosticoRoute: DiagnosticoRoute,
   EducaRoute: EducaRoute,
   EventosRoute: EventosRoute,
+  MetricasRoute: MetricasRoute,
   RadioRoute: RadioRoute,
   SobreRoute: SobreRoute,
   SumateRoute: SumateRoute,

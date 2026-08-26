@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft,
+  BarChart3,
   Check,
   Eye,
   EyeOff,
@@ -1034,6 +1035,37 @@ function AdminPage() {
           Administra el contenido y la comunidad desde un solo lugar.
         </p>
       </div>
+
+      {/* CENTRO DE INTELIGENCIA */}
+
+      <Link
+        to="/metricas"
+        className="group mt-5 flex items-center justify-between gap-4 rounded-xl border border-primary/20 bg-secondary/20 p-4 transition-colors hover:border-primary/40 hover:bg-secondary/30"
+      >
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary text-primary-foreground">
+            <BarChart3 className="h-4.5 w-4.5" />
+          </div>
+
+          <div className="min-w-0">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-primary">
+              Inteligencia de gestión
+            </p>
+
+            <h2 className="mt-0.5 font-display text-base font-semibold">
+              Métricas y Gestión
+            </h2>
+
+            <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
+              Dashboard ejecutivo · Evolución · Rankings · Datos · Informes
+            </p>
+          </div>
+        </div>
+
+        <span className="hidden shrink-0 text-xs font-semibold text-primary sm:block">
+          Ver dashboard →
+        </span>
+      </Link>
 
       <div className="sticky top-16 z-30 -mx-2 mt-6 overflow-x-auto border-y border-border bg-background px-2 py-3">
         <div className="flex min-w-max gap-2">

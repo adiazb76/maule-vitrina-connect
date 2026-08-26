@@ -17,55 +17,80 @@ const NAV = [
 ] as const;
 
 export function SiteHeader() {
-  const [open, setOpen] = useState(false);
-  const { user } = useAuth();
+  const [open, setOpen] =
+    useState(false);
+
+  const { user } =
+    useAuth();
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border/70 bg-background/95 backdrop-blur">
-      <div className="container-page flex h-16 items-center justify-between gap-4">
+    <header className="sticky top-0 z-40 border-b border-border/80 bg-background/95 backdrop-blur">
+      {/* DESKTOP / TABLET */}
+
+      <div className="container-page flex h-14 items-center justify-between gap-3">
+        {/* MARCA */}
+
         <Link
           to="/"
-          className="flex items-center gap-2.5"
-          onClick={() => setOpen(false)}
+          onClick={() =>
+            setOpen(false)
+          }
+          className="flex shrink-0 items-center gap-2"
         >
-          <span className="grid h-9 w-9 place-items-center rounded-lg bg-primary font-display text-lg font-semibold text-primary-foreground">
+          <span className="grid h-8 w-8 place-items-center rounded-lg bg-primary font-display text-base font-semibold text-primary-foreground">
             V
           </span>
 
-          <span className="leading-tight">
-            <span className="block font-display text-base font-semibold tracking-tight">
+          <span className="hidden leading-tight sm:block">
+            <span className="block font-display text-sm font-semibold tracking-tight">
               LA VITRINA
             </span>
 
-            <span className="block text-[11px] text-muted-foreground">
+            <span className="block text-[10px] text-muted-foreground">
               Emprendedores del Maule Sur
             </span>
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-1 lg:flex">
-          {NAV.map((item) => (
-            <Link
-              key={item.to}
-              to={item.to}
-              activeOptions={{
-                exact: item.to === "/",
-              }}
-              activeProps={{
-                className: "text-primary",
-              }}
-              className="rounded-md px-2 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
-            >
-              {item.label}
-            </Link>
-          ))}
+        {/* MENÚ ESCRITORIO */}
+
+        <nav className="hidden min-w-0 flex-1 items-center justify-center gap-0.5 lg:flex">
+          {NAV.map(
+            (item) => (
+              <Link
+                key={
+                  item.to
+                }
+                to={
+                  item.to
+                }
+                activeOptions={{
+                  exact:
+                    item.to ===
+                    "/",
+                }}
+                activeProps={{
+                  className:
+                    "bg-secondary/60 text-foreground",
+                }}
+                className="whitespace-nowrap rounded-md px-2 py-1.5 text-[13px] font-medium text-muted-foreground transition-colors hover:bg-secondary/30 hover:text-foreground"
+              >
+                {
+                  item.label
+                }
+              </Link>
+            ),
+          )}
         </nav>
 
-        <div className="hidden items-center gap-2 lg:flex">
+        {/* ACCIONES */}
+
+        <div className="hidden shrink-0 items-center gap-1.5 lg:flex">
           <Button
             asChild
             variant="ghost"
             size="sm"
+            className="h-8 px-2.5 text-xs"
           >
             <Link
               to={
@@ -83,12 +108,15 @@ export function SiteHeader() {
           <Button
             asChild
             size="sm"
+            className="h-8 px-3 text-xs"
           >
             <Link to="/sumate">
               Quiero ser parte
             </Link>
           </Button>
         </div>
+
+        {/* MENÚ MÓVIL */}
 
         <button
           type="button"
@@ -97,50 +125,71 @@ export function SiteHeader() {
               ? "Cerrar menú"
               : "Abrir menú"
           }
-          className="grid h-10 w-10 place-items-center rounded-md border border-border lg:hidden"
+          aria-expanded={
+            open
+          }
+          className="grid h-9 w-9 place-items-center rounded-md border border-border bg-card lg:hidden"
           onClick={() =>
             setOpen(
-              (previous) =>
+              (
+                previous,
+              ) =>
                 !previous,
             )
           }
         >
           {open ? (
-            <X className="h-5 w-5" />
+            <X className="h-4.5 w-4.5" />
           ) : (
-            <Menu className="h-5 w-5" />
+            <Menu className="h-4.5 w-4.5" />
           )}
         </button>
       </div>
 
+      {/* MENÚ MÓVIL ABIERTO */}
+
       {open ? (
         <div className="border-t border-border bg-background lg:hidden">
-          <nav className="container-page flex flex-col py-3">
-            {NAV.map((item) => (
-              <Link
-                key={item.to}
-                to={item.to}
-                onClick={() =>
-                  setOpen(false)
-                }
-                activeOptions={{
-                  exact:
-                    item.to === "/",
-                }}
-                activeProps={{
-                  className:
-                    "text-primary",
-                }}
-                className="rounded-md px-1 py-3 text-base font-medium text-foreground"
-              >
-                {item.label}
-              </Link>
-            ))}
+          <nav className="container-page py-2">
+            <div className="grid gap-0.5">
+              {NAV.map(
+                (item) => (
+                  <Link
+                    key={
+                      item.to
+                    }
+                    to={
+                      item.to
+                    }
+                    onClick={() =>
+                      setOpen(
+                        false,
+                      )
+                    }
+                    activeOptions={{
+                      exact:
+                        item.to ===
+                        "/",
+                    }}
+                    activeProps={{
+                      className:
+                        "bg-secondary/60 text-foreground",
+                    }}
+                    className="rounded-lg px-3 py-2.5 text-sm font-medium text-foreground/80 transition-colors hover:bg-secondary/30 hover:text-foreground"
+                  >
+                    {
+                      item.label
+                    }
+                  </Link>
+                ),
+              )}
+            </div>
 
-            <div className="mt-3 flex flex-col gap-2 border-t border-border pb-4 pt-4">
+            <div className="mt-2 grid gap-2 border-t border-border pt-3 pb-3 sm:grid-cols-2">
               <Button
                 asChild
                 variant="outline"
+                size="sm"
               >
                 <Link
                   to={
@@ -149,7 +198,9 @@ export function SiteHeader() {
                       : "/auth"
                   }
                   onClick={() =>
-                    setOpen(false)
+                    setOpen(
+                      false,
+                    )
                   }
                 >
                   {user
@@ -158,11 +209,16 @@ export function SiteHeader() {
                 </Link>
               </Button>
 
-              <Button asChild>
+              <Button
+                asChild
+                size="sm"
+              >
                 <Link
                   to="/sumate"
                   onClick={() =>
-                    setOpen(false)
+                    setOpen(
+                      false,
+                    )
                   }
                 >
                   Quiero ser parte
