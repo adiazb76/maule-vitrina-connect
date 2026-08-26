@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as CompraventaRouteImport } from './routes/compraventa'
 import { Route as ComunidadRouteImport } from './routes/comunidad'
 import { Route as DiagnosticoRouteImport } from './routes/diagnostico'
 import { Route as EducaRouteImport } from './routes/educa'
@@ -43,6 +44,11 @@ const AdminRoute = AdminRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompraventaRoute = CompraventaRouteImport.update({
+  id: '/compraventa',
+  path: '/compraventa',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ComunidadRoute = ComunidadRouteImport.update({
@@ -110,6 +116,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/compraventa': typeof CompraventaRoute
   '/comunidad': typeof ComunidadRoute
   '/diagnostico': typeof DiagnosticoRoute
   '/educa': typeof EducaRoute
@@ -127,6 +134,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/compraventa': typeof CompraventaRoute
   '/comunidad': typeof ComunidadRoute
   '/diagnostico': typeof DiagnosticoRoute
   '/educa': typeof EducaRoute
@@ -146,6 +154,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/compraventa': typeof CompraventaRoute
   '/comunidad': typeof ComunidadRoute
   '/diagnostico': typeof DiagnosticoRoute
   '/educa': typeof EducaRoute
@@ -165,6 +174,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/auth'
+    | '/compraventa'
     | '/comunidad'
     | '/diagnostico'
     | '/educa'
@@ -182,6 +192,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/auth'
+    | '/compraventa'
     | '/comunidad'
     | '/diagnostico'
     | '/educa'
@@ -200,6 +211,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/admin'
     | '/auth'
+    | '/compraventa'
     | '/comunidad'
     | '/diagnostico'
     | '/educa'
@@ -219,6 +231,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AdminRoute: typeof AdminRoute
   AuthRoute: typeof AuthRoute
+  CompraventaRoute: typeof CompraventaRoute
   ComunidadRoute: typeof ComunidadRoute
   DiagnosticoRoute: typeof DiagnosticoRoute
   EducaRoute: typeof EducaRoute
@@ -259,6 +272,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compraventa': {
+      id: '/compraventa'
+      path: '/compraventa'
+      fullPath: '/compraventa'
+      preLoaderRoute: typeof CompraventaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/comunidad': {
@@ -366,6 +386,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,
+  CompraventaRoute: CompraventaRoute,
   ComunidadRoute: ComunidadRoute,
   DiagnosticoRoute: DiagnosticoRoute,
   EducaRoute: EducaRoute,

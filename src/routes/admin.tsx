@@ -3,7 +3,6 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import {
   ArrowLeft,
-  CalendarDays,
   Check,
   Eye,
   EyeOff,
@@ -20,12 +19,15 @@ import { toast } from "sonner";
 import { NewsAdmin } from "@/components/admin/news-admin";
 import { EducationAdmin } from "@/components/admin/education-admin";
 import { ContactAdmin } from "@/components/admin/contact-admin";
+import { EventAdmin } from "@/components/admin/event-admin";
+import { MarketplaceAdmin } from "@/components/admin/marketplace-admin";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+
 import {
   Select,
   SelectContent,
@@ -36,13 +38,12 @@ import {
 
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useIsAdmin } from "@/hooks/use-auth";
+
 import {
-  fetchEvents,
   fetchRadioItems,
   fetchSiteSettings,
   fetchWeeklyFeature,
   type Entrepreneur,
-  type EventItem,
   type RadioItem,
 } from "@/lib/vitrina";
 
@@ -68,6 +69,7 @@ const ADMIN_NAV = [
   { href: "#noticias", label: "Noticias" },
   { href: "#educa", label: "Educa" },
   { href: "#eventos", label: "Eventos" },
+  { href: "#compraventa", label: "Compraventa" },
   { href: "#radio", label: "Radio" },
   { href: "#auspiciadores", label: "Auspiciadores" },
   { href: "#contacto", label: "Contacto y Redes" },
@@ -75,12 +77,21 @@ const ADMIN_NAV = [
 
 function AdminPage() {
   const { user, loading } = useAuth();
-  const isAdmin = useIsAdmin(user?.id);
-  const queryClient = useQueryClient();
 
-  const [savingHome, setSavingHome] = useState(false);
-  const [heroFile, setHeroFile] = useState<File | null>(null);
-  const [heroPreview, setHeroPreview] = useState("");
+  const isAdmin =
+    useIsAdmin(user?.id);
+
+  const queryClient =
+    useQueryClient();
+
+  const [savingHome, setSavingHome] =
+    useState(false);
+
+  const [heroFile, setHeroFile] =
+    useState<File | null>(null);
+
+  const [heroPreview, setHeroPreview] =
+    useState("");
 
   const [homeForm, setHomeForm] = useState({
     hero_subtitle: "",
@@ -88,18 +99,15 @@ function AdminPage() {
     hero_image_url: "",
   });
 
-  const [weeklyEntrepreneurId, setWeeklyEntrepreneurId] = useState("");
-  const [weeklyStory, setWeeklyStory] = useState("");
+  const [
+    weeklyEntrepreneurId,
+    setWeeklyEntrepreneurId,
+  ] = useState("");
 
-  const [eventForm, setEventForm] = useState({
-    id: "",
-    title: "",
-    description: "",
-    starts_at: "",
-    location: "",
-    organizer: "",
-    registration_url: "",
-  });
+  const [
+    weeklyStory,
+    setWeeklyStory,
+  ] = useState("");
 
   const [radioForm, setRadioForm] = useState({
     id: "",
@@ -110,17 +118,21 @@ function AdminPage() {
     image_url: "",
   });
 
-  const [sponsorForm, setSponsorForm] = useState({
-    id: "",
-    name: "",
-    website_url: "",
-    description: "",
-    level: "aliado",
-    sort_order: "0",
-    logo_url: "",
-  });
+  const [sponsorForm, setSponsorForm] =
+    useState({
+      id: "",
+      name: "",
+      website_url: "",
+      description: "",
+      level: "aliado",
+      sort_order: "0",
+      logo_url: "",
+    });
 
-  const [sponsorLogoFile, setSponsorLogoFile] = useState<File | null>(null);
+  const [
+    sponsorLogoFile,
+    setSponsorLogoFile,
+  ] = useState<File | null>(null);
 
   const siteSettings = useQuery({
     queryKey: ["site-settings"],
@@ -134,12 +146,6 @@ function AdminPage() {
     queryFn: fetchWeeklyFeature,
   });
 
-  const events = useQuery({
-    queryKey: ["events"],
-    enabled: Boolean(isAdmin),
-    queryFn: fetchEvents,
-  });
-
   const radioItems = useQuery({
     queryKey: ["radio"],
     enabled: Boolean(isAdmin),
@@ -148,16 +154,55 @@ function AdminPage() {
 
   const sponsors = useQuery({
     queryKey: ["sponsors-admin"],
-    enabled: Boolean(isAdmin),
+
+    enabled:
+      Boolean(isAdmin),
+
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
-        .from("sponsors")
-        .select("*")
-        .order("sort_order", { ascending: true });
+      const { data, error } =
+        await (supabase as any)
+          .from("sponsors")
+          .select("*")
+          .order(
+            "sort_order",
+            {
+              ascending: true,
+            },
+          );
 
       if (error) throw error;
 
-      return (data ?? []) as Sponsor[];
+      return (
+        data ?? []
+      ) as Sponsor[];
+    },
+  });
+
+  const entrepreneurs = useQuery({
+    queryKey: ["admin-entrepreneurs"],
+
+    enabled:
+      Boolean(isAdmin),
+
+    queryFn: async () => {
+      const { data, error } =
+        await supabase
+          .from("entrepreneurs")
+          .select(
+            "*, categories:category_id(name,slug), comunas:comuna_id(name,slug)",
+          )
+          .order(
+            "created_at",
+            {
+              ascending: false,
+            },
+          );
+
+      if (error) throw error;
+
+      return (
+        data ?? []
+      ) as unknown as Entrepreneur[];
     },
   });
 
@@ -165,68 +210,80 @@ function AdminPage() {
     if (!siteSettings.data) return;
 
     setHomeForm({
-      hero_subtitle: siteSettings.data.hero_subtitle ?? "",
-      hero_description: siteSettings.data.hero_description ?? "",
-      hero_image_url: siteSettings.data.hero_image_url ?? "",
+      hero_subtitle:
+        siteSettings.data.hero_subtitle ??
+        "",
+
+      hero_description:
+        siteSettings.data.hero_description ??
+        "",
+
+      hero_image_url:
+        siteSettings.data.hero_image_url ??
+        "",
     });
 
-    setHeroPreview(siteSettings.data.hero_image_url ?? "");
+    setHeroPreview(
+      siteSettings.data.hero_image_url ??
+        "",
+    );
   }, [siteSettings.data]);
 
   useEffect(() => {
     if (!weekly.data) return;
 
     setWeeklyEntrepreneurId(
-      weekly.data.entrepreneurs?.id ?? "",
+      weekly.data.entrepreneurs?.id ??
+        "",
     );
 
     setWeeklyStory(
-      weekly.data.story ?? "",
+      weekly.data.story ??
+        "",
     );
   }, [weekly.data]);
 
-  const entrepreneurs = useQuery({
-    queryKey: ["admin-entrepreneurs"],
-    enabled: Boolean(isAdmin),
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("entrepreneurs")
-        .select(
-          "*, categories:category_id(name,slug), comunas:comuna_id(name,slug)",
-        )
-        .order("created_at", { ascending: false });
+  const pending =
+    (entrepreneurs.data ?? []).filter(
+      (entrepreneur) =>
+        entrepreneur.status ===
+        "pendiente",
+    );
 
-      if (error) throw error;
+  const approved =
+    (entrepreneurs.data ?? []).filter(
+      (entrepreneur) =>
+        entrepreneur.status ===
+        "aprobado",
+    );
 
-      return (data ?? []) as unknown as Entrepreneur[];
-    },
-  });
+  const rejected =
+    (entrepreneurs.data ?? []).filter(
+      (entrepreneur) =>
+        entrepreneur.status ===
+        "rechazado",
+    );
 
-  const pending = (entrepreneurs.data ?? []).filter(
-    (e) => e.status === "pendiente",
-  );
+  const hidden =
+    approved.filter(
+      (entrepreneur) =>
+        !entrepreneur.visible,
+    );
 
-  const approved = (entrepreneurs.data ?? []).filter(
-    (e) => e.status === "aprobado",
-  );
+  const publishedEntrepreneurs =
+    useMemo(
+      () =>
+        (
+          entrepreneurs.data ?? []
+        ).filter(
+          (entrepreneur) =>
+            entrepreneur.status ===
+              "aprobado" &&
+            entrepreneur.visible,
+        ),
 
-  const rejected = (entrepreneurs.data ?? []).filter(
-    (e) => e.status === "rechazado",
-  );
-
-  const hidden = approved.filter(
-    (e) => !e.visible,
-  );
-
-  const publishedEntrepreneurs = useMemo(
-    () =>
-      (entrepreneurs.data ?? []).filter(
-        (e) =>
-          e.status === "aprobado" &&
-          e.visible,
-      ),
-    [entrepreneurs.data],
-  );
+      [entrepreneurs.data],
+    );
 
   async function refreshEntrepreneurs() {
     await queryClient.invalidateQueries({
@@ -246,25 +303,38 @@ function AdminPage() {
     });
 
     await queryClient.invalidateQueries({
-      queryKey: ["community-entrepreneurs"],
+      queryKey: [
+        "community-entrepreneurs",
+      ],
     });
 
     await queryClient.invalidateQueries({
-      queryKey: ["community-all-entrepreneurs"],
+      queryKey: [
+        "community-all-entrepreneurs",
+      ],
     });
   }
 
   async function updateStatus(
     id: string,
-    status: "aprobado" | "rechazado" | "pendiente",
+    status:
+      | "aprobado"
+      | "rechazado"
+      | "pendiente",
   ) {
-    const { error } = await supabase
-      .from("entrepreneurs")
-      .update({ status })
-      .eq("id", id);
+    const { error } =
+      await supabase
+        .from("entrepreneurs")
+        .update({
+          status,
+        })
+        .eq("id", id);
 
     if (error) {
-      toast.error(error.message);
+      toast.error(
+        error.message,
+      );
+
       return;
     }
 
@@ -280,19 +350,28 @@ function AdminPage() {
   }
 
   async function toggleVisibility(
-    e: Entrepreneur,
+    entrepreneur: Entrepreneur,
   ) {
-    const nextVisible = !e.visible;
+    const nextVisible =
+      !entrepreneur.visible;
 
-    const { error } = await (supabase as any)
-      .from("entrepreneurs")
-      .update({
-        visible: nextVisible,
-      })
-      .eq("id", e.id);
+    const { error } =
+      await (supabase as any)
+        .from("entrepreneurs")
+        .update({
+          visible:
+            nextVisible,
+        })
+        .eq(
+          "id",
+          entrepreneur.id,
+        );
 
     if (error) {
-      toast.error(error.message);
+      toast.error(
+        error.message,
+      );
+
       return;
     }
 
@@ -309,48 +388,77 @@ function AdminPage() {
     id: string,
     businessName: string,
   ) {
-    const confirmed = window.confirm(
-      `¿Seguro que quieres eliminar "${businessName}"? Esta acción no se puede deshacer.`,
-    );
+    const confirmed =
+      window.confirm(
+        `¿Seguro que quieres eliminar "${businessName}"? Esta acción no se puede deshacer.`,
+      );
 
     if (!confirmed) return;
 
-    const { error } = await supabase
-      .from("entrepreneurs")
-      .delete()
-      .eq("id", id);
+    const { error } =
+      await supabase
+        .from("entrepreneurs")
+        .delete()
+        .eq("id", id);
 
     if (error) {
-      toast.error(error.message);
+      toast.error(
+        error.message,
+      );
+
       return;
     }
 
-    toast.success("Emprendimiento eliminado.");
+    toast.success(
+      "Emprendimiento eliminado.",
+    );
 
     await refreshEntrepreneurs();
   }
 
-  function selectHero(file?: File) {
+  function selectHero(
+    file?: File,
+  ) {
     if (!file) return;
 
-    if (!file.type.startsWith("image/")) {
-      toast.error("Selecciona una imagen válida.");
+    if (
+      !file.type.startsWith(
+        "image/",
+      )
+    ) {
+      toast.error(
+        "Selecciona una imagen válida.",
+      );
+
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("La imagen no puede superar los 5 MB.");
+    if (
+      file.size >
+      5 * 1024 * 1024
+    ) {
+      toast.error(
+        "La imagen no puede superar los 5 MB.",
+      );
+
       return;
     }
 
     setHeroFile(file);
 
-    const reader = new FileReader();
+    const reader =
+      new FileReader();
 
     reader.onload = () =>
-      setHeroPreview(String(reader.result));
+      setHeroPreview(
+        String(
+          reader.result,
+        ),
+      );
 
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(
+      file,
+    );
   }
 
   async function uploadToBucket(
@@ -361,30 +469,48 @@ function AdminPage() {
       file.name
         .split(".")
         .pop()
-        ?.toLowerCase() || "jpg";
+        ?.toLowerCase() ||
+      "jpg";
 
     const fileName =
       `${prefix}/${Date.now()}-${Math.random()
         .toString(36)
-        .slice(2, 8)}.${extension}`;
+        .slice(
+          2,
+          8,
+        )}.${extension}`;
 
-    const { error } = await supabase.storage
-      .from("Entrepreneur-images")
-      .upload(
-        fileName,
-        file,
-        {
-          cacheControl: "3600",
-          upsert: false,
-          contentType: file.type,
-        },
-      );
+    const { error } =
+      await supabase.storage
+        .from(
+          "Entrepreneur-images",
+        )
+        .upload(
+          fileName,
+          file,
+          {
+            cacheControl:
+              "3600",
 
-    if (error) throw error;
+            upsert: false,
 
-    const { data } = supabase.storage
-      .from("Entrepreneur-images")
-      .getPublicUrl(fileName);
+            contentType:
+              file.type,
+          },
+        );
+
+    if (error) {
+      throw error;
+    }
+
+    const { data } =
+      supabase.storage
+        .from(
+          "Entrepreneur-images",
+        )
+        .getPublicUrl(
+          fileName,
+        );
 
     return data.publicUrl;
   }
@@ -398,47 +524,64 @@ function AdminPage() {
 
     try {
       let imageUrl =
-        homeForm.hero_image_url || null;
+        homeForm.hero_image_url ||
+        null;
 
       if (heroFile) {
-        imageUrl = await uploadToBucket(
-          heroFile,
-          "site",
-        );
+        imageUrl =
+          await uploadToBucket(
+            heroFile,
+            "site",
+          );
       }
 
-      const { error } = await (supabase as any)
-        .from("site_settings")
-        .update({
-          hero_subtitle:
-            homeForm.hero_subtitle,
+      const { error } =
+        await (supabase as any)
+          .from(
+            "site_settings",
+          )
+          .update({
+            hero_subtitle:
+              homeForm.hero_subtitle,
 
-          hero_description:
-            homeForm.hero_description,
+            hero_description:
+              homeForm.hero_description,
+
+            hero_image_url:
+              imageUrl,
+
+            updated_at:
+              new Date().toISOString(),
+          })
+          .eq(
+            "id",
+            "home",
+          );
+
+      if (error) {
+        throw error;
+      }
+
+      setHomeForm(
+        (previous) => ({
+          ...previous,
 
           hero_image_url:
-            imageUrl,
-
-          updated_at:
-            new Date().toISOString(),
-        })
-        .eq("id", "home");
-
-      if (error) throw error;
-
-      setHomeForm((previous) => ({
-        ...previous,
-        hero_image_url:
-          imageUrl ?? "",
-      }));
+            imageUrl ?? "",
+        }),
+      );
 
       setHeroFile(null);
 
       await queryClient.invalidateQueries({
-        queryKey: ["site-settings"],
+        queryKey: [
+          "site-settings",
+        ],
       });
 
-      toast.success("Portada actualizada.");
+      toast.success(
+        "Portada actualizada.",
+      );
     } catch (error) {
       toast.error(
         error instanceof Error
@@ -451,8 +594,13 @@ function AdminPage() {
   }
 
   async function saveWeekly() {
-    if (!weeklyEntrepreneurId) {
-      toast.error("Selecciona un emprendedor.");
+    if (
+      !weeklyEntrepreneurId
+    ) {
+      toast.error(
+        "Selecciona un emprendedor.",
+      );
+
       return;
     }
 
@@ -461,26 +609,34 @@ function AdminPage() {
         .toISOString()
         .slice(0, 10);
 
-    const { error } = await (supabase as any)
-      .from("weekly_features")
-      .upsert(
-        {
-          entrepreneur_id:
-            weeklyEntrepreneurId,
+    const { error } =
+      await (supabase as any)
+        .from(
+          "weekly_features",
+        )
+        .upsert(
+          {
+            entrepreneur_id:
+              weeklyEntrepreneurId,
 
-          story:
-            weeklyStory || null,
+            story:
+              weeklyStory ||
+              null,
 
-          week_start:
-            weekStart,
-        },
-        {
-          onConflict: "week_start",
-        },
-      );
+            week_start:
+              weekStart,
+          },
+          {
+            onConflict:
+              "week_start",
+          },
+        );
 
     if (error) {
-      toast.error(error.message);
+      toast.error(
+        error.message,
+      );
+
       return;
     }
 
@@ -493,141 +649,33 @@ function AdminPage() {
     );
   }
 
-  async function saveEvent() {
-    if (
-      !eventForm.title ||
-      !eventForm.starts_at
-    ) {
-      toast.error(
-        "Título y fecha son obligatorios.",
-      );
-      return;
-    }
-
-    const payload = {
-      title: eventForm.title,
-      description:
-        eventForm.description || null,
-
-      starts_at:
-        new Date(
-          eventForm.starts_at,
-        ).toISOString(),
-
-      location:
-        eventForm.location || null,
-
-      organizer:
-        eventForm.organizer || null,
-
-      registration_url:
-        eventForm.registration_url || null,
-
-      published: true,
-
-      slug:
-        `${eventForm.title
-          .toLowerCase()
-          .normalize("NFD")
-          .replace(
-            /[\u0300-\u036f]/g,
-            "",
-          )
-          .replace(
-            /[^a-z0-9]+/g,
-            "-",
-          )
-          .replace(
-            /(^-|-$)/g,
-            "",
-          )}-${Date.now()
-          .toString()
-          .slice(-5)}`,
-    };
-
-    let error;
-
-    if (eventForm.id) {
-      ({ error } = await (supabase as any)
-        .from("events")
-        .update(payload)
-        .eq("id", eventForm.id));
-    } else {
-      ({ error } = await (supabase as any)
-        .from("events")
-        .insert(payload));
-    }
-
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
-
-    setEventForm({
-      id: "",
-      title: "",
-      description: "",
-      starts_at: "",
-      location: "",
-      organizer: "",
-      registration_url: "",
-    });
-
-    await queryClient.invalidateQueries({
-      queryKey: ["events"],
-    });
-
-    toast.success("Evento guardado.");
-  }
-
-  async function deleteEvent(
-    id: string,
-  ) {
-    if (
-      !window.confirm(
-        "¿Eliminar este evento?",
-      )
-    ) {
-      return;
-    }
-
-    const { error } = await (supabase as any)
-      .from("events")
-      .delete()
-      .eq("id", id);
-
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
-
-    await queryClient.invalidateQueries({
-      queryKey: ["events"],
-    });
-
-    toast.success("Evento eliminado.");
-  }
-
   async function saveRadio() {
     if (!radioForm.title) {
       toast.error(
         "El título es obligatorio.",
       );
+
       return;
     }
 
     const payload = {
-      title: radioForm.title,
-      kind: radioForm.kind,
+      title:
+        radioForm.title,
+
+      kind:
+        radioForm.kind,
 
       description:
-        radioForm.description || null,
+        radioForm.description ||
+        null,
 
       media_url:
-        radioForm.media_url || null,
+        radioForm.media_url ||
+        null,
 
       image_url:
-        radioForm.image_url || null,
+        radioForm.image_url ||
+        null,
 
       published: true,
 
@@ -638,18 +686,30 @@ function AdminPage() {
     let error;
 
     if (radioForm.id) {
-      ({ error } = await (supabase as any)
-        .from("radio_items")
-        .update(payload)
-        .eq("id", radioForm.id));
+      ({ error } =
+        await (supabase as any)
+          .from(
+            "radio_items",
+          )
+          .update(payload)
+          .eq(
+            "id",
+            radioForm.id,
+          ));
     } else {
-      ({ error } = await (supabase as any)
-        .from("radio_items")
-        .insert(payload));
+      ({ error } =
+        await (supabase as any)
+          .from(
+            "radio_items",
+          )
+          .insert(payload));
     }
 
     if (error) {
-      toast.error(error.message);
+      toast.error(
+        error.message,
+      );
+
       return;
     }
 
@@ -682,13 +742,22 @@ function AdminPage() {
       return;
     }
 
-    const { error } = await (supabase as any)
-      .from("radio_items")
-      .delete()
-      .eq("id", id);
+    const { error } =
+      await (supabase as any)
+        .from(
+          "radio_items",
+        )
+        .delete()
+        .eq(
+          "id",
+          id,
+        );
 
     if (error) {
-      toast.error(error.message);
+      toast.error(
+        error.message,
+      );
+
       return;
     }
 
@@ -702,18 +771,24 @@ function AdminPage() {
   }
 
   async function saveSponsor() {
-    if (!sponsorForm.name) {
+    if (
+      !sponsorForm.name
+    ) {
       toast.error(
         "El nombre es obligatorio.",
       );
+
       return;
     }
 
     let logoUrl =
-      sponsorForm.logo_url || null;
+      sponsorForm.logo_url ||
+      null;
 
     try {
-      if (sponsorLogoFile) {
+      if (
+        sponsorLogoFile
+      ) {
         logoUrl =
           await uploadToBucket(
             sponsorLogoFile,
@@ -726,10 +801,12 @@ function AdminPage() {
           sponsorForm.name,
 
         website_url:
-          sponsorForm.website_url || null,
+          sponsorForm.website_url ||
+          null,
 
         description:
-          sponsorForm.description || null,
+          sponsorForm.description ||
+          null,
 
         level:
           sponsorForm.level,
@@ -747,18 +824,35 @@ function AdminPage() {
 
       let error;
 
-      if (sponsorForm.id) {
-        ({ error } = await (supabase as any)
-          .from("sponsors")
-          .update(payload)
-          .eq("id", sponsorForm.id));
+      if (
+        sponsorForm.id
+      ) {
+        ({ error } =
+          await (supabase as any)
+            .from(
+              "sponsors",
+            )
+            .update(
+              payload,
+            )
+            .eq(
+              "id",
+              sponsorForm.id,
+            ));
       } else {
-        ({ error } = await (supabase as any)
-          .from("sponsors")
-          .insert(payload));
+        ({ error } =
+          await (supabase as any)
+            .from(
+              "sponsors",
+            )
+            .insert(
+              payload,
+            ));
       }
 
-      if (error) throw error;
+      if (error) {
+        throw error;
+      }
 
       setSponsorForm({
         id: "",
@@ -770,14 +864,20 @@ function AdminPage() {
         logo_url: "",
       });
 
-      setSponsorLogoFile(null);
+      setSponsorLogoFile(
+        null,
+      );
 
       await queryClient.invalidateQueries({
-        queryKey: ["sponsors-admin"],
+        queryKey: [
+          "sponsors-admin",
+        ],
       });
 
       await queryClient.invalidateQueries({
-        queryKey: ["sponsors"],
+        queryKey: [
+          "sponsors",
+        ],
       });
 
       toast.success(
@@ -795,25 +895,38 @@ function AdminPage() {
   async function toggleSponsorVisibility(
     sponsor: Sponsor,
   ) {
-    const { error } = await (supabase as any)
-      .from("sponsors")
-      .update({
-        visible:
-          !sponsor.visible,
-      })
-      .eq("id", sponsor.id);
+    const { error } =
+      await (supabase as any)
+        .from(
+          "sponsors",
+        )
+        .update({
+          visible:
+            !sponsor.visible,
+        })
+        .eq(
+          "id",
+          sponsor.id,
+        );
 
     if (error) {
-      toast.error(error.message);
+      toast.error(
+        error.message,
+      );
+
       return;
     }
 
     await queryClient.invalidateQueries({
-      queryKey: ["sponsors-admin"],
+      queryKey: [
+        "sponsors-admin",
+      ],
     });
 
     await queryClient.invalidateQueries({
-      queryKey: ["sponsors"],
+      queryKey: [
+        "sponsors",
+      ],
     });
   }
 
@@ -828,22 +941,35 @@ function AdminPage() {
       return;
     }
 
-    const { error } = await (supabase as any)
-      .from("sponsors")
-      .delete()
-      .eq("id", id);
+    const { error } =
+      await (supabase as any)
+        .from(
+          "sponsors",
+        )
+        .delete()
+        .eq(
+          "id",
+          id,
+        );
 
     if (error) {
-      toast.error(error.message);
+      toast.error(
+        error.message,
+      );
+
       return;
     }
 
     await queryClient.invalidateQueries({
-      queryKey: ["sponsors-admin"],
+      queryKey: [
+        "sponsors-admin",
+      ],
     });
 
     await queryClient.invalidateQueries({
-      queryKey: ["sponsors"],
+      queryKey: [
+        "sponsors",
+      ],
     });
 
     toast.success(
@@ -859,7 +985,10 @@ function AdminPage() {
     );
   }
 
-  if (!user || !isAdmin) {
+  if (
+    !user ||
+    !isAdmin
+  ) {
     return (
       <section className="container-page py-20 text-center">
         <h1 className="font-display text-3xl font-semibold">
@@ -906,23 +1035,21 @@ function AdminPage() {
         </p>
       </div>
 
-      {/* NAVEGACIÓN ADMIN */}
-
       <div className="sticky top-16 z-30 -mx-2 mt-6 overflow-x-auto border-y border-border bg-background px-2 py-3">
         <div className="flex min-w-max gap-2">
-          {ADMIN_NAV.map((item) => (
-            <a
-              key={item.href}
-              href={item.href}
-              className="rounded-full border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
-            >
-              {item.label}
-            </a>
-          ))}
+          {ADMIN_NAV.map(
+            (item) => (
+              <a
+                key={item.href}
+                href={item.href}
+                className="rounded-full border border-border bg-card px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+              >
+                {item.label}
+              </a>
+            ),
+          )}
         </div>
       </div>
-
-      {/* PORTADA */}
 
       <AdminBlock
         id="portada"
@@ -938,15 +1065,13 @@ function AdminPage() {
         >
           <Field label="Bajada principal">
             <Input
-              value={
-                homeForm.hero_subtitle
-              }
-              onChange={(e) =>
+              value={homeForm.hero_subtitle}
+              onChange={(event) =>
                 setHomeForm(
                   (previous) => ({
                     ...previous,
                     hero_subtitle:
-                      e.target.value,
+                      event.target.value,
                   }),
                 )
               }
@@ -956,15 +1081,13 @@ function AdminPage() {
           <Field label="Texto introductorio">
             <Textarea
               rows={4}
-              value={
-                homeForm.hero_description
-              }
-              onChange={(e) =>
+              value={homeForm.hero_description}
+              onChange={(event) =>
                 setHomeForm(
                   (previous) => ({
                     ...previous,
                     hero_description:
-                      e.target.value,
+                      event.target.value,
                   }),
                 )
               }
@@ -975,9 +1098,9 @@ function AdminPage() {
             <Input
               type="file"
               accept="image/jpeg,image/png,image/webp"
-              onChange={(e) =>
+              onChange={(event) =>
                 selectHero(
-                  e.target.files?.[0],
+                  event.target.files?.[0],
                 )
               }
             />
@@ -1005,8 +1128,6 @@ function AdminPage() {
         </form>
       </AdminBlock>
 
-      {/* DESTACADO */}
-
       <AdminBlock
         id="destacado"
         icon={
@@ -1018,12 +1139,8 @@ function AdminPage() {
         <div className="grid gap-5">
           <Field label="Emprendedor">
             <Select
-              value={
-                weeklyEntrepreneurId
-              }
-              onValueChange={
-                setWeeklyEntrepreneurId
-              }
+              value={weeklyEntrepreneurId}
+              onValueChange={setWeeklyEntrepreneurId}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Selecciona un emprendedor" />
@@ -1031,12 +1148,12 @@ function AdminPage() {
 
               <SelectContent>
                 {publishedEntrepreneurs.map(
-                  (e) => (
+                  (entrepreneur) => (
                     <SelectItem
-                      key={e.id}
-                      value={e.id}
+                      key={entrepreneur.id}
+                      value={entrepreneur.id}
                     >
-                      {e.business_name}
+                      {entrepreneur.business_name}
                     </SelectItem>
                   ),
                 )}
@@ -1048,9 +1165,9 @@ function AdminPage() {
             <Textarea
               rows={4}
               value={weeklyStory}
-              onChange={(e) =>
+              onChange={(event) =>
                 setWeeklyStory(
-                  e.target.value,
+                  event.target.value,
                 )
               }
             />
@@ -1065,8 +1182,6 @@ function AdminPage() {
           </Button>
         </div>
       </AdminBlock>
-
-      {/* EMPRENDEDORES */}
 
       <section
         id="emprendedores"
@@ -1107,9 +1222,7 @@ function AdminPage() {
           items={pending}
           onStatus={updateStatus}
           onDelete={removeEntrepreneur}
-          onVisibility={
-            toggleVisibility
-          }
+          onVisibility={toggleVisibility}
         />
 
         <AdminSection
@@ -1117,9 +1230,7 @@ function AdminPage() {
           items={approved}
           onStatus={updateStatus}
           onDelete={removeEntrepreneur}
-          onVisibility={
-            toggleVisibility
-          }
+          onVisibility={toggleVisibility}
         />
 
         <AdminSection
@@ -1127,13 +1238,9 @@ function AdminPage() {
           items={rejected}
           onStatus={updateStatus}
           onDelete={removeEntrepreneur}
-          onVisibility={
-            toggleVisibility
-          }
+          onVisibility={toggleVisibility}
         />
       </section>
-
-      {/* NOTICIAS */}
 
       <div
         id="noticias"
@@ -1142,8 +1249,6 @@ function AdminPage() {
         <NewsAdmin />
       </div>
 
-      {/* EDUCA */}
-
       <div
         id="educa"
         className="scroll-mt-32"
@@ -1151,175 +1256,21 @@ function AdminPage() {
         <EducationAdmin />
       </div>
 
-      {/* EVENTOS */}
-
-      <AdminBlock
+      <div
         id="eventos"
-        icon={
-          <CalendarDays className="h-5 w-5 text-primary" />
-        }
-        eyebrow="Agenda"
-        title="Eventos"
+        className="scroll-mt-32"
       >
-        <div className="grid gap-4">
-          <Field label="Título">
-            <Input
-              value={
-                eventForm.title
-              }
-              onChange={(e) =>
-                setEventForm(
-                  (previous) => ({
-                    ...previous,
-                    title:
-                      e.target.value,
-                  }),
-                )
-              }
-            />
-          </Field>
+        <EventAdmin />
+      </div>
 
-          <Field label="Descripción">
-            <Textarea
-              rows={3}
-              value={
-                eventForm.description
-              }
-              onChange={(e) =>
-                setEventForm(
-                  (previous) => ({
-                    ...previous,
-                    description:
-                      e.target.value,
-                  }),
-                )
-              }
-            />
-          </Field>
+      {/* COMPRAVENTA */}
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Fecha y hora">
-              <Input
-                type="datetime-local"
-                value={
-                  eventForm.starts_at
-                }
-                onChange={(e) =>
-                  setEventForm(
-                    (previous) => ({
-                      ...previous,
-                      starts_at:
-                        e.target.value,
-                    }),
-                  )
-                }
-              />
-            </Field>
-
-            <Field label="Lugar">
-              <Input
-                value={
-                  eventForm.location
-                }
-                onChange={(e) =>
-                  setEventForm(
-                    (previous) => ({
-                      ...previous,
-                      location:
-                        e.target.value,
-                    }),
-                  )
-                }
-              />
-            </Field>
-
-            <Field label="Organizador">
-              <Input
-                value={
-                  eventForm.organizer
-                }
-                onChange={(e) =>
-                  setEventForm(
-                    (previous) => ({
-                      ...previous,
-                      organizer:
-                        e.target.value,
-                    }),
-                  )
-                }
-              />
-            </Field>
-
-            <Field label="Link inscripción">
-              <Input
-                value={
-                  eventForm.registration_url
-                }
-                onChange={(e) =>
-                  setEventForm(
-                    (previous) => ({
-                      ...previous,
-                      registration_url:
-                        e.target.value,
-                    }),
-                  )
-                }
-              />
-            </Field>
-          </div>
-
-          <Button
-            type="button"
-            className="justify-self-start"
-            onClick={saveEvent}
-          >
-            {eventForm.id
-              ? "Actualizar evento"
-              : "Crear evento"}
-          </Button>
-        </div>
-
-        <div className="mt-8 space-y-3">
-          {(events.data ?? []).map(
-            (event: EventItem) => (
-              <SimpleRow
-                key={event.id}
-                title={event.title}
-                subtitle={
-                  event.location ?? ""
-                }
-                onEdit={() =>
-                  setEventForm({
-                    id: event.id,
-                    title: event.title,
-                    description:
-                      event.description ?? "",
-                    starts_at:
-                      new Date(
-                        event.starts_at,
-                      )
-                        .toISOString()
-                        .slice(0, 16),
-                    location:
-                      event.location ?? "",
-                    organizer:
-                      event.organizer ?? "",
-                    registration_url:
-                      event.registration_url ?? "",
-                  })
-                }
-                onDelete={() =>
-                  deleteEvent(
-                    event.id,
-                  )
-                }
-              />
-            ),
-          )}
-        </div>
-      </AdminBlock>
-
-      {/* RADIO */}
+      <div
+        id="compraventa"
+        className="scroll-mt-32"
+      >
+        <MarketplaceAdmin />
+      </div>
 
       <AdminBlock
         id="radio"
@@ -1332,15 +1283,13 @@ function AdminPage() {
         <div className="grid gap-4">
           <Field label="Título">
             <Input
-              value={
-                radioForm.title
-              }
-              onChange={(e) =>
+              value={radioForm.title}
+              onChange={(event) =>
                 setRadioForm(
                   (previous) => ({
                     ...previous,
                     title:
-                      e.target.value,
+                      event.target.value,
                   }),
                 )
               }
@@ -1349,9 +1298,7 @@ function AdminPage() {
 
           <Field label="Tipo">
             <Select
-              value={
-                radioForm.kind
-              }
+              value={radioForm.kind}
               onValueChange={(value) =>
                 setRadioForm(
                   (previous) => ({
@@ -1384,15 +1331,13 @@ function AdminPage() {
           <Field label="Descripción">
             <Textarea
               rows={3}
-              value={
-                radioForm.description
-              }
-              onChange={(e) =>
+              value={radioForm.description}
+              onChange={(event) =>
                 setRadioForm(
                   (previous) => ({
                     ...previous,
                     description:
-                      e.target.value,
+                      event.target.value,
                   }),
                 )
               }
@@ -1401,15 +1346,13 @@ function AdminPage() {
 
           <Field label="URL de audio">
             <Input
-              value={
-                radioForm.media_url
-              }
-              onChange={(e) =>
+              value={radioForm.media_url}
+              onChange={(event) =>
                 setRadioForm(
                   (previous) => ({
                     ...previous,
                     media_url:
-                      e.target.value,
+                      event.target.value,
                   }),
                 )
               }
@@ -1418,15 +1361,13 @@ function AdminPage() {
 
           <Field label="URL de imagen">
             <Input
-              value={
-                radioForm.image_url
-              }
-              onChange={(e) =>
+              value={radioForm.image_url}
+              onChange={(event) =>
                 setRadioForm(
                   (previous) => ({
                     ...previous,
                     image_url:
-                      e.target.value,
+                      event.target.value,
                   }),
                 )
               }
@@ -1475,8 +1416,6 @@ function AdminPage() {
         </div>
       </AdminBlock>
 
-      {/* AUSPICIADORES */}
-
       <AdminBlock
         id="auspiciadores"
         icon={
@@ -1488,15 +1427,13 @@ function AdminPage() {
         <div className="grid gap-4">
           <Field label="Nombre">
             <Input
-              value={
-                sponsorForm.name
-              }
-              onChange={(e) =>
+              value={sponsorForm.name}
+              onChange={(event) =>
                 setSponsorForm(
                   (previous) => ({
                     ...previous,
                     name:
-                      e.target.value,
+                      event.target.value,
                   }),
                 )
               }
@@ -1506,15 +1443,13 @@ function AdminPage() {
           <Field label="Descripción">
             <Textarea
               rows={3}
-              value={
-                sponsorForm.description
-              }
-              onChange={(e) =>
+              value={sponsorForm.description}
+              onChange={(event) =>
                 setSponsorForm(
                   (previous) => ({
                     ...previous,
                     description:
-                      e.target.value,
+                      event.target.value,
                   }),
                 )
               }
@@ -1524,9 +1459,7 @@ function AdminPage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Nivel">
               <Select
-                value={
-                  sponsorForm.level
-                }
+                value={sponsorForm.level}
                 onValueChange={(value) =>
                   setSponsorForm(
                     (previous) => ({
@@ -1559,15 +1492,13 @@ function AdminPage() {
             <Field label="Orden">
               <Input
                 type="number"
-                value={
-                  sponsorForm.sort_order
-                }
-                onChange={(e) =>
+                value={sponsorForm.sort_order}
+                onChange={(event) =>
                   setSponsorForm(
                     (previous) => ({
                       ...previous,
                       sort_order:
-                        e.target.value,
+                        event.target.value,
                     }),
                   )
                 }
@@ -1577,15 +1508,13 @@ function AdminPage() {
 
           <Field label="Sitio web">
             <Input
-              value={
-                sponsorForm.website_url
-              }
-              onChange={(e) =>
+              value={sponsorForm.website_url}
+              onChange={(event) =>
                 setSponsorForm(
                   (previous) => ({
                     ...previous,
                     website_url:
-                      e.target.value,
+                      event.target.value,
                   }),
                 )
               }
@@ -1596,9 +1525,9 @@ function AdminPage() {
             <Input
               type="file"
               accept="image/jpeg,image/png,image/webp"
-              onChange={(e) =>
+              onChange={(event) =>
                 setSponsorLogoFile(
-                  e.target.files?.[0] ??
+                  event.target.files?.[0] ??
                     null,
                 )
               }
@@ -1653,28 +1582,20 @@ function AdminPage() {
                     variant="outline"
                     onClick={() =>
                       setSponsorForm({
-                        id:
-                          sponsor.id,
-
-                        name:
-                          sponsor.name,
-
+                        id: sponsor.id,
+                        name: sponsor.name,
                         website_url:
                           sponsor.website_url ??
                           "",
-
                         description:
                           sponsor.description ??
                           "",
-
                         level:
                           sponsor.level,
-
                         sort_order:
                           String(
                             sponsor.sort_order,
                           ),
-
                         logo_url:
                           sponsor.logo_url ??
                           "",
@@ -1715,8 +1636,6 @@ function AdminPage() {
           )}
         </div>
       </AdminBlock>
-
-      {/* CONTACTO Y REDES */}
 
       <div
         id="contacto"
@@ -1776,7 +1695,10 @@ function Field({
 }) {
   return (
     <div className="space-y-2">
-      <Label>{label}</Label>
+      <Label>
+        {label}
+      </Label>
+
       {children}
     </div>
   );
@@ -1868,20 +1790,14 @@ function AdminSection({
           {items.map(
             (entrepreneur) => (
               <article
-                key={
-                  entrepreneur.id
-                }
+                key={entrepreneur.id}
                 className="rounded-2xl border border-border bg-card p-5"
               >
                 <div className="flex flex-col gap-5 md:flex-row">
                   {entrepreneur.photo_url ? (
                     <img
-                      src={
-                        entrepreneur.photo_url
-                      }
-                      alt={
-                        entrepreneur.business_name
-                      }
+                      src={entrepreneur.photo_url}
+                      alt={entrepreneur.business_name}
                       className="h-40 w-full rounded-xl object-cover md:w-56"
                     />
                   ) : null}
@@ -1889,9 +1805,7 @@ function AdminSection({
                   <div className="flex-1">
                     <div className="flex flex-wrap gap-2">
                       <Badge variant="secondary">
-                        {entrepreneur
-                          .categories
-                          ?.name ??
+                        {entrepreneur.categories?.name ??
                           "Sin categoría"}
                       </Badge>
 
@@ -1909,15 +1823,11 @@ function AdminSection({
                     </div>
 
                     <h3 className="mt-3 font-display text-xl font-semibold">
-                      {
-                        entrepreneur.business_name
-                      }
+                      {entrepreneur.business_name}
                     </h3>
 
                     <p className="mt-2 text-sm text-muted-foreground">
-                      {
-                        entrepreneur.short_description
-                      }
+                      {entrepreneur.short_description}
                     </p>
 
                     <div className="mt-5 flex flex-wrap gap-2">

@@ -1,6 +1,12 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Link,
+  useNavigate,
+} from "@tanstack/react-router";
+
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+
 import {
   Handshake,
   Search,
@@ -10,6 +16,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+
 import {
   Select,
   SelectContent,
@@ -17,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+
 import { EntrepreneurCard } from "@/components/entrepreneur-card";
 
 import {
@@ -36,8 +44,13 @@ type SearchParams = {
 };
 
 export const Route = createFileRoute("/comunidad")({
-  validateSearch: (search: Record<string, unknown>): SearchParams => ({
-    q: typeof search["q"] === "string" ? search["q"] : undefined,
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): SearchParams => ({
+    q:
+      typeof search["q"] === "string"
+        ? search["q"]
+        : undefined,
 
     categoria:
       typeof search["categoria"] === "string"
@@ -49,17 +62,25 @@ export const Route = createFileRoute("/comunidad")({
         ? search["comuna"]
         : undefined,
 
-    orden: ["recientes", "visitados", "destacados", "alfabetico"].includes(
+    orden: [
+      "recientes",
+      "visitados",
+      "destacados",
+      "alfabetico",
+    ].includes(
       String(search["orden"]),
     )
-      ? (search["orden"] as DirectoryFilters["sort"])
+      ? (search[
+          "orden"
+        ] as DirectoryFilters["sort"])
       : undefined,
   }),
 
   head: () => ({
     meta: [
       {
-        title: "Comunidad de emprendedores del Maule Sur | La Vitrina",
+        title:
+          "Comunidad de emprendedores del Maule Sur | La Vitrina",
       },
       {
         name: "description",
@@ -73,86 +94,156 @@ export const Route = createFileRoute("/comunidad")({
 });
 
 function ComunidadPage() {
-  const search = Route.useSearch();
-  const navigate = useNavigate({ from: "/comunidad" });
+  const search =
+    Route.useSearch();
 
-  const [term, setTerm] = useState(search.q ?? "");
+  const navigate =
+    useNavigate({
+      from: "/comunidad",
+    });
+
+  const [term, setTerm] =
+    useState(
+      search.q ?? "",
+    );
 
   useEffect(() => {
-    setTerm(search.q ?? "");
+    setTerm(
+      search.q ?? "",
+    );
   }, [search.q]);
 
-  const categories = useQuery({
-    queryKey: ["categories"],
-    queryFn: fetchCategories,
-  });
+  const categories =
+    useQuery({
+      queryKey: [
+        "categories",
+      ],
 
-  const comunas = useQuery({
-    queryKey: ["comunas"],
-    queryFn: fetchComunas,
-  });
+      queryFn:
+        fetchCategories,
+    });
 
-  const weekly = useQuery({
-    queryKey: ["weekly"],
-    queryFn: fetchWeeklyFeature,
-  });
+  const comunas =
+    useQuery({
+      queryKey: [
+        "comunas",
+      ],
 
-  const filters: DirectoryFilters = {
-    search: search.q,
-    categorySlug: search.categoria,
-    comunaSlug: search.comuna,
-    sort: search.orden ?? "destacados",
-  };
+      queryFn:
+        fetchComunas,
+    });
 
-  const list = useQuery({
-    queryKey: ["community-entrepreneurs", filters],
-    queryFn: () => fetchEntrepreneurs(filters, 200),
-  });
+  const weekly =
+    useQuery({
+      queryKey: [
+        "weekly",
+      ],
 
-  const all = useQuery({
-    queryKey: ["community-all-entrepreneurs"],
-    queryFn: () => fetchEntrepreneurs({}, 200),
-  });
+      queryFn:
+        fetchWeeklyFeature,
+    });
 
-  const update = (patch: Partial<SearchParams>) =>
+  const filters:
+    DirectoryFilters = {
+      search:
+        search.q,
+
+      categorySlug:
+        search.categoria,
+
+      comunaSlug:
+        search.comuna,
+
+      sort:
+        search.orden ??
+        "destacados",
+    };
+
+  const list =
+    useQuery({
+      queryKey: [
+        "community-entrepreneurs",
+        filters,
+      ],
+
+      queryFn: () =>
+        fetchEntrepreneurs(
+          filters,
+          200,
+        ),
+    });
+
+  const all =
+    useQuery({
+      queryKey: [
+        "community-all-entrepreneurs",
+      ],
+
+      queryFn: () =>
+        fetchEntrepreneurs(
+          {},
+          200,
+        ),
+    });
+
+  const update = (
+    patch:
+      Partial<SearchParams>,
+  ) =>
     navigate({
-      search: (previous: SearchParams) => ({
+      search: (
+        previous:
+          SearchParams,
+      ) => ({
         ...previous,
         ...patch,
       }),
     });
 
-  const collaborators = (all.data ?? []).filter(
-    (entrepreneur) =>
-      entrepreneur.collaboration_offering ||
-      entrepreneur.collaboration_seeking,
-  );
+  const collaborators =
+    (
+      all.data ?? []
+    ).filter(
+      (
+        entrepreneur,
+      ) =>
+        entrepreneur.collaboration_offering ||
+        entrepreneur.collaboration_seeking,
+    );
 
-  const featured = weekly.data?.entrepreneurs ?? null;
+  const featured =
+    weekly.data
+      ?.entrepreneurs ??
+    null;
 
   return (
     <>
-      {/* CABECERA COMPACTA */}
+      {/* CABECERA */}
 
       <section className="border-b border-border bg-surface">
-        <div className="container-page py-10 sm:py-12">
-          <p className="eyebrow">LA COMUNIDAD</p>
-
-          <div className="mt-2 grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
+        <div className="container-page py-7 sm:py-8">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <h1 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">
+              <p className="eyebrow">
+                LA COMUNIDAD
+              </p>
+
+              <h1 className="mt-1 font-display text-2xl font-semibold tracking-tight sm:text-3xl">
                 Encuentra. Conoce. Conecta.
               </h1>
 
-              <p className="mt-2 max-w-2xl text-muted-foreground">
-                Emprendedores, productos, servicios y oportunidades del
-                Maule Sur en un solo lugar.
+              <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
+                Emprendedores, productos y servicios del Maule Sur.
               </p>
             </div>
 
-            <Button asChild variant="outline">
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+            >
               <Link to="/sumate">
-                Quiero aparecer en La Vitrina
+                Quiero aparecer
               </Link>
             </Button>
           </div>
@@ -160,12 +251,16 @@ function ComunidadPage() {
           {/* BUSCADOR */}
 
           <form
-            className="mt-7 flex flex-col gap-3 sm:flex-row"
-            onSubmit={(event) => {
+            className="mt-5 flex gap-2"
+            onSubmit={(
+              event,
+            ) => {
               event.preventDefault();
 
               update({
-                q: term.trim() || undefined,
+                q:
+                  term.trim() ||
+                  undefined,
               });
             }}
           >
@@ -174,17 +269,24 @@ function ComunidadPage() {
 
               <Input
                 value={term}
-                onChange={(event) => setTerm(event.target.value)}
+                onChange={(
+                  event,
+                ) =>
+                  setTerm(
+                    event
+                      .target
+                      .value,
+                  )
+                }
                 placeholder="¿Qué estás buscando?"
-                aria-label="Buscar en La Vitrina"
-                className="h-12 rounded-xl bg-card pl-9"
+                className="h-10 bg-card pl-9"
               />
             </div>
 
             <Button
               type="submit"
-              size="lg"
-              className="h-12 rounded-xl px-8"
+              size="sm"
+              className="h-10 px-5"
             >
               Buscar
             </Button>
@@ -192,19 +294,27 @@ function ComunidadPage() {
 
           {/* FILTROS */}
 
-          <div className="mt-4 flex flex-wrap items-center gap-3">
+          <div className="mt-3 flex flex-wrap items-center gap-2">
             <SlidersHorizontal className="h-4 w-4 text-muted-foreground" />
 
             <Select
-              value={search.categoria ?? "todas"}
-              onValueChange={(value) =>
+              value={
+                search.categoria ??
+                "todas"
+              }
+              onValueChange={(
+                value,
+              ) =>
                 update({
                   categoria:
-                    value === "todas" ? undefined : value,
+                    value ===
+                    "todas"
+                      ? undefined
+                      : value,
                 })
               }
             >
-              <SelectTrigger className="h-10 w-[190px] bg-card">
+              <SelectTrigger className="h-9 w-[175px] bg-card text-xs">
                 <SelectValue placeholder="Categoría" />
               </SelectTrigger>
 
@@ -213,27 +323,45 @@ function ComunidadPage() {
                   Todas las categorías
                 </SelectItem>
 
-                {categories.data?.map((category) => (
-                  <SelectItem
-                    key={category.id}
-                    value={category.slug}
-                  >
-                    {category.name}
-                  </SelectItem>
-                ))}
+                {categories.data?.map(
+                  (
+                    category,
+                  ) => (
+                    <SelectItem
+                      key={
+                        category.id
+                      }
+                      value={
+                        category.slug
+                      }
+                    >
+                      {
+                        category.name
+                      }
+                    </SelectItem>
+                  ),
+                )}
               </SelectContent>
             </Select>
 
             <Select
-              value={search.comuna ?? "todas"}
-              onValueChange={(value) =>
+              value={
+                search.comuna ??
+                "todas"
+              }
+              onValueChange={(
+                value,
+              ) =>
                 update({
                   comuna:
-                    value === "todas" ? undefined : value,
+                    value ===
+                    "todas"
+                      ? undefined
+                      : value,
                 })
               }
             >
-              <SelectTrigger className="h-10 w-[180px] bg-card">
+              <SelectTrigger className="h-9 w-[155px] bg-card text-xs">
                 <SelectValue placeholder="Comuna" />
               </SelectTrigger>
 
@@ -242,26 +370,42 @@ function ComunidadPage() {
                   Todas las comunas
                 </SelectItem>
 
-                {comunas.data?.map((comuna) => (
-                  <SelectItem
-                    key={comuna.id}
-                    value={comuna.slug}
-                  >
-                    {comuna.name}
-                  </SelectItem>
-                ))}
+                {comunas.data?.map(
+                  (
+                    comuna,
+                  ) => (
+                    <SelectItem
+                      key={
+                        comuna.id
+                      }
+                      value={
+                        comuna.slug
+                      }
+                    >
+                      {
+                        comuna.name
+                      }
+                    </SelectItem>
+                  ),
+                )}
               </SelectContent>
             </Select>
 
             <Select
-              value={search.orden ?? "destacados"}
-              onValueChange={(value) =>
+              value={
+                search.orden ??
+                "destacados"
+              }
+              onValueChange={(
+                value,
+              ) =>
                 update({
-                  orden: value as SearchParams["orden"],
+                  orden:
+                    value as SearchParams["orden"],
                 })
               }
             >
-              <SelectTrigger className="h-10 w-[170px] bg-card">
+              <SelectTrigger className="h-9 w-[145px] bg-card text-xs">
                 <SelectValue placeholder="Ordenar" />
               </SelectTrigger>
 
@@ -290,66 +434,89 @@ function ComunidadPage() {
               <Button
                 variant="ghost"
                 size="sm"
+                className="h-9 text-xs"
                 onClick={() =>
                   navigate({
                     search: {
-                      q: undefined,
-                      categoria: undefined,
-                      comuna: undefined,
-                      orden: search.orden,
+                      q:
+                        undefined,
+
+                      categoria:
+                        undefined,
+
+                      comuna:
+                        undefined,
+
+                      orden:
+                        search.orden,
                     },
                   })
                 }
               >
-                Limpiar filtros
+                Limpiar
               </Button>
             ) : null}
           </div>
         </div>
       </section>
 
-      {/* EMPRENDEDOR DESTACADO */}
+      {/* DESTACADO */}
 
       {featured ? (
-        <section className="container-page pt-10">
-          <div className="overflow-hidden rounded-2xl border border-border bg-card">
-            <div className="grid md:grid-cols-[0.8fr_1.2fr]">
-              {featured.photo_url ? (
-                <img
-                  src={featured.photo_url}
-                  alt={featured.business_name}
-                  className="h-64 w-full object-cover md:h-full"
-                />
-              ) : null}
+        <section className="container-page pt-6">
+          <div className="flex overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+            {featured.photo_url ? (
+              <img
+                src={
+                  featured.photo_url
+                }
+                alt={
+                  featured.business_name
+                }
+                className="hidden w-40 shrink-0 object-cover sm:block"
+              />
+            ) : null}
 
-              <div className="p-6 sm:p-8">
-                <p className="inline-flex items-center gap-2 text-sm font-medium text-primary">
-                  <Sparkles className="h-4 w-4" />
-                  Emprendedor destacado
-                </p>
+            <div className="min-w-0 flex-1 p-4">
+              <p className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-primary">
+                <Sparkles className="h-3.5 w-3.5" />
+                Destacado
+              </p>
 
-                <h2 className="mt-2 font-display text-2xl font-semibold">
-                  {featured.business_name}
-                </h2>
+              <h2 className="mt-1 font-display text-lg font-semibold">
+                {
+                  featured.business_name
+                }
+              </h2>
 
-                <p className="text-sm text-muted-foreground">
-                  {featured.owner_name}
-                </p>
+              <p className="text-xs text-muted-foreground">
+                {
+                  featured.owner_name
+                }
+              </p>
 
-                <p className="mt-3 max-w-2xl text-foreground/85">
-                  {weekly.data?.story ??
-                    featured.short_description}
-                </p>
+              <p className="mt-1.5 line-clamp-2 max-w-3xl text-xs leading-relaxed text-foreground/75">
+                {weekly.data
+                  ?.story ??
+                  featured.short_description}
+              </p>
 
-                <Button asChild className="mt-5">
-                  <Link
-                    to="/emprendedores/$slug"
-                    params={{ slug: featured.slug }}
-                  >
-                    Conocer su historia
-                  </Link>
-                </Button>
-              </div>
+              <Button
+                asChild
+                size="sm"
+                variant="outline"
+                className="mt-3 h-8 text-xs"
+              >
+                <Link
+                  to="/emprendedores/$slug"
+                  params={{
+                    slug:
+                      featured.slug,
+                  }}
+                >
+                  Ver perfil
+                </Link>
+              </Button>
             </div>
           </div>
         </section>
@@ -357,47 +524,68 @@ function ComunidadPage() {
 
       {/* DIRECTORIO */}
 
-      <section className="container-page py-10 sm:py-12">
-        <div className="flex flex-wrap items-end justify-between gap-3">
+      <section className="container-page py-7 sm:py-8">
+        <div className="flex items-end justify-between gap-3">
           <div>
-            <p className="eyebrow">DESCUBRE</p>
+            <p className="eyebrow">
+              DESCUBRE
+            </p>
 
-            <h2 className="mt-1 font-display text-2xl font-semibold">
-              Emprendedores de la comunidad
+            <h2 className="mt-1 font-display text-xl font-semibold">
+              Emprendedores
             </h2>
           </div>
 
-          <p className="text-sm text-muted-foreground">
+          <p className="text-xs text-muted-foreground">
             {list.isLoading
               ? "Buscando..."
-              : `${list.data?.length ?? 0} emprendimientos`}
+              : `${list.data?.length ?? 0} disponibles`}
           </p>
         </div>
 
-        <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
           {list.isLoading
-            ? Array.from({ length: 6 }).map((_, index) => (
-                <div
-                  key={index}
-                  className="h-96 animate-pulse rounded-2xl bg-muted"
-                />
-              ))
-            : list.data?.map((entrepreneur) => (
-                <EntrepreneurCard
-                  key={entrepreneur.id}
-                  e={entrepreneur}
-                />
-              ))}
+            ? Array.from({
+                length: 6,
+              }).map(
+                (
+                  _,
+                  index,
+                ) => (
+                  <div
+                    key={
+                      index
+                    }
+                    className="h-40 animate-pulse rounded-xl bg-muted"
+                  />
+                ),
+              )
+            : list.data?.map(
+                (
+                  entrepreneur,
+                ) => (
+                  <EntrepreneurCard
+                    key={
+                      entrepreneur.id
+                    }
+                    e={
+                      entrepreneur
+                    }
+                  />
+                ),
+              )}
         </div>
 
         {!list.isLoading &&
-        (list.data?.length ?? 0) === 0 ? (
-          <div className="mt-6 rounded-2xl border border-dashed border-border p-10 text-center">
-            <p className="font-display text-xl">
+        (list.data
+          ?.length ??
+          0) === 0 ? (
+          <div className="mt-5 rounded-xl border border-dashed border-border p-7 text-center">
+            <p className="font-display text-base font-semibold">
               No encontramos resultados
             </p>
 
-            <p className="mt-2 text-sm text-muted-foreground">
+            <p className="mt-1 text-xs text-muted-foreground">
               Prueba con otra búsqueda, categoría o comuna.
             </p>
           </div>
@@ -406,127 +594,142 @@ function ComunidadPage() {
 
       {/* COLABORACIÓN */}
 
-      <section className="border-y border-border bg-secondary/25">
-        <div className="container-page py-10 sm:py-12">
-          <div className="max-w-2xl">
+      <section className="border-y border-border bg-secondary/20">
+        <div className="container-page py-7">
+          <div>
             <p className="eyebrow">
               CONECTA
             </p>
 
-            <h2 className="mt-1 inline-flex items-center gap-2 font-display text-2xl font-semibold">
-              <Handshake className="h-5 w-5 text-primary" />
+            <h2 className="mt-1 inline-flex items-center gap-2 font-display text-xl font-semibold">
+              <Handshake className="h-4 w-4 text-primary" />
               Oportunidades de colaboración
             </h2>
-
-            <p className="mt-2 text-sm text-muted-foreground">
-              Emprendedores que buscan apoyo, alianzas,
-              proveedores, conocimientos o que tienen algo
-              que ofrecer a la comunidad.
-            </p>
           </div>
 
-          {collaborators.length === 0 &&
+          {collaborators.length ===
+            0 &&
           !all.isLoading ? (
-            <div className="mt-6 rounded-xl border border-dashed border-border bg-background p-8 text-center text-muted-foreground">
-              Aún no hay oportunidades de colaboración publicadas.
+            <div className="mt-4 rounded-xl border border-dashed border-border bg-background p-6 text-center text-xs text-muted-foreground">
+              Aún no hay oportunidades publicadas.
             </div>
           ) : (
-            <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {collaborators.slice(0, 6).map((entrepreneur) => {
-                const whatsapp = whatsappLink(entrepreneur);
+            <div className="mt-4 grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+              {collaborators
+                .slice(
+                  0,
+                  6,
+                )
+                .map(
+                  (
+                    entrepreneur,
+                  ) => {
+                    const whatsapp =
+                      whatsappLink(
+                        entrepreneur,
+                      );
 
-                return (
-                  <article
-                    key={entrepreneur.id}
-                    className="rounded-2xl border border-border bg-card p-5"
-                  >
-                    <h3 className="font-display text-lg font-semibold">
-                      <Link
-                        to="/emprendedores/$slug"
-                        params={{
-                          slug: entrepreneur.slug,
-                        }}
+                    return (
+                      <article
+                        key={
+                          entrepreneur.id
+                        }
+                        className="rounded-xl border border-border bg-card p-4"
                       >
-                        {entrepreneur.business_name}
-                      </Link>
-                    </h3>
+                        <h3 className="line-clamp-1 font-display text-sm font-semibold">
+                          <Link
+                            to="/emprendedores/$slug"
+                            params={{
+                              slug:
+                                entrepreneur.slug,
+                            }}
+                          >
+                            {
+                              entrepreneur.business_name
+                            }
+                          </Link>
+                        </h3>
 
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      {entrepreneur.categories?.name ??
-                        "Emprendimiento"}
-                      {entrepreneur.comunas?.name
-                        ? ` · ${entrepreneur.comunas.name}`
-                        : ""}
-                    </p>
+                        <p className="mt-0.5 text-[10px] text-muted-foreground">
+                          {entrepreneur
+                            .categories
+                            ?.name ??
+                            "Emprendimiento"}
 
-                    {entrepreneur.collaboration_seeking ? (
-                      <div className="mt-4">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                          Busca
+                          {entrepreneur
+                            .comunas
+                            ?.name
+                            ? ` · ${entrepreneur.comunas.name}`
+                            : ""}
                         </p>
 
-                        <p className="mt-1 text-sm">
-                          {
-                            entrepreneur.collaboration_seeking
-                          }
-                        </p>
-                      </div>
-                    ) : null}
+                        {entrepreneur.collaboration_seeking ? (
+                          <p className="mt-2 line-clamp-2 text-xs">
+                            <strong>
+                              Busca:
+                            </strong>{" "}
+                            {
+                              entrepreneur.collaboration_seeking
+                            }
+                          </p>
+                        ) : null}
 
-                    {entrepreneur.collaboration_offering ? (
-                      <div className="mt-4">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                          Puede aportar
-                        </p>
+                        {entrepreneur.collaboration_offering ? (
+                          <p className="mt-1 line-clamp-2 text-xs">
+                            <strong>
+                              Ofrece:
+                            </strong>{" "}
+                            {
+                              entrepreneur.collaboration_offering
+                            }
+                          </p>
+                        ) : null}
 
-                        <p className="mt-1 text-sm">
-                          {
-                            entrepreneur.collaboration_offering
-                          }
-                        </p>
-                      </div>
-                    ) : null}
-
-                    {whatsapp ? (
-                      <Button
-                        asChild
-                        variant="whatsapp"
-                        size="sm"
-                        className="mt-5"
-                      >
-                        <a
-                          href={whatsapp}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          Contactar
-                        </a>
-                      </Button>
-                    ) : null}
-                  </article>
-                );
-              })}
+                        {whatsapp ? (
+                          <Button
+                            asChild
+                            size="sm"
+                            variant="whatsapp"
+                            className="mt-3 h-7 px-2.5 text-[11px]"
+                          >
+                            <a
+                              href={
+                                whatsapp
+                              }
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              Contactar
+                            </a>
+                          </Button>
+                        ) : null}
+                      </article>
+                    );
+                  },
+                )}
             </div>
           )}
         </div>
       </section>
 
-      {/* LLAMADO FINAL */}
+      {/* CIERRE */}
 
-      <section className="container-page py-12">
-        <div className="flex flex-col items-start justify-between gap-5 rounded-2xl border border-border bg-card p-7 sm:flex-row sm:items-center">
+      <section className="container-page py-7">
+        <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="font-display text-2xl font-semibold">
+            <h2 className="font-display text-lg font-semibold">
               ¿Tienes un emprendimiento?
             </h2>
 
-            <p className="mt-1 text-muted-foreground">
-              Súmate a La Vitrina y hazte visible en la
-              comunidad del Maule Sur.
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              Súmate a La Vitrina y hazte visible.
             </p>
           </div>
 
-          <Button asChild>
+          <Button
+            asChild
+            size="sm"
+          >
             <Link to="/sumate">
               Quiero ser parte
             </Link>

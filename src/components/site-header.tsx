@@ -1,16 +1,18 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Menu, X } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 
 const NAV = [
   { to: "/", label: "Inicio" },
   { to: "/comunidad", label: "Comunidad" },
+  { to: "/eventos", label: "Eventos" },
   { to: "/educa", label: "Educa" },
   { to: "/diagnostico", label: "Diagnóstico" },
-  { to: "/eventos", label: "Eventos" },
   { to: "/radio", label: "Radio" },
+  { to: "/compraventa", label: "Compra-venta" },
   { to: "/sobre", label: "Sobre La Vitrina" },
 ] as const;
 
@@ -52,7 +54,7 @@ export function SiteHeader() {
               activeProps={{
                 className: "text-primary",
               }}
-              className="rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+              className="rounded-md px-2 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
             >
               {item.label}
             </Link>
@@ -135,7 +137,7 @@ export function SiteHeader() {
               </Link>
             ))}
 
-            <div className="mt-3 flex flex-col gap-2 border-t border-border pt-4 pb-4">
+            <div className="mt-3 flex flex-col gap-2 border-t border-border pb-4 pt-4">
               <Button
                 asChild
                 variant="outline"
