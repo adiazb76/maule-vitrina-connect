@@ -1370,7 +1370,37 @@ function ReportView({
   const priorities = report.priorities.slice(0, 3);
   const strengths = report.strengths.slice(0, 3);
   const opportunities = report.opportunities.slice(0, 3);
-  const steps = [...report.priorities, ...report.opportunities].slice(0, 5);
+  const isExcellent = report.overall >= 95;
+  const growthSteps = [
+    {
+      title: "Proteger lo que ya funciona",
+      detail:
+        "Documenta los procesos, controles y prácticas que hoy sostienen el buen desempeño para evitar retrocesos y facilitar su continuidad.",
+    },
+    {
+      title: "Medir con indicadores",
+      detail:
+        "Define un tablero simple con ventas, margen, clientes recurrentes, costos, caja y cumplimiento para detectar desviaciones a tiempo.",
+    },
+    {
+      title: "Fortalecer clientes y mercado",
+      detail:
+        "Analiza qué clientes, productos o servicios generan mayor valor y concentra el esfuerzo comercial en los segmentos con mejores resultados.",
+    },
+    {
+      title: "Evaluar nuevas oportunidades",
+      detail:
+        "Prueba nuevos canales, alianzas, productos o territorios en pequeña escala antes de comprometer inversiones relevantes.",
+    },
+    {
+      title: "Preparar el siguiente nivel",
+      detail:
+        "Define una meta concreta de crecimiento para los próximos 90 días y asígnale responsables, recursos, fecha y criterio de éxito.",
+    },
+  ];
+  const steps = isExcellent
+    ? growthSteps
+    : [...report.priorities, ...report.opportunities].slice(0, 5);
   const dimensions = report.dimensions.slice(0, 8);
 
   const cleanTitle = (title: string) => {
@@ -1428,7 +1458,9 @@ function ReportView({
   }).format(new Date());
 
   const executiveMessage =
-    report.overall >= 75
+    isExcellent
+      ? `El diagnóstico muestra un emprendimiento con un nivel de desarrollo sobresaliente en las dimensiones evaluadas. No se observan brechas prioritarias que requieran corrección inmediata. El foco recomendado cambia desde resolver falencias hacia consolidar lo logrado, medir sistemáticamente el desempeño y aprovechar oportunidades de crecimiento con disciplina. El desafío ahora es sostener este estándar en el tiempo y transformar una buena base en mayor rentabilidad, resiliencia y capacidad de expansión.`
+      : report.overall >= 75
       ? `El diagnóstico muestra un emprendimiento con una base favorable y fortalezas que conviene proteger. El siguiente desafío es aprovechar las oportunidades detectadas, cerrar brechas específicas y transformar esos avances en mayor rentabilidad, capacidad de gestión y crecimiento sostenible. Las prioridades señaladas no buscan frenar el negocio, sino concentrar el esfuerzo donde puede generar mayor impacto.`
       : report.overall >= 50
       ? `El diagnóstico muestra avances relevantes y capacidades sobre las cuales seguir construyendo. Al mismo tiempo, existen espacios de mejora que hoy limitan parte del potencial del emprendimiento. La recomendación es mantener y reforzar lo que ya funciona, resolver primero las brechas prioritarias y aprovechar las oportunidades detectadas para ordenar la gestión, mejorar resultados y preparar una siguiente etapa de crecimiento.`
@@ -1516,10 +1548,12 @@ function ReportView({
             </article>
 
             <article className="rounded-xl border border-border bg-card p-4">
-              <p className="eyebrow">OPORTUNIDADES Y BRECHAS</p>
-              <h2 className="mt-1 section-title">Dónde existe mayor espacio para avanzar</h2>
+              <p className="eyebrow">{isExcellent ? "OPORTUNIDADES DE CRECIMIENTO" : "OPORTUNIDADES Y BRECHAS"}</p>
+              <h2 className="mt-1 section-title">
+                {isExcellent ? "Cómo aprovechar una base sobresaliente" : "Dónde existe mayor espacio para avanzar"}
+              </h2>
               <div className="mt-2 space-y-2">
-                {[...priorities, ...opportunities].slice(0,3).map((item,i)=>(
+                {(isExcellent ? growthSteps.slice(0,3) : [...priorities, ...opportunities].slice(0,3)).map((item,i)=>(
                   <div key={i}>
                     <p className="text-[11px] font-semibold">{i+1}. {cleanTitle(item.title)}</p>
                     <p className="mt-0.5 text-[10px] leading-relaxed text-muted-foreground">{actionOnly(item.detail)}</p>
@@ -1553,7 +1587,9 @@ function ReportView({
             <p className="eyebrow">PASO A PASO</p>
             <h2 className="mt-1 section-title">Qué hacer ahora</h2>
             <p className="mt-1 text-[10px] text-muted-foreground">
-              A partir de las brechas y oportunidades detectadas, este es el orden recomendado para avanzar. Cada paso resuelto facilita el siguiente.
+              {isExcellent
+                ? "Con una base sobresaliente, el objetivo es consolidar, medir y crecer de manera controlada. Este es el orden recomendado."
+                : "A partir de las brechas y oportunidades detectadas, este es el orden recomendado para avanzar. Cada paso resuelto facilita el siguiente."}
             </p>
 
             <div className="mt-3 space-y-2">
@@ -1580,7 +1616,9 @@ function ReportView({
             <article className="rounded-xl border border-border bg-card p-3">
               <p className="eyebrow">ANTES DE INVERTIR MÁS</p>
               <p className="mt-1 text-[10px] leading-relaxed">
-                Primero deja encaminadas las brechas prioritarias. Luego mide resultados y recién después evalúa nuevas inversiones, costos fijos o expansión.
+                {isExcellent
+                  ? "Antes de aumentar costos fijos o realizar inversiones relevantes, valida la oportunidad con datos, una prueba acotada y metas claras de retorno."
+                  : "Primero deja encaminadas las brechas prioritarias. Luego mide resultados y recién después evalúa nuevas inversiones, costos fijos o expansión."}
               </p>
             </article>
           </section>
@@ -1590,33 +1628,63 @@ function ReportView({
         <div className="diagnostic-page">
           <section className="rounded-xl border border-border bg-card p-5">
             <p className="eyebrow">HOJA DE RUTA</p>
-            <h2 className="mt-1 section-title">De ordenar a crecer</h2>
-            <p className="mt-1 text-[10px] text-muted-foreground">Una secuencia simple para transformar el diagnóstico en avance.</p>
+            <h2 className="mt-1 section-title">
+              {isExcellent ? "De consolidar a crecer" : "De ordenar a crecer"}
+            </h2>
+            <p className="mt-1 text-[10px] text-muted-foreground">
+              {isExcellent
+                ? "Una secuencia simple para sostener el buen desempeño y preparar el siguiente nivel."
+                : "Una secuencia simple para transformar el diagnóstico en avance."}
+            </p>
 
             <div className="mt-4 grid gap-3 md:grid-cols-3">
               <div className="rounded-lg border border-border bg-background p-3">
                 <p className="text-[9px] font-semibold uppercase tracking-wide text-muted-foreground">0–30 días</p>
-                <p className="mt-1 text-xs font-semibold">Resolver lo habilitante</p>
-                <p className="mt-1 text-[10px] leading-relaxed text-muted-foreground">{priorities[0] ? actionOnly(priorities[0].detail) : "Ordenar la base formal y de gestión."}</p>
+                <p className="mt-1 text-xs font-semibold">
+                  {isExcellent ? "Consolidar y documentar" : "Resolver lo habilitante"}
+                </p>
+                <p className="mt-1 text-[10px] leading-relaxed text-muted-foreground">
+                  {isExcellent
+                    ? "Documenta procesos, indicadores y prácticas clave para asegurar continuidad y consistencia."
+                    : priorities[0]
+                    ? actionOnly(priorities[0].detail)
+                    : "Ordenar la base formal y de gestión."}
+                </p>
               </div>
               <div className="rounded-lg border border-border bg-background p-3">
                 <p className="text-[9px] font-semibold uppercase tracking-wide text-muted-foreground">31–60 días</p>
-                <p className="mt-1 text-xs font-semibold">Gestionar y medir</p>
-                <p className="mt-1 text-[10px] leading-relaxed text-muted-foreground">Implementa controles simples sobre ventas, costos, clientes y operación para saber qué está funcionando.</p>
+                <p className="mt-1 text-xs font-semibold">
+                  {isExcellent ? "Medir y optimizar" : "Gestionar y medir"}
+                </p>
+                <p className="mt-1 text-[10px] leading-relaxed text-muted-foreground">
+                  {isExcellent
+                    ? "Usa indicadores para identificar los productos, clientes y procesos que más aportan a rentabilidad y estabilidad."
+                    : "Implementa controles simples sobre ventas, costos, clientes y operación para saber qué está funcionando."}
+                </p>
               </div>
               <div className="rounded-lg border border-border bg-background p-3">
                 <p className="text-[9px] font-semibold uppercase tracking-wide text-muted-foreground">61–90 días</p>
                 <p className="mt-1 text-xs font-semibold">Preparar el crecimiento</p>
-                <p className="mt-1 text-[10px] leading-relaxed text-muted-foreground">Con las brechas principales encaminadas, evalúa oportunidades de inversión o expansión con demanda, capacidad y caja validadas.</p>
+                <p className="mt-1 text-[10px] leading-relaxed text-muted-foreground">
+                  {isExcellent
+                    ? "Evalúa una oportunidad concreta de expansión, alianza o nuevo canal con demanda, capacidad, caja y retorno previamente validados."
+                    : "Con las brechas principales encaminadas, evalúa oportunidades de inversión o expansión con demanda, capacidad y caja validadas."}
+                </p>
               </div>
             </div>
           </section>
 
           <section className="mt-4 rounded-xl border border-border bg-secondary/15 p-5">
             <p className="eyebrow">MENSAJE FINAL</p>
-            <h2 className="mt-1 section-title">El diagnóstico no busca detenerte: busca ayudarte a avanzar mejor.</h2>
+            <h2 className="mt-1 section-title">
+              {isExcellent
+                ? "El desafío ya no es corregir: es sostener, medir y crecer con criterio."
+                : "El diagnóstico no busca detenerte: busca ayudarte a avanzar mejor."}
+            </h2>
             <p className="mt-2 text-xs leading-relaxed">
-              No necesitas resolver todo de una vez. Reconoce lo que ya has construido, concéntrate en las oportunidades y brechas que pueden generar mayor impacto y avanza paso a paso. Cada mejora fortalece tu emprendimiento y te acerca a un negocio más ordenado, rentable, sostenible y preparado para crecer.
+              {isExcellent
+                ? "Has construido una base sólida en las dimensiones evaluadas. El siguiente paso es cuidar ese estándar, convertir la información en decisiones y seleccionar oportunidades de crecimiento que realmente agreguen valor. Un buen resultado no significa detenerse: significa que estás en condiciones de avanzar con mayor control y ambición."
+                : "No necesitas resolver todo de una vez. Reconoce lo que ya has construido, concéntrate en las oportunidades y brechas que pueden generar mayor impacto y avanza paso a paso. Cada mejora fortalece tu emprendimiento y te acerca a un negocio más ordenado, rentable, sostenible y preparado para crecer."}
             </p>
           </section>
 
