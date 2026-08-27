@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
-import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/auth")({
@@ -46,7 +45,10 @@ function AuthPage() {
     setBusy(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setBusy(false);
-    if (error) { toast.error(error.message); return; }
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success("¡Bienvenido de vuelta!");
     navigate({ to: "/panel" });
   }
@@ -63,16 +65,26 @@ function AuthPage() {
       },
     });
     setBusy(false);
-    if (error) { toast.error(error.message); return; }
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success("Cuenta creada. Revisa tu correo si te pedimos confirmación.");
-navigate({ to: "/sumate" });
+    navigate({ to: "/sumate" });
   }
 
   async function google() {
-    try {
-      await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "No pudimos iniciar sesión con Google");
+    setBusy(true);
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/panel`,
+      },
+    });
+    setBusy(false);
+
+    if (error) {
+      toast.error(error.message);
     }
   }
 
@@ -85,7 +97,7 @@ navigate({ to: "/sumate" });
           Publica tu emprendimiento, revisa tus visitas y conecta con otros del Maule Sur.
         </p>
 
-        <Button variant="outline" className="mt-6 w-full" onClick={google}>
+        <Button variant="outline" className="mt-6 w-full" onClick={google} disabled={busy}>
           Continuar con Google
         </Button>
 
