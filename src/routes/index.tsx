@@ -258,108 +258,36 @@ function IndexPage() {
 
   return (
     <>
-      {/* INDICADORES */}
-
-      {indicators.data ? (
-        <section className="border-b border-border bg-secondary/20">
-          <div className="container-page">
-            <div className="flex items-center gap-5 overflow-x-auto py-2">
-              <div className="flex shrink-0 items-center gap-1.5">
-                <TrendingUp className="h-3.5 w-3.5 text-primary" />
-
-                <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
-                  Indicadores
-                </span>
-              </div>
-
-              <div className="h-4 w-px shrink-0 bg-border" />
-
-              <Indicator
-                label="UF"
-                value={
-                  indicators
-                    .data
-                    .uf
-                    ?.valor
-                }
-                decimals={2}
-              />
-
-              <Indicator
-                label="UTM"
-                value={
-                  indicators
-                    .data
-                    .utm
-                    ?.valor
-                }
-                decimals={0}
-              />
-
-              <Indicator
-                label="Dólar"
-                value={
-                  indicators
-                    .data
-                    .dolar
-                    ?.valor
-                }
-                decimals={2}
-              />
-
-              <Indicator
-                label="Euro"
-                value={
-                  indicators
-                    .data
-                    .euro
-                    ?.valor
-                }
-                decimals={2}
-              />
-
-              <span className="ml-auto shrink-0 text-[9px] text-muted-foreground">
-                Referenciales
-              </span>
-            </div>
-          </div>
-        </section>
-      ) : null}
-
       {/* LA VITRINA EN NÚMEROS */}
 
       <section className="border-b border-border bg-background">
         <div className="container-page py-3">
           <div className="rounded-xl border border-border bg-card px-4 py-3 shadow-sm">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-              <div className="shrink-0 sm:w-44">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-primary">
-                  La Vitrina en números
-                </p>
-                <p className="mt-1 text-[9px] text-muted-foreground">
-                  {new Intl.DateTimeFormat("es-CL", {
-                    day: "2-digit",
-                    month: "short",
-                    year: "numeric",
-                  }).format(new Date())}
-                </p>
-              </div>
+            <p className="text-left text-[10px] font-semibold uppercase tracking-[0.12em] text-primary">
+              La Vitrina en números
+            </p>
 
-              {publicMetrics.isLoading ? (
-                <div className="h-10 flex-1 animate-pulse rounded-md bg-muted" />
-              ) : publicMetrics.data ? (
-                <div className="grid flex-1 grid-cols-3 gap-y-3 divide-x divide-border sm:grid-cols-6 sm:gap-y-0">
-                  <StripMetric value={publicMetrics.data.entrepreneurs} label="Emprendimientos" />
-                  <StripMetric value={publicMetrics.data.views} label="Vistas" />
-                  <StripMetric value={publicMetrics.data.contacts} label="Contactos" />
-                  <StripMetric value={publicMetrics.data.diagnostics} label="Diagnósticos" />
-                  <StripMetric value={publicMetrics.data.ads} label="Avisos" />
-                  <StripMetric value={publicMetrics.data.comunas} label="Comunas" />
-                </div>
-              ) : (
-                <p className="text-[10px] text-muted-foreground">Cifras en actualización.</p>
-              )}
-            </div>
+            <p className="mt-1 text-left text-[9px] text-muted-foreground">
+              {new Intl.DateTimeFormat("es-CL", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              }).format(new Date())}
+            </p>
+
+            {publicMetrics.isLoading ? (
+              <div className="mt-3 h-10 animate-pulse rounded-md bg-muted" />
+            ) : publicMetrics.data ? (
+              <div className="mt-3 grid max-w-xl grid-cols-3 divide-x divide-border">
+                <StripMetric value={publicMetrics.data.entrepreneurs} label="Emprendedores" />
+                <StripMetric value={publicMetrics.data.views} label="Visitas" />
+                <StripMetric value={publicMetrics.data.comunas} label="Comunas" />
+              </div>
+            ) : (
+              <p className="mt-3 text-left text-[10px] text-muted-foreground">
+                Cifras en actualización.
+              </p>
+            )}
           </div>
         </div>
       </section>
@@ -417,6 +345,25 @@ function IndexPage() {
                 </Link>
               </Button>
             </div>
+
+            {indicators.data ? (
+              <div className="mt-4 rounded-lg border border-border bg-secondary/15 px-3 py-2">
+                <div className="flex items-center gap-4 overflow-x-auto">
+                  <div className="flex shrink-0 items-center gap-1.5">
+                    <TrendingUp className="h-3.5 w-3.5 text-primary" />
+                    <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
+                      Indicadores económicos
+                    </span>
+                  </div>
+
+                  <div className="h-4 w-px shrink-0 bg-border" />
+                  <Indicator label="UF" value={indicators.data.uf?.valor} decimals={2} />
+                  <Indicator label="UTM" value={indicators.data.utm?.valor} decimals={0} />
+                  <Indicator label="Dólar" value={indicators.data.dolar?.valor} decimals={2} />
+                  <Indicator label="Euro" value={indicators.data.euro?.valor} decimals={2} />
+                </div>
+              </div>
+            ) : null}
           </div>
 
           <div>
