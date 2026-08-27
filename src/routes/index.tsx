@@ -21,6 +21,10 @@ import {
 } from "@/components/ui/button";
 
 import {
+  supabase,
+} from "@/integrations/supabase/client";
+
+import {
   fetchNewsItems,
   fetchSiteSettings,
   fetchSponsors,
@@ -151,6 +155,47 @@ function IndexPage() {
 
       queryFn:
         fetchSponsors,
+    });
+
+  const publicMetrics =
+    useQuery({
+      queryKey: ["public-home-metrics"],
+
+      queryFn: async () => {
+        const [e, d, a] = await Promise.all([
+          (supabase as any)
+            .from("entrepreneurs")
+            .select("id,views,contacts,comuna_id")
+            .eq("status", "aprobado")
+            .neq("visible", false),
+
+          (supabase as any)
+            .from("entrepreneur_diagnostics")
+            .select("id"),
+
+          (supabase as any)
+            .from("marketplace_ads")
+            .select("id")
+            .eq("status", "aprobado"),
+        ]);
+
+        if (e.error) throw e.error;
+        if (d.error) throw d.error;
+        if (a.error) throw a.error;
+
+        const rows = e.data ?? [];
+
+        return {
+          entrepreneurs: rows.length,
+          views: rows.reduce((s: number, r: any) => s + Number(r.views ?? 0), 0),
+          contacts: rows.reduce((s: number, r: any) => s + Number(r.contacts ?? 0), 0),
+          diagnostics: (d.data ?? []).length,
+          ads: (a.data ?? []).length,
+          comunas: new Set(rows.map((r: any) => r.comuna_id).filter(Boolean)).size,
+        };
+      },
+
+      staleTime: 1000 * 60 * 5,
     });
 
   const indicators =
@@ -344,6 +389,45 @@ function IndexPage() {
               alt="La Vitrina - Emprendedores del Maule Sur"
               className="aspect-[16/9] w-full rounded-xl object-cover shadow-sm"
             />
+          </div>
+        </div>
+      </section>
+
+      {/* LA VITRINA EN NÚMEROS */}
+
+      <section className="border-b border-border bg-secondary/10">
+        <div className="container-page">
+          <div className="flex items-center gap-5 overflow-x-auto py-3">
+            <div className="shrink-0 pr-1">
+              <p className="text-[9px] font-semibold uppercase tracking-wider text-primary">
+                La Vitrina en números
+              </p>
+
+              <p className="mt-0.5 whitespace-nowrap text-[9px] text-muted-foreground">
+                {new Intl.DateTimeFormat("es-CL", {
+                  day: "2-digit",
+                  month: "short",
+                  year: "numeric",
+                }).format(new Date())}
+              </p>
+            </div>
+
+            {publicMetrics.isLoading ? (
+              <div className="h-8 w-full min-w-[520px] animate-pulse rounded-lg bg-muted" />
+            ) : publicMetrics.data ? (
+              <>
+                <PublicMetric value={publicMetrics.data.entrepreneurs} label="Emprendimientos" />
+                <PublicMetric value={publicMetrics.data.views} label="Visualizaciones" />
+                <PublicMetric value={publicMetrics.data.contacts} label="Contactos" />
+                <PublicMetric value={publicMetrics.data.diagnostics} label="Diagnósticos" />
+                <PublicMetric value={publicMetrics.data.ads} label="Avisos" />
+                <PublicMetric value={publicMetrics.data.comunas} label="Comunas" />
+              </>
+            ) : (
+              <span className="text-[10px] text-muted-foreground">
+                Cifras en actualización.
+              </span>
+            )}
           </div>
         </div>
       </section>
@@ -618,6 +702,30 @@ function IndexPage() {
           </div>
         )}
       </section>
+    </>
+  );
+}
+
+function PublicMetric({
+  value,
+  label,
+}: {
+  value: number;
+  label: string;
+}) {
+  return (
+    <>
+      <div className="h-7 w-px shrink-0 bg-border" />
+
+      <div className="shrink-0 text-center">
+        <p className="font-display text-lg font-semibold leading-none sm:text-xl">
+          {new Intl.NumberFormat("es-CL").format(value)}
+        </p>
+
+        <p className="mt-1 whitespace-nowrap text-[9px] uppercase tracking-wide text-muted-foreground">
+          {label}
+        </p>
+      </div>
     </>
   );
 }
