@@ -1,8 +1,8 @@
-﻿import { tanstackStart } from "@tanstack/react-start/plugin/vite";
+﻿import { defineConfig } from "vite";
+import { tanstackStart } from "@tanstack/react-start/plugin/vite";
+import { cloudflare } from "@cloudflare/vite-plugin";
+import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
-import viteReact from "@vitejs/plugin-react";
-import { nitro } from "nitro/vite";
-import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 
 const forcedDefine: Record<string, string> = {};
@@ -19,11 +19,11 @@ if (process.env.VITE_SUPABASE_PUBLISHABLE_KEY) {
 
 export default defineConfig({
   plugins: [
+    cloudflare({ viteEnvironment: { name: "ssr" } }),
     tsconfigPaths(),
     tailwindcss(),
     tanstackStart(),
-    nitro(),
-    viteReact(),
+    react(),
   ],
   define: forcedDefine,
 });
