@@ -1,4 +1,4 @@
-﻿import {
+import {
   createFileRoute,
   Link,
   useNavigate,
@@ -70,7 +70,7 @@ export const Route =
       meta: [
         {
           title:
-            "Mi panel â€” La Vitrina",
+            "Mi panel — La Vitrina",
         },
 
         {
@@ -78,7 +78,7 @@ export const Route =
             "description",
 
           content:
-            "Administra tu emprendimiento, eventos, compraventa y mÃ©tricas en La Vitrina.",
+            "Administra tu emprendimiento, eventos, compraventa y métricas en La Vitrina.",
         },
 
         {
@@ -101,7 +101,7 @@ const STATUS_LABEL:
     string
   > = {
     pendiente:
-      "En revisiÃ³n",
+      "En revisión",
 
     aprobado:
       "Publicado",
@@ -267,14 +267,19 @@ function PanelPage() {
               size="sm"
             >
               <Link to="/admin">
-                AdministraciÃ³n
+                Administración
               </Link>
             </Button>
           ) : null}
+
           {(mine.data?.length ?? 0) === 0 ? (
-            <Button asChild size="sm">
+            <Button
+              asChild
+              size="sm"
+            >
               <Link to="/sumate">
                 <Plus className="h-4 w-4" />
+
                 Nuevo emprendimiento
               </Link>
             </Button>
@@ -287,7 +292,7 @@ function PanelPage() {
               signOut
             }
           >
-            Cerrar sesiÃ³n
+            Cerrar sesión
           </Button>
         </div>
       </div>
@@ -330,7 +335,7 @@ function PanelPage() {
             0 ? (
               <div className="rounded-2xl border border-dashed border-border p-10 text-center">
                 <p className="font-display text-lg">
-                  TodavÃ­a no publicas tu emprendimiento
+                  Todavía no publicas tu emprendimiento
                 </p>
 
                 <p className="mt-1 text-sm text-muted-foreground">
@@ -505,7 +510,7 @@ function EntrepreneurPanel({
         </div>
       </div>
 
-      {/* PESTAÃ‘AS */}
+      {/* PESTAÑAS */}
 
       <div className="border-y border-border bg-secondary/10 px-3 py-2">
         <div className="flex gap-1 overflow-x-auto">
@@ -576,7 +581,7 @@ function EntrepreneurPanel({
               <BarChart3 className="h-4 w-4" />
             }
 
-            label="MÃ©tricas"
+            label="Métricas"
 
             onClick={() =>
               setTab(
@@ -1101,7 +1106,7 @@ function MetricStatus({
 function EmptyMetric() {
   return (
     <p className="text-xs text-muted-foreground">
-      AÃºn no hay informaciÃ³n para mostrar.
+      Aún no hay información para mostrar.
     </p>
   );
 }
@@ -1231,4 +1236,3 @@ function Stat({
     </div>
   );
 }
-

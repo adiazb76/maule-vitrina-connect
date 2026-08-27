@@ -1,4 +1,4 @@
-﻿import {
+import {
   createFileRoute,
   Link,
   useNavigate,
@@ -91,23 +91,46 @@ function SumatePage() {
   const navigate =
     useNavigate();
 
-  
   const existingEntrepreneur =
     useQuery({
-      queryKey: ["existing-entrepreneur", user?.id],
-      enabled: Boolean(user?.id),
-      queryFn: async () => {
-        const { data, error } = await (supabase as any)
-          .from("entrepreneurs")
-          .select("id,business_name,slug")
-          .eq("user_id", user!.id)
-          .maybeSingle();
+      queryKey: [
+        "existing-entrepreneur",
+        user?.id,
+      ],
 
-        if (error) throw error;
-        return data ?? null;
-      },
+      enabled:
+        Boolean(
+          user?.id,
+        ),
+
+      queryFn:
+        async () => {
+          const {
+            data,
+            error,
+          } =
+            await (supabase as any)
+              .from(
+                "entrepreneurs",
+              )
+              .select(
+                "id,business_name,slug",
+              )
+              .eq(
+                "user_id",
+                user!.id,
+              )
+              .maybeSingle();
+
+          if (error) {
+            throw error;
+          }
+
+          return data ?? null;
+        },
     });
-const categories =
+
+  const categories =
     useQuery({
       queryKey: [
         "categories",
@@ -238,10 +261,20 @@ const categories =
     });
 
   useEffect(() => {
-    if (existingEntrepreneur.data && !existingEntrepreneur.isLoading) {
-      navigate({ to: "/panel", replace: true });
+    if (
+      existingEntrepreneur.data &&
+      !existingEntrepreneur.isLoading
+    ) {
+      navigate({
+        to: "/panel",
+        replace: true,
+      });
     }
-  }, [existingEntrepreneur.data, existingEntrepreneur.isLoading, navigate]);
+  }, [
+    existingEntrepreneur.data,
+    existingEntrepreneur.isLoading,
+    navigate,
+  ]);
 
   const set =
     (
@@ -393,7 +426,12 @@ const categories =
       toast.error(
         "Ya tienes un emprendimiento registrado. Puedes editarlo desde Mi panel.",
       );
-      navigate({ to: "/panel" });
+
+      navigate({
+        to:
+          "/panel",
+      });
+
       return;
     }
 
