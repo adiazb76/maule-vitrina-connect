@@ -321,16 +321,39 @@ function PanelPage() {
         />
       </div>
 
-      {mine.isError ? (
-        <div className="mt-5 rounded-xl border border-red-300 bg-red-50 p-4 text-sm text-red-800">
-          <p className="font-semibold">Error cargando tus emprendimientos</p>
-          <p className="mt-1 break-words">
-            {mine.error instanceof Error
-              ? mine.error.message
-              : String(mine.error)}
+      <div className="mt-5 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+        <p className="font-semibold">Diagnóstico temporal de producción</p>
+        <div className="mt-2 space-y-1 text-xs">
+          <p>
+            <span className="font-semibold">Usuario detectado:</span>{" "}
+            {user?.id ?? "sin usuario"}
           </p>
+          <p>
+            <span className="font-semibold">Correo:</span>{" "}
+            {user?.email ?? "sin correo"}
+          </p>
+          <p>
+            <span className="font-semibold">Registros devueltos:</span>{" "}
+            {mine.data?.length ?? 0}
+          </p>
+          <p>
+            <span className="font-semibold">Estado consulta:</span>{" "}
+            {mine.isLoading
+              ? "cargando"
+              : mine.isError
+              ? "error"
+              : "ok"}
+          </p>
+          {mine.isError ? (
+            <p className="break-words">
+              <span className="font-semibold">Error:</span>{" "}
+              {mine.error instanceof Error
+                ? mine.error.message
+                : String(mine.error)}
+            </p>
+          ) : null}
         </div>
-      ) : null}
+      </div>
 
       {/* EMPRENDIMIENTOS */}
 
