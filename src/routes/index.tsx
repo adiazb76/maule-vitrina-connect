@@ -381,7 +381,7 @@ function IndexPage() {
             </div>
           </div>
 
-          <div>
+          <div className="relative">
             <img
               src={
                 heroPhoto
@@ -389,45 +389,44 @@ function IndexPage() {
               alt="La Vitrina - Emprendedores del Maule Sur"
               className="aspect-[16/9] w-full rounded-xl object-cover shadow-sm"
             />
-          </div>
-        </div>
-      </section>
 
-      {/* LA VITRINA EN NÚMEROS */}
+            <div className="absolute inset-x-2 top-2 rounded-lg border border-white/20 bg-background/88 px-3 py-2 shadow-sm backdrop-blur-md sm:inset-x-3 sm:top-3 sm:px-4">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-[9px] font-semibold uppercase tracking-[0.12em] text-foreground">
+                  La Vitrina en números
+                </p>
 
-      <section className="border-b border-border bg-secondary/10">
-        <div className="container-page">
-          <div className="flex items-center gap-5 overflow-x-auto py-3">
-            <div className="shrink-0 pr-1">
-              <p className="text-[9px] font-semibold uppercase tracking-wider text-primary">
-                La Vitrina en números
-              </p>
+                <p className="shrink-0 text-[8px] text-muted-foreground">
+                  {new Intl.DateTimeFormat(
+                    "es-CL",
+                    {
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                    },
+                  ).format(
+                    new Date(),
+                  )}
+                </p>
+              </div>
 
-              <p className="mt-0.5 whitespace-nowrap text-[9px] text-muted-foreground">
-                {new Intl.DateTimeFormat("es-CL", {
-                  day: "2-digit",
-                  month: "short",
-                  year: "numeric",
-                }).format(new Date())}
-              </p>
+              {publicMetrics.isLoading ? (
+                <div className="mt-2 h-8 animate-pulse rounded-md bg-muted" />
+              ) : publicMetrics.data ? (
+                <div className="mt-2 grid grid-cols-6 divide-x divide-border/70">
+                  <HeroPublicMetric value={publicMetrics.data.entrepreneurs} label="Emprend." />
+                  <HeroPublicMetric value={publicMetrics.data.views} label="Vistas" />
+                  <HeroPublicMetric value={publicMetrics.data.contacts} label="Contactos" />
+                  <HeroPublicMetric value={publicMetrics.data.diagnostics} label="Diagnóst." />
+                  <HeroPublicMetric value={publicMetrics.data.ads} label="Avisos" />
+                  <HeroPublicMetric value={publicMetrics.data.comunas} label="Comunas" />
+                </div>
+              ) : (
+                <p className="mt-2 text-[9px] text-muted-foreground">
+                  Cifras en actualización.
+                </p>
+              )}
             </div>
-
-            {publicMetrics.isLoading ? (
-              <div className="h-8 w-full min-w-[520px] animate-pulse rounded-lg bg-muted" />
-            ) : publicMetrics.data ? (
-              <>
-                <PublicMetric value={publicMetrics.data.entrepreneurs} label="Emprendimientos" />
-                <PublicMetric value={publicMetrics.data.views} label="Visualizaciones" />
-                <PublicMetric value={publicMetrics.data.contacts} label="Contactos" />
-                <PublicMetric value={publicMetrics.data.diagnostics} label="Diagnósticos" />
-                <PublicMetric value={publicMetrics.data.ads} label="Avisos" />
-                <PublicMetric value={publicMetrics.data.comunas} label="Comunas" />
-              </>
-            ) : (
-              <span className="text-[10px] text-muted-foreground">
-                Cifras en actualización.
-              </span>
-            )}
           </div>
         </div>
       </section>
@@ -706,7 +705,7 @@ function IndexPage() {
   );
 }
 
-function PublicMetric({
+function HeroPublicMetric({
   value,
   label,
 }: {
@@ -714,19 +713,15 @@ function PublicMetric({
   label: string;
 }) {
   return (
-    <>
-      <div className="h-7 w-px shrink-0 bg-border" />
+    <div className="min-w-0 px-1 text-center sm:px-1.5">
+      <p className="truncate font-display text-[11px] font-semibold leading-none text-foreground sm:text-xs">
+        {new Intl.NumberFormat("es-CL").format(value)}
+      </p>
 
-      <div className="shrink-0 text-center">
-        <p className="font-display text-lg font-semibold leading-none sm:text-xl">
-          {new Intl.NumberFormat("es-CL").format(value)}
-        </p>
-
-        <p className="mt-1 whitespace-nowrap text-[9px] uppercase tracking-wide text-muted-foreground">
-          {label}
-        </p>
-      </div>
-    </>
+      <p className="mt-1 truncate text-[7px] uppercase tracking-wide text-muted-foreground sm:text-[8px]">
+        {label}
+      </p>
+    </div>
   );
 }
 
