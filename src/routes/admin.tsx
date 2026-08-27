@@ -67,6 +67,7 @@ const ADMIN_NAV = [
   { href: "#portada", label: "Portada" },
   { href: "#destacado", label: "Destacado" },
   { href: "#emprendedores", label: "Emprendedores" },
+  { href: "#diagnosticos", label: "Diagnósticos" },
   { href: "#noticias", label: "Noticias" },
   { href: "#educa", label: "Educa" },
   { href: "#eventos", label: "Eventos" },
@@ -176,6 +177,20 @@ function AdminPage() {
       return (
         data ?? []
       ) as Sponsor[];
+    },
+  });
+
+  const diagnostics = useQuery({
+    queryKey: ["admin-diagnostics"],
+    enabled: Boolean(isAdmin),
+    queryFn: async () => {
+      const { data, error } = await (supabase as any)
+        .from("entrepreneur_diagnostics")
+        .select("id,entrepreneur_id,user_id,score,sector,stage,created_at,entrepreneurs:entrepreneur_id(business_name,short_description)")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      return (data ?? []) as any[];
     },
   });
 
@@ -1272,6 +1287,99 @@ function AdminPage() {
           onDelete={removeEntrepreneur}
           onVisibility={toggleVisibility}
         />
+      </section>
+
+      <section id="diagnosticos" className="scroll-mt-32 pt-10">
+        <p className="eyebrow">Inteligencia de gestión</p>
+        <h2 className="mt-1 font-display text-2xl font-semibold">Diagnósticos</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Vista ejecutiva de los diagnósticos realizados por los emprendedores registrados.
+        </p>
+
+        {diagnostics.isLoading ? (
+          <div className="mt-5 h-32 animate-pulse rounded-2xl bg-muted" />
+        ) : diagnostics.isError ? (
+          <div className="mt-5 rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm">
+            No fue posible cargar los diagnósticos.
+          </div>
+        ) : (() => {
+          const rows = diagnostics.data ?? [];
+          const diagnosed = new Set(rows.map((row: any) => row.entrepreneur_id)).size;
+          const average = rows.length
+            ? Math.round(rows.reduce((sum: number, row: any) => sum + Number(row.score || 0), 0) / rows.length)
+            : 0;
+          const high = rows.length
+            ? Math.round((rows.filter((row: any) => Number(row.score || 0) >= 75).length / rows.length) * 100)
+            : 0;
+
+          return (
+            <>
+              <div className="mt-5 grid gap-4 sm:grid-cols-4">
+                <Stat label="Diagnósticos totales" value={rows.length} />
+                <Stat label="Emprendedores diagnosticados" value={diagnosed} />
+                <Stat label="Puntaje promedio" value={average} />
+                <Stat label="% con resultado ≥75" value={high} />
+              </div>
+
+              <div className="mt-6 overflow-hidden rounded-2xl border border-border bg-card">
+                <div className="overflow-x-auto">
+                  <table className="w-full min-w-[760px] text-left text-sm">
+                    <thead className="border-b border-border bg-secondary/20 text-xs text-muted-foreground">
+                      <tr>
+                        <th className="px-4 py-3 font-semibold">Emprendimiento</th>
+                        <th className="px-4 py-3 font-semibold">Rubro</th>
+                        <th className="px-4 py-3 font-semibold">Fecha</th>
+                        <th className="px-4 py-3 font-semibold">Puntaje</th>
+                        <th className="px-4 py-3 font-semibold">Nivel</th>
+                        <th className="px-4 py-3 font-semibold">Informe</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {rows.map((row: any) => {
+                        const score = Number(row.score || 0);
+                        const level =
+                          score >= 95 ? "Sobresaliente" :
+                          score >= 75 ? "Favorable" :
+                          score >= 50 ? "En desarrollo" : "Prioritario";
+                        const entrepreneur = Array.isArray(row.entrepreneurs)
+                          ? row.entrepreneurs[0]
+                          : row.entrepreneurs;
+
+                        return (
+                          <tr key={row.id} className="border-b border-border last:border-0">
+                            <td className="px-4 py-3 font-medium">
+                              {entrepreneur?.business_name ?? "Emprendimiento"}
+                            </td>
+                            <td className="px-4 py-3 text-muted-foreground">{row.sector ?? "—"}</td>
+                            <td className="px-4 py-3 text-muted-foreground">
+                              {new Date(row.created_at).toLocaleDateString("es-CL")}
+                            </td>
+                            <td className="px-4 py-3 font-display text-lg font-semibold">{score}/100</td>
+                            <td className="px-4 py-3">{level}</td>
+                            <td className="px-4 py-3">
+                              <Button asChild variant="outline" size="sm">
+                                <Link to="/diagnosticos/$id" params={{ id: row.id }}>
+                                  Ver diagnóstico
+                                </Link>
+                              </Button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                      {rows.length === 0 ? (
+                        <tr>
+                          <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
+                            Aún no hay diagnósticos registrados.
+                          </td>
+                        </tr>
+                      ) : null}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </>
+          );
+        })()}
       </section>
 
       <div
