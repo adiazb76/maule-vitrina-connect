@@ -321,6 +321,17 @@ function PanelPage() {
         />
       </div>
 
+      {mine.isError ? (
+        <div className="mt-5 rounded-xl border border-red-300 bg-red-50 p-4 text-sm text-red-800">
+          <p className="font-semibold">Error cargando tus emprendimientos</p>
+          <p className="mt-1 break-words">
+            {mine.error instanceof Error
+              ? mine.error.message
+              : String(mine.error)}
+          </p>
+        </div>
+      ) : null}
+
       {/* EMPRENDIMIENTOS */}
 
       <div className="mt-7 space-y-5">
