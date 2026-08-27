@@ -46,6 +46,10 @@ import {
 } from "@/components/like-summary";
 
 import {
+  LatestDiagnostic,
+} from "@/components/latest-diagnostic";
+
+import {
   supabase,
 } from "@/integrations/supabase/client";
 
@@ -745,56 +749,64 @@ function SummaryTab({
     );
 
   return (
-    <div className="grid gap-3 sm:grid-cols-2">
-      <SummaryCard
-        title="Evento"
-
-        value={
-          event.data
-            ? event.data.title
-            : "Sin evento"
-        }
-
-        status={
-          event.data
-            ? event.data.status
-            : undefined
-        }
-
-        expired={
-          event.data?.ends_at
-            ? new Date(
-                event.data.ends_at,
-              ).getTime() <
-              Date.now()
-            : false
+    <div className="space-y-3">
+      <LatestDiagnostic
+        entrepreneurId={
+          entrepreneur.id
         }
       />
 
-      <SummaryCard
-        title="Compra-venta"
+      <div className="grid gap-3 sm:grid-cols-2">
+        <SummaryCard
+          title="Evento"
 
-        value={
-          ad.data
-            ? ad.data.title
-            : "Sin aviso"
-        }
+          value={
+            event.data
+              ? event.data.title
+              : "Sin evento"
+          }
 
-        status={
-          ad.data
-            ? ad.data.status
-            : undefined
-        }
+          status={
+            event.data
+              ? event.data.status
+              : undefined
+          }
 
-        expired={
-          ad.data
-            ? new Date(
-                ad.data.expires_at,
-              ).getTime() <
-              Date.now()
-            : false
-        }
-      />
+          expired={
+            event.data?.ends_at
+              ? new Date(
+                  event.data.ends_at,
+                ).getTime() <
+                Date.now()
+              : false
+          }
+        />
+
+        <SummaryCard
+          title="Compra-venta"
+
+          value={
+            ad.data
+              ? ad.data.title
+              : "Sin aviso"
+          }
+
+          status={
+            ad.data
+              ? ad.data.status
+              : undefined
+          }
+
+          expired={
+            ad.data
+              ? new Date(
+                  ad.data.expires_at,
+                ).getTime() <
+                Date.now()
+              : false
+          }
+        />
+      </div>
     </div>
   );
 }

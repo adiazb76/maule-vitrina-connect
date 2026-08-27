@@ -24,6 +24,7 @@ import { Route as SobreRouteImport } from './routes/sobre'
 import { Route as SumateRouteImport } from './routes/sumate'
 import { Route as AuthenticatedPanelRouteImport } from './routes/_authenticated/panel'
 import { Route as CategoriasIndexRouteImport } from './routes/categorias.index'
+import { Route as DiagnosticosIdRouteImport } from './routes/diagnosticos.$id'
 import { Route as EmprendedoresIndexRouteImport } from './routes/emprendedores.index'
 import { Route as EmprendedoresSlugRouteImport } from './routes/emprendedores.$slug'
 import { Route as AuthenticatedEditarIdRouteImport } from './routes/_authenticated/editar.$id'
@@ -102,6 +103,11 @@ const CategoriasIndexRoute = CategoriasIndexRouteImport.update({
   path: '/categorias/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DiagnosticosIdRoute = DiagnosticosIdRouteImport.update({
+  id: '/diagnosticos/$id',
+  path: '/diagnosticos/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EmprendedoresIndexRoute = EmprendedoresIndexRouteImport.update({
   id: '/emprendedores/',
   path: '/emprendedores/',
@@ -132,6 +138,7 @@ export interface FileRoutesByFullPath {
   '/sobre': typeof SobreRoute
   '/sumate': typeof SumateRoute
   '/panel': typeof AuthenticatedPanelRoute
+  '/diagnosticos/$id': typeof DiagnosticosIdRoute
   '/emprendedores/$slug': typeof EmprendedoresSlugRoute
   '/categorias/': typeof CategoriasIndexRoute
   '/emprendedores/': typeof EmprendedoresIndexRoute
@@ -151,6 +158,7 @@ export interface FileRoutesByTo {
   '/sobre': typeof SobreRoute
   '/sumate': typeof SumateRoute
   '/panel': typeof AuthenticatedPanelRoute
+  '/diagnosticos/$id': typeof DiagnosticosIdRoute
   '/emprendedores/$slug': typeof EmprendedoresSlugRoute
   '/categorias': typeof CategoriasIndexRoute
   '/emprendedores': typeof EmprendedoresIndexRoute
@@ -172,6 +180,7 @@ export interface FileRoutesById {
   '/sobre': typeof SobreRoute
   '/sumate': typeof SumateRoute
   '/_authenticated/panel': typeof AuthenticatedPanelRoute
+  '/diagnosticos/$id': typeof DiagnosticosIdRoute
   '/emprendedores/$slug': typeof EmprendedoresSlugRoute
   '/categorias/': typeof CategoriasIndexRoute
   '/emprendedores/': typeof EmprendedoresIndexRoute
@@ -193,6 +202,7 @@ export interface FileRouteTypes {
     | '/sobre'
     | '/sumate'
     | '/panel'
+    | '/diagnosticos/$id'
     | '/emprendedores/$slug'
     | '/categorias/'
     | '/emprendedores/'
@@ -212,6 +222,7 @@ export interface FileRouteTypes {
     | '/sobre'
     | '/sumate'
     | '/panel'
+    | '/diagnosticos/$id'
     | '/emprendedores/$slug'
     | '/categorias'
     | '/emprendedores'
@@ -232,6 +243,7 @@ export interface FileRouteTypes {
     | '/sobre'
     | '/sumate'
     | '/_authenticated/panel'
+    | '/diagnosticos/$id'
     | '/emprendedores/$slug'
     | '/categorias/'
     | '/emprendedores/'
@@ -252,6 +264,7 @@ export interface RootRouteChildren {
   RadioRoute: typeof RadioRoute
   SobreRoute: typeof SobreRoute
   SumateRoute: typeof SumateRoute
+  DiagnosticosIdRoute: typeof DiagnosticosIdRoute
   EmprendedoresSlugRoute: typeof EmprendedoresSlugRoute
   CategoriasIndexRoute: typeof CategoriasIndexRoute
   EmprendedoresIndexRoute: typeof EmprendedoresIndexRoute
@@ -364,6 +377,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CategoriasIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/diagnosticos/$id': {
+      id: '/diagnosticos/$id'
+      path: '/diagnosticos/$id'
+      fullPath: '/diagnosticos/$id'
+      preLoaderRoute: typeof DiagnosticosIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/emprendedores/': {
       id: '/emprendedores/'
       path: '/emprendedores'
@@ -415,6 +435,7 @@ const rootRouteChildren: RootRouteChildren = {
   RadioRoute: RadioRoute,
   SobreRoute: SobreRoute,
   SumateRoute: SumateRoute,
+  DiagnosticosIdRoute: DiagnosticosIdRoute,
   EmprendedoresSlugRoute: EmprendedoresSlugRoute,
   CategoriasIndexRoute: CategoriasIndexRoute,
   EmprendedoresIndexRoute: EmprendedoresIndexRoute,
