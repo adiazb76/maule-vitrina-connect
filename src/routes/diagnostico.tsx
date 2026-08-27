@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+﻿import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import {
   AlertTriangle,
@@ -21,11 +21,11 @@ import { useAuth } from "@/hooks/use-auth";
 export const Route = createFileRoute("/diagnostico")({
   head: () => ({
     meta: [
-      { title: "Diagnóstico del Emprendedor" },
+      { title: "DiagnÃ³stico del Emprendedor" },
       {
         name: "description",
         content:
-          "Evaluación integral para orientar decisiones, identificar brechas y definir prioridades de desarrollo.",
+          "EvaluaciÃ³n integral para orientar decisiones, identificar brechas y definir prioridades de desarrollo.",
       },
     ],
   }),
@@ -35,12 +35,12 @@ export const Route = createFileRoute("/diagnostico")({
 type AnswerMap = Record<string, string>;
 type Severity = "ok" | "warning" | "critical" | "info";
 type Dimension =
-  | "Formalización"
+  | "FormalizaciÃ³n"
   | "Tributario"
   | "Municipal y permisos"
   | "Finanzas"
   | "Mercado y ventas"
-  | "Operación"
+  | "OperaciÃ³n"
   | "Personas"
   | "Digital"
   | "Riesgos"
@@ -68,23 +68,23 @@ type Question = {
 const STORAGE_KEY = "diagnostico-emprendedor-v1";
 
 const sectors = [
-  ["agricultura", "Agricultura / producción rural"],
+  ["agricultura", "Agricultura / producciÃ³n rural"],
   ["pesca", "Pesca artesanal / recursos del mar"],
-  ["gastronomia", "Alimentos / gastronomía"],
+  ["gastronomia", "Alimentos / gastronomÃ­a"],
   ["comercio", "Comercio / venta de productos"],
   ["feria", "Feria / comercio itinerante"],
-  ["artesania", "Artesanía / oficios productivos"],
+  ["artesania", "ArtesanÃ­a / oficios productivos"],
   ["pasajeros", "Taxi / colectivo / transporte de pasajeros"],
   ["carga", "Camiones / fletes / transporte de carga"],
-  ["construccion", "Construcción / oficio técnico"],
+  ["construccion", "ConstrucciÃ³n / oficio tÃ©cnico"],
   ["turismo", "Turismo / alojamiento / experiencias"],
   ["profesional", "Servicios profesionales"],
   ["personal", "Servicios personales"],
-  ["belleza", "Belleza / estética"],
-  ["educacion", "Educación / capacitación"],
-  ["musica", "Música / arte / espectáculos"],
-  ["manufactura", "Manufactura / fabricación"],
-  ["tecnologia", "Tecnología / servicios digitales"],
+  ["belleza", "Belleza / estÃ©tica"],
+  ["educacion", "EducaciÃ³n / capacitaciÃ³n"],
+  ["musica", "MÃºsica / arte / espectÃ¡culos"],
+  ["manufactura", "Manufactura / fabricaciÃ³n"],
+  ["tecnologia", "TecnologÃ­a / servicios digitales"],
   ["otro", "Otra actividad"],
 ] as const;
 
@@ -92,10 +92,10 @@ const yesNo = (
   action: string,
   organism?: string,
 ): Option[] => [
-  { value: "si", label: "Sí, completamente", score: 4, severity: "ok" },
+  { value: "si", label: "SÃ­, completamente", score: 4, severity: "ok" },
   { value: "parcial", label: "Parcialmente / en proceso", score: 2, severity: "warning", action, organism },
   { value: "no", label: "No", score: 0, severity: "critical", action, organism },
-  { value: "nose", label: "No sé / necesito orientación", score: 1, severity: "warning", action, organism },
+  { value: "nose", label: "No sÃ© / necesito orientaciÃ³n", score: 1, severity: "warning", action, organism },
 ];
 
 const sectorIs =
@@ -124,19 +124,19 @@ const canAskOperationalCompliance = (a: AnswerMap) =>
 const questions: Question[] = [
   {
     id: "nombre_emprendimiento",
-    section: "Identificación",
+    section: "IdentificaciÃ³n",
     when: (a) => a._profile_bound !== "yes",
-    title: "¿Cómo se llama tu emprendimiento?",
+    title: "Â¿CÃ³mo se llama tu emprendimiento?",
     options: [
-      { value: "registrado", label: "Usaré el nombre registrado en mi ficha" },
-      { value: "sin_nombre", label: "Todavía no tiene nombre" },
+      { value: "registrado", label: "UsarÃ© el nombre registrado en mi ficha" },
+      { value: "sin_nombre", label: "TodavÃ­a no tiene nombre" },
     ],
   },
   {
     id: "nombre_emprendedor",
-    section: "Identificación",
+    section: "IdentificaciÃ³n",
     when: (a) => a._profile_bound !== "yes",
-    title: "¿Quién lidera actualmente el emprendimiento?",
+    title: "Â¿QuiÃ©n lidera actualmente el emprendimiento?",
     options: [
       { value: "titular", label: "Yo soy el/la titular o responsable principal" },
       { value: "socios", label: "Lo lideramos entre socios/as" },
@@ -147,52 +147,52 @@ const questions: Question[] = [
   {
     id: "etapa",
     section: "Tu emprendimiento",
-    title: "¿En qué etapa está hoy tu emprendimiento?",
+    title: "Â¿En quÃ© etapa estÃ¡ hoy tu emprendimiento?",
     options: [
       { value: "idea", label: "Tengo una idea y quiero saber si es viable" },
       { value: "preparacion", label: "Estoy preparando todo para comenzar" },
-      { value: "inicio", label: "Ya comencé, pero vendo ocasionalmente" },
+      { value: "inicio", label: "Ya comencÃ©, pero vendo ocasionalmente" },
       { value: "ventas", label: "Tengo ventas habituales" },
       { value: "crecimiento", label: "Estoy creciendo y necesito ordenar el negocio" },
       { value: "consolidado", label: "Tengo un negocio consolidado y quiero seguir creciendo" },
-      { value: "dificultad", label: "Mi negocio está pasando por dificultades" },
+      { value: "dificultad", label: "Mi negocio estÃ¡ pasando por dificultades" },
     ],
   },
   {
     id: "objetivo",
     section: "Tu emprendimiento",
-    title: "¿Cuál es hoy tu principal objetivo?",
+    title: "Â¿CuÃ¡l es hoy tu principal objetivo?",
     options: [
-      { value: "comenzar", label: "Saber cómo comenzar correctamente" },
+      { value: "comenzar", label: "Saber cÃ³mo comenzar correctamente" },
       { value: "formalizar", label: "Formalizarme y ordenar permisos" },
-      { value: "vender", label: "Conseguir clientes o vender más" },
+      { value: "vender", label: "Conseguir clientes o vender mÃ¡s" },
       { value: "rentabilidad", label: "Mejorar precios, costos y rentabilidad" },
-      { value: "ordenar", label: "Ordenar la gestión del negocio" },
+      { value: "ordenar", label: "Ordenar la gestiÃ³n del negocio" },
       { value: "financiar", label: "Conseguir financiamiento o invertir" },
       { value: "crecer", label: "Crecer, contratar o llegar a nuevos mercados" },
       { value: "recuperar", label: "Recuperar un negocio que ha bajado" },
-      { value: "general", label: "Conocer mi situación general" },
+      { value: "general", label: "Conocer mi situaciÃ³n general" },
     ],
   },
   {
     id: "sector",
     section: "Tu emprendimiento",
-    title: "¿Cuál describe mejor tu actividad principal?",
+    title: "Â¿CuÃ¡l describe mejor tu actividad principal?",
     options: sectors.map(([value, label]) => ({ value, label })),
   },
   {
     id: "lugar",
     section: "Tu emprendimiento",
-    title: "¿Dónde desarrollas principalmente la actividad?",
+    title: "Â¿DÃ³nde desarrollas principalmente la actividad?",
     options: [
       { value: "casa", label: "En mi casa" },
       { value: "local", label: "En un local comercial" },
       { value: "taller", label: "En un taller" },
       { value: "feria", label: "En una feria" },
-      { value: "via", label: "En la vía pública" },
-      { value: "terreno", label: "En terreno agrícola o rural" },
-      { value: "mar", label: "En mar, río, lago o caleta" },
-      { value: "vehiculo", label: "En un vehículo" },
+      { value: "via", label: "En la vÃ­a pÃºblica" },
+      { value: "terreno", label: "En terreno agrÃ­cola o rural" },
+      { value: "mar", label: "En mar, rÃ­o, lago o caleta" },
+      { value: "vehiculo", label: "En un vehÃ­culo" },
       { value: "cliente", label: "En instalaciones del cliente" },
       { value: "internet", label: "Principalmente por internet" },
       { value: "varios", label: "En varios de los anteriores" },
@@ -201,16 +201,16 @@ const questions: Question[] = [
   {
     id: "territorio",
     section: "Tu emprendimiento",
-    title: "¿Dónde desarrollas principalmente tu actividad?",
+    title: "Â¿DÃ³nde desarrollas principalmente tu actividad?",
     options: [
       { value: "linares", label: "Linares" },
-      { value: "longavi", label: "Longaví" },
+      { value: "longavi", label: "LongavÃ­" },
       { value: "parral", label: "Parral" },
       { value: "retiro", label: "Retiro" },
       { value: "sanjavier", label: "San Javier" },
       { value: "villaalegre", label: "Villa Alegre" },
       { value: "yerbasbuenas", label: "Yerbas Buenas" },
-      { value: "colbun", label: "Colbún" },
+      { value: "colbun", label: "ColbÃºn" },
       { value: "cauquenes", label: "Cauquenes" },
       { value: "chanco", label: "Chanco" },
       { value: "pelluhue", label: "Pelluhue" },
@@ -219,252 +219,252 @@ const questions: Question[] = [
   },
   {
     id: "estructura",
-    section: "Formalización",
-    dimension: "Formalización",
-    title: "¿Cómo funciona legalmente hoy tu actividad?",
+    section: "FormalizaciÃ³n",
+    dimension: "FormalizaciÃ³n",
+    title: "Â¿CÃ³mo funciona legalmente hoy tu actividad?",
     options: [
       { value: "empresa", label: "Empresa o sociedad con RUT propio", score: 4, severity: "ok" },
       { value: "natural", label: "Persona natural con inicio de actividades", score: 4, severity: "ok" },
-      { value: "preparando", label: "Aún no comienzo y estoy definiendo cómo formalizarme", score: 2, severity: "warning", action: "Definir la forma de formalización antes de iniciar operaciones." },
-      { value: "informal", label: "Ya vendo o presto servicios sin formalización", score: 0, severity: "critical", action: "Revisar la forma adecuada de formalización antes de expandir la actividad.", organism: "SII / Registro de Empresas y Sociedades" },
-      { value: "nose", label: "No sé qué estructura necesito", score: 1, severity: "warning", action: "Evaluar la estructura jurídica y tributaria adecuada para la actividad." },
+      { value: "preparando", label: "AÃºn no comienzo y estoy definiendo cÃ³mo formalizarme", score: 2, severity: "warning", action: "Definir la forma de formalizaciÃ³n antes de iniciar operaciones." },
+      { value: "informal", label: "Ya vendo o presto servicios sin formalizaciÃ³n", score: 0, severity: "critical", action: "Revisar la forma adecuada de formalizaciÃ³n antes de expandir la actividad.", organism: "SII / Registro de Empresas y Sociedades" },
+      { value: "nose", label: "No sÃ© quÃ© estructura necesito", score: 1, severity: "warning", action: "Evaluar la estructura jurÃ­dica y tributaria adecuada para la actividad." },
     ],
   },
   {
     id: "sii",
-    section: "Formalización",
+    section: "FormalizaciÃ³n",
     dimension: "Tributario",
-    title: "¿Tienes Inicio de Actividades vigente ante el SII?",
+    title: "Â¿Tienes Inicio de Actividades vigente ante el SII?",
     options: [
-      { value: "si", label: "Sí", score: 4, severity: "ok" },
-      { value: "tramite", label: "Está en trámite", score: 2, severity: "warning", action: "Completar y verificar el Inicio de Actividades.", organism: "SII" },
+      { value: "si", label: "SÃ­", score: 4, severity: "ok" },
+      { value: "tramite", label: "EstÃ¡ en trÃ¡mite", score: 2, severity: "warning", action: "Completar y verificar el Inicio de Actividades.", organism: "SII" },
       { value: "no", label: "No", score: 0, severity: "critical", action: "Revisar y regularizar el Inicio de Actividades antes de mantener ventas habituales.", organism: "SII" },
-      { value: "nose", label: "No sé si me corresponde", score: 1, severity: "warning", action: "Revisar la obligación según la actividad económica.", organism: "SII" },
-      { value: "aun", label: "Todavía no comienzo", score: 2, severity: "info" },
+      { value: "nose", label: "No sÃ© si me corresponde", score: 1, severity: "warning", action: "Revisar la obligaciÃ³n segÃºn la actividad econÃ³mica.", organism: "SII" },
+      { value: "aun", label: "TodavÃ­a no comienzo", score: 2, severity: "info" },
     ],
   },
   {
     id: "documentos",
-    section: "Formalización",
+    section: "FormalizaciÃ³n",
     dimension: "Tributario",
-    title: "¿Emites los documentos tributarios que corresponden a tus ventas o servicios?",
+    title: "Â¿Emites los documentos tributarios que corresponden a tus ventas o servicios?",
     when: canAskOperationalCompliance,
     options: [
-      { value: "si", label: "Sí, siempre", score: 4, severity: "ok" },
+      { value: "si", label: "SÃ­, siempre", score: 4, severity: "ok" },
       { value: "casi", label: "Casi siempre", score: 3, severity: "warning", action: "Revisar que todas las operaciones queden correctamente documentadas.", organism: "SII" },
-      { value: "solicitan", label: "Sólo cuando me lo solicitan", score: 1, severity: "warning", action: "Revisar la obligación de emisión de documentos tributarios.", organism: "SII" },
-      { value: "no", label: "No", score: 0, severity: "critical", action: "Regularizar la emisión de documentos tributarios.", organism: "SII" },
-      { value: "nose", label: "No sé qué documento debo emitir", score: 1, severity: "warning", action: "Determinar el documento tributario aplicable.", organism: "SII" },
-      { value: "novendo", label: "Todavía no vendo", score: 2, severity: "info" },
+      { value: "solicitan", label: "SÃ³lo cuando me lo solicitan", score: 1, severity: "warning", action: "Revisar la obligaciÃ³n de emisiÃ³n de documentos tributarios.", organism: "SII" },
+      { value: "no", label: "No", score: 0, severity: "critical", action: "Regularizar la emisiÃ³n de documentos tributarios.", organism: "SII" },
+      { value: "nose", label: "No sÃ© quÃ© documento debo emitir", score: 1, severity: "warning", action: "Determinar el documento tributario aplicable.", organism: "SII" },
+      { value: "novendo", label: "TodavÃ­a no vendo", score: 2, severity: "info" },
     ],
   },
   {
     id: "patente_previa",
-    section: "Formalización",
+    section: "FormalizaciÃ³n",
     dimension: "Municipal y permisos",
-    title: "Antes de formalizarte, ¿has revisado qué patente o permiso municipal podría necesitar tu actividad?",
+    title: "Antes de formalizarte, Â¿has revisado quÃ© patente o permiso municipal podrÃ­a necesitar tu actividad?",
     when: isPreFormal,
     options: [
-      { value: "si", label: "Sí, ya sé qué podría necesitar", score: 3, severity: "ok" },
+      { value: "si", label: "SÃ­, ya sÃ© quÃ© podrÃ­a necesitar", score: 3, severity: "ok" },
       { value: "parcial", label: "Tengo una idea, pero debo confirmarlo", score: 2, severity: "warning", action: "Confirmar requisitos municipales antes de invertir o habilitar un lugar.", organism: "Municipalidad" },
       { value: "no", label: "No lo he revisado", score: 1, severity: "warning", action: "Consultar anticipadamente patente, permiso y condiciones del lugar antes de invertir.", organism: "Municipalidad" },
-      { value: "nose", label: "No sé por dónde partir", score: 1, severity: "warning", action: "Solicitar orientación municipal sobre patente, permiso y uso del lugar.", organism: "Municipalidad" },
+      { value: "nose", label: "No sÃ© por dÃ³nde partir", score: 1, severity: "warning", action: "Solicitar orientaciÃ³n municipal sobre patente, permiso y uso del lugar.", organism: "Municipalidad" },
     ],
   },
   {
     id: "patente",
-    section: "Formalización",
+    section: "FormalizaciÃ³n",
     dimension: "Municipal y permisos",
-    title: "¿Has revisado si tu actividad requiere patente o permiso municipal?",
+    title: "Â¿Has revisado si tu actividad requiere patente o permiso municipal?",
     when: canAskOperationalCompliance,
     options: [
-      { value: "vigente", label: "Sí, y lo tengo vigente", score: 4, severity: "ok" },
-      { value: "tramite", label: "Sí, está en trámite", score: 2, severity: "warning", action: "Completar la tramitación municipal.", organism: "Municipalidad" },
-      { value: "pendiente", label: "Sé que lo necesito, pero aún no lo tramito", score: 0, severity: "critical", action: "Tramitar la patente o permiso aplicable antes de ampliar la actividad.", organism: "Municipalidad" },
-      { value: "noaplica", label: "Ya revisé y no aplica", score: 4, severity: "ok" },
-      { value: "nose", label: "No sé si corresponde", score: 1, severity: "warning", action: "Consultar si la forma y lugar de operación requieren patente o permiso.", organism: "Municipalidad" },
+      { value: "vigente", label: "SÃ­, y lo tengo vigente", score: 4, severity: "ok" },
+      { value: "tramite", label: "SÃ­, estÃ¡ en trÃ¡mite", score: 2, severity: "warning", action: "Completar la tramitaciÃ³n municipal.", organism: "Municipalidad" },
+      { value: "pendiente", label: "SÃ© que lo necesito, pero aÃºn no lo tramito", score: 0, severity: "critical", action: "Tramitar la patente o permiso aplicable antes de ampliar la actividad.", organism: "Municipalidad" },
+      { value: "noaplica", label: "Ya revisÃ© y no aplica", score: 4, severity: "ok" },
+      { value: "nose", label: "No sÃ© si corresponde", score: 1, severity: "warning", action: "Consultar si la forma y lugar de operaciÃ³n requieren patente o permiso.", organism: "Municipalidad" },
     ],
   },
   {
     id: "inmueble",
-    section: "Formalización",
+    section: "FormalizaciÃ³n",
     dimension: "Municipal y permisos",
-    title: "¿El lugar donde funciona o funcionará tu negocio está habilitado para esa actividad?",
+    title: "Â¿El lugar donde funciona o funcionarÃ¡ tu negocio estÃ¡ habilitado para esa actividad?",
     when: (a) => hasPremises(a) && hasFormalTaxStart(a),
-    options: yesNo("Verificar uso, recepción y condiciones del inmueble antes de nuevas inversiones.", "Municipalidad / DOM"),
+    options: yesNo("Verificar uso, recepciÃ³n y condiciones del inmueble antes de nuevas inversiones.", "Municipalidad / DOM"),
   },
   {
     id: "inmueble_previo",
-    section: "Formalización",
+    section: "FormalizaciÃ³n",
     dimension: "Municipal y permisos",
-    title: "Antes de invertir en el lugar, ¿has validado si ese inmueble o terreno puede usarse para tu actividad?",
+    title: "Antes de invertir en el lugar, Â¿has validado si ese inmueble o terreno puede usarse para tu actividad?",
     when: (a) => hasPremises(a) && isPreFormal(a),
     options: [
-      { value: "si", label: "Sí, ya lo revisé", score: 3, severity: "ok" },
-      { value: "parcial", label: "Lo estoy revisando", score: 2, severity: "warning", action: "Completar la validación del lugar antes de realizar inversiones importantes.", organism: "Municipalidad / DOM" },
-      { value: "no", label: "No lo he revisado", score: 0, severity: "critical", action: "Validar uso, recepción y condiciones del inmueble antes de invertir.", organism: "Municipalidad / DOM" },
-      { value: "nose", label: "No sé si debo revisarlo", score: 1, severity: "warning", action: "Consultar si el lugar es compatible con la actividad antes de habilitarlo.", organism: "Municipalidad / DOM" },
+      { value: "si", label: "SÃ­, ya lo revisÃ©", score: 3, severity: "ok" },
+      { value: "parcial", label: "Lo estoy revisando", score: 2, severity: "warning", action: "Completar la validaciÃ³n del lugar antes de realizar inversiones importantes.", organism: "Municipalidad / DOM" },
+      { value: "no", label: "No lo he revisado", score: 0, severity: "critical", action: "Validar uso, recepciÃ³n y condiciones del inmueble antes de invertir.", organism: "Municipalidad / DOM" },
+      { value: "nose", label: "No sÃ© si debo revisarlo", score: 1, severity: "warning", action: "Consultar si el lugar es compatible con la actividad antes de habilitarlo.", organism: "Municipalidad / DOM" },
     ],
   },
   {
     id: "alimentos",
-    section: "Formalización",
-    title: "¿Tu actividad produce, manipula, almacena o vende alimentos?",
+    section: "FormalizaciÃ³n",
+    title: "Â¿Tu actividad produce, manipula, almacena o vende alimentos?",
     options: [
-      { value: "elabora", label: "Sí, elaboro o manipulo alimentos" },
-      { value: "almacena", label: "Sí, almaceno o distribuyo alimentos" },
-      { value: "envasados", label: "Sólo comercializo productos envasados" },
+      { value: "elabora", label: "SÃ­, elaboro o manipulo alimentos" },
+      { value: "almacena", label: "SÃ­, almaceno o distribuyo alimentos" },
+      { value: "envasados", label: "SÃ³lo comercializo productos envasados" },
       { value: "no", label: "No trabajo con alimentos" },
     ],
   },
   {
     id: "sanitaria_previa",
-    section: "Formalización",
+    section: "FormalizaciÃ³n",
     dimension: "Municipal y permisos",
-    title: "¿Has revisado qué autorización sanitaria podría requerir tu actividad con alimentos?",
+    title: "Â¿Has revisado quÃ© autorizaciÃ³n sanitaria podrÃ­a requerir tu actividad con alimentos?",
     when: (a) => foodActivity(a) && isPreFormal(a),
     options: [
-      { value: "si", label: "Sí, ya conozco el requisito", score: 3, severity: "ok" },
-      { value: "parcial", label: "Tengo información, pero debo confirmarla", score: 2, severity: "warning", action: "Confirmar requisitos sanitarios antes de habilitar o comprar equipamiento.", organism: "SEREMI de Salud" },
-      { value: "no", label: "No lo he revisado", score: 0, severity: "critical", action: "Revisar requisitos sanitarios antes de invertir en infraestructura o comenzar elaboración.", organism: "SEREMI de Salud" },
-      { value: "nose", label: "No sé si necesito autorización", score: 1, severity: "warning", action: "Consultar a la autoridad sanitaria antes de habilitar el negocio.", organism: "SEREMI de Salud" },
+      { value: "si", label: "SÃ­, ya conozco el requisito", score: 3, severity: "ok" },
+      { value: "parcial", label: "Tengo informaciÃ³n, pero debo confirmarla", score: 2, severity: "warning", action: "Confirmar requisitos sanitarios antes de habilitar o comprar equipamiento.", organism: "SEREMI de Salud" },
+      { value: "no", label: "No lo he revisado", score: 0, severity: "critical", action: "Revisar requisitos sanitarios antes de invertir en infraestructura o comenzar elaboraciÃ³n.", organism: "SEREMI de Salud" },
+      { value: "nose", label: "No sÃ© si necesito autorizaciÃ³n", score: 1, severity: "warning", action: "Consultar a la autoridad sanitaria antes de habilitar el negocio.", organism: "SEREMI de Salud" },
     ],
   },
   {
     id: "sanitaria",
-    section: "Formalización",
+    section: "FormalizaciÃ³n",
     dimension: "Municipal y permisos",
-    title: "¿Tienes la autorización sanitaria que corresponde a tu actividad?",
+    title: "Â¿Tienes la autorizaciÃ³n sanitaria que corresponde a tu actividad?",
     when: (a) => foodActivity(a) && hasFormalTaxStart(a),
-    options: yesNo("Revisar y tramitar la autorización sanitaria antes de operar o expandir.", "SEREMI de Salud"),
+    options: yesNo("Revisar y tramitar la autorizaciÃ³n sanitaria antes de operar o expandir.", "SEREMI de Salud"),
   },
   {
     id: "separacion",
-    section: "Números del negocio",
+    section: "NÃºmeros del negocio",
     dimension: "Finanzas",
-    title: "¿El dinero del negocio se maneja separado de tus gastos personales?",
-    options: yesNo("Separar las finanzas personales de las del negocio como prioridad de gestión."),
+    title: "Â¿El dinero del negocio se maneja separado de tus gastos personales?",
+    options: yesNo("Separar las finanzas personales de las del negocio como prioridad de gestiÃ³n."),
   },
   {
     id: "costos",
-    section: "Números del negocio",
+    section: "NÃºmeros del negocio",
     dimension: "Finanzas",
-    title: "¿Conoces cuánto te cuesta realmente producir o entregar lo que vendes?",
+    title: "Â¿Conoces cuÃ¡nto te cuesta realmente producir o entregar lo que vendes?",
     options: yesNo("Calcular costos directos e indirectos antes de decidir precios o crecimiento."),
   },
   {
     id: "precios",
-    section: "Números del negocio",
+    section: "NÃºmeros del negocio",
     dimension: "Finanzas",
-    title: "¿Cómo defines tus precios?",
+    title: "Â¿CÃ³mo defines tus precios?",
     options: [
       { value: "completo", label: "Considero costos, gastos, impuestos, margen y mercado", score: 4, severity: "ok" },
       { value: "margen", label: "Principalmente costos + margen", score: 3, severity: "ok" },
-      { value: "competencia", label: "Me guío principalmente por la competencia", score: 2, severity: "warning", action: "Comprobar que el precio cubra todos los costos y deje margen." },
-      { value: "intuicion", label: "Defino un precio que me parece adecuado", score: 1, severity: "warning", action: "Construir una metodología simple de fijación de precios." },
-      { value: "sin", label: "Aún no he definido precios", score: 1, severity: "warning", action: "Definir precios sólo después de validar costos, cliente y mercado." },
+      { value: "competencia", label: "Me guÃ­o principalmente por la competencia", score: 2, severity: "warning", action: "Comprobar que el precio cubra todos los costos y deje margen." },
+      { value: "intuicion", label: "Defino un precio que me parece adecuado", score: 1, severity: "warning", action: "Construir una metodologÃ­a simple de fijaciÃ³n de precios." },
+      { value: "sin", label: "AÃºn no he definido precios", score: 1, severity: "warning", action: "Definir precios sÃ³lo despuÃ©s de validar costos, cliente y mercado." },
     ],
   },
   {
     id: "margen",
-    section: "Números del negocio",
+    section: "NÃºmeros del negocio",
     dimension: "Finanzas",
-    title: "¿Sabes cuánto ganas realmente por cada producto o servicio vendido?",
+    title: "Â¿Sabes cuÃ¡nto ganas realmente por cada producto o servicio vendido?",
     options: yesNo("Calcular margen real por producto o servicio antes de aumentar ventas."),
   },
   {
     id: "equilibrio",
-    section: "Números del negocio",
+    section: "NÃºmeros del negocio",
     dimension: "Finanzas",
-    title: "¿Sabes cuánto debes vender para cubrir todos tus costos?",
-    options: yesNo("Calcular el punto de equilibrio y la caja mínima mensual."),
+    title: "Â¿Sabes cuÃ¡nto debes vender para cubrir todos tus costos?",
+    options: yesNo("Calcular el punto de equilibrio y la caja mÃ­nima mensual."),
   },
   {
     id: "cliente",
     section: "Clientes y ventas",
     dimension: "Mercado y ventas",
-    title: "¿Tienes claramente identificado quién es tu cliente principal?",
+    title: "Â¿Tienes claramente identificado quiÃ©n es tu cliente principal?",
     options: yesNo("Definir el segmento de cliente prioritario y su necesidad principal."),
   },
   {
     id: "demanda",
     section: "Clientes y ventas",
     dimension: "Mercado y ventas",
-    title: "¿Has comprobado que existen personas dispuestas a pagar por lo que ofreces?",
+    title: "Â¿Has comprobado que existen personas dispuestas a pagar por lo que ofreces?",
     options: [
-      { value: "recurrente", label: "Sí, tengo clientes recurrentes", score: 4, severity: "ok" },
-      { value: "ventas", label: "Sí, ya he realizado varias ventas", score: 3, severity: "ok" },
+      { value: "recurrente", label: "SÃ­, tengo clientes recurrentes", score: 4, severity: "ok" },
+      { value: "ventas", label: "SÃ­, ya he realizado varias ventas", score: 3, severity: "ok" },
       { value: "pruebas", label: "He realizado algunas ventas o pruebas", score: 2, severity: "warning", action: "Seguir validando demanda, recurrencia y precio." },
-      { value: "interes", label: "Hay interés, pero aún no ventas", score: 1, severity: "warning", action: "Validar disposición a pagar antes de realizar inversiones importantes." },
-      { value: "no", label: "Todavía no lo he validado", score: 0, severity: "critical", action: "Validar demanda y precio antes de comprometer inversión relevante." },
+      { value: "interes", label: "Hay interÃ©s, pero aÃºn no ventas", score: 1, severity: "warning", action: "Validar disposiciÃ³n a pagar antes de realizar inversiones importantes." },
+      { value: "no", label: "TodavÃ­a no lo he validado", score: 0, severity: "critical", action: "Validar demanda y precio antes de comprometer inversiÃ³n relevante." },
     ],
   },
   {
     id: "seguimiento",
     section: "Clientes y ventas",
     dimension: "Mercado y ventas",
-    title: "¿Registras y haces seguimiento a personas interesadas y clientes?",
-    options: yesNo("Implementar un sistema básico de seguimiento comercial."),
+    title: "Â¿Registras y haces seguimiento a personas interesadas y clientes?",
+    options: yesNo("Implementar un sistema bÃ¡sico de seguimiento comercial."),
   },
   {
     id: "procesos",
-    section: "Operación",
-    dimension: "Operación",
-    title: "¿Tienes una forma ordenada y repetible de trabajar?",
-    options: yesNo("Documentar los procesos críticos antes de crecer."),
+    section: "OperaciÃ³n",
+    dimension: "OperaciÃ³n",
+    title: "Â¿Tienes una forma ordenada y repetible de trabajar?",
+    options: yesNo("Documentar los procesos crÃ­ticos antes de crecer."),
   },
   {
     id: "capacidad",
-    section: "Operación",
-    dimension: "Operación",
-    title: "Si mañana duplicaras tus ventas, ¿podrías responder sin perder calidad?",
-    options: yesNo("Identificar cuellos de botella y capacidad máxima antes de acelerar ventas."),
+    section: "OperaciÃ³n",
+    dimension: "OperaciÃ³n",
+    title: "Si maÃ±ana duplicaras tus ventas, Â¿podrÃ­as responder sin perder calidad?",
+    options: yesNo("Identificar cuellos de botella y capacidad mÃ¡xima antes de acelerar ventas."),
   },
   {
     id: "personas",
     section: "Personas",
-    title: "¿Quiénes trabajan regularmente en el negocio?",
+    title: "Â¿QuiÃ©nes trabajan regularmente en el negocio?",
     options: [
       { value: "solo", label: "Trabajo solo" },
       { value: "familia", label: "Trabajo con familiares" },
       { value: "socios", label: "Trabajo con socios" },
       { value: "contratados", label: "Tengo trabajadores contratados" },
       { value: "externos", label: "Trabajo con prestadores o colaboradores externos" },
-      { value: "aun", label: "Todavía no comienzo" },
+      { value: "aun", label: "TodavÃ­a no comienzo" },
     ],
   },
   {
     id: "laboral",
     section: "Personas",
     dimension: "Personas",
-    title: "¿Las personas que trabajan contigo tienen su relación contractual correctamente definida?",
+    title: "Â¿Las personas que trabajan contigo tienen su relaciÃ³n contractual correctamente definida?",
     when: (a) => hasWorkers(a) && hasFormalTaxStart(a),
-    options: yesNo("Revisar contratos, cotizaciones y obligaciones laborales o de prestación de servicios.", "Dirección del Trabajo"),
+    options: yesNo("Revisar contratos, cotizaciones y obligaciones laborales o de prestaciÃ³n de servicios.", "DirecciÃ³n del Trabajo"),
   },
   {
     id: "laboral_previo",
     section: "Personas",
     dimension: "Personas",
-    title: "Cuando formalices la actividad, ¿has definido cómo se vincularán las personas que trabajan contigo?",
+    title: "Cuando formalices la actividad, Â¿has definido cÃ³mo se vincularÃ¡n las personas que trabajan contigo?",
     when: (a) => hasWorkers(a) && isPreFormal(a),
     options: [
-      { value: "si", label: "Sí, ya lo tengo definido", score: 3, severity: "ok" },
-      { value: "parcial", label: "Tengo una idea, pero debo revisarla", score: 2, severity: "warning", action: "Definir correctamente si corresponde relación laboral, societaria o prestación de servicios.", organism: "Dirección del Trabajo / asesoría laboral" },
-      { value: "no", label: "No lo he definido", score: 1, severity: "warning", action: "Revisar la forma correcta de vinculación antes de comenzar operaciones regulares.", organism: "Dirección del Trabajo / asesoría laboral" },
-      { value: "nose", label: "No sé qué corresponde", score: 1, severity: "warning", action: "Solicitar orientación laboral antes de contratar o pagar remuneraciones.", organism: "Dirección del Trabajo / asesoría laboral" },
+      { value: "si", label: "SÃ­, ya lo tengo definido", score: 3, severity: "ok" },
+      { value: "parcial", label: "Tengo una idea, pero debo revisarla", score: 2, severity: "warning", action: "Definir correctamente si corresponde relaciÃ³n laboral, societaria o prestaciÃ³n de servicios.", organism: "DirecciÃ³n del Trabajo / asesorÃ­a laboral" },
+      { value: "no", label: "No lo he definido", score: 1, severity: "warning", action: "Revisar la forma correcta de vinculaciÃ³n antes de comenzar operaciones regulares.", organism: "DirecciÃ³n del Trabajo / asesorÃ­a laboral" },
+      { value: "nose", label: "No sÃ© quÃ© corresponde", score: 1, severity: "warning", action: "Solicitar orientaciÃ³n laboral antes de contratar o pagar remuneraciones.", organism: "DirecciÃ³n del Trabajo / asesorÃ­a laboral" },
     ],
   },
   {
     id: "digital",
-    section: "Digitalización",
+    section: "DigitalizaciÃ³n",
     dimension: "Digital",
-    title: "¿Qué tan fácil es para un cliente encontrarte y contactarte por internet?",
+    title: "Â¿QuÃ© tan fÃ¡cil es para un cliente encontrarte y contactarte por internet?",
     options: [
-      { value: "facil", label: "Muy fácil, tengo canales actualizados", score: 4, severity: "ok" },
+      { value: "facil", label: "Muy fÃ¡cil, tengo canales actualizados", score: 4, severity: "ok" },
       { value: "redes", label: "Principalmente por redes sociales", score: 3, severity: "ok" },
-      { value: "whatsapp", label: "Principalmente por WhatsApp", score: 2, severity: "warning", action: "Ordenar la presencia digital y facilitar contacto, ubicación y oferta." },
-      { value: "desactualizado", label: "Mi información está desactualizada", score: 1, severity: "warning", action: "Actualizar información y canales digitales." },
-      { value: "nada", label: "No tengo presencia digital", score: 0, severity: "warning", action: "Evaluar un canal digital básico acorde al cliente." },
+      { value: "whatsapp", label: "Principalmente por WhatsApp", score: 2, severity: "warning", action: "Ordenar la presencia digital y facilitar contacto, ubicaciÃ³n y oferta." },
+      { value: "desactualizado", label: "Mi informaciÃ³n estÃ¡ desactualizada", score: 1, severity: "warning", action: "Actualizar informaciÃ³n y canales digitales." },
+      { value: "nada", label: "No tengo presencia digital", score: 0, severity: "warning", action: "Evaluar un canal digital bÃ¡sico acorde al cliente." },
       { value: "noaplica", label: "No es relevante para mi actividad", score: 4, severity: "ok" },
     ],
   },
@@ -472,82 +472,82 @@ const questions: Question[] = [
     id: "dependencia",
     section: "Riesgos",
     dimension: "Riesgos",
-    title: "¿Qué pasaría si tú no pudieras trabajar durante un mes?",
+    title: "Â¿QuÃ© pasarÃ­a si tÃº no pudieras trabajar durante un mes?",
     options: [
-      { value: "normal", label: "El negocio seguiría funcionando normalmente", score: 4, severity: "ok" },
-      { value: "parcial", label: "Funcionaría parcialmente", score: 3, severity: "ok" },
-      { value: "dificil", label: "Tendría dificultades importantes", score: 1, severity: "warning", action: "Reducir dependencia del dueño mediante procesos, respaldo y delegación." },
-      { value: "detiene", label: "Prácticamente se detendría", score: 0, severity: "critical", action: "Crear continuidad operacional y reducir dependencia crítica del dueño." },
+      { value: "normal", label: "El negocio seguirÃ­a funcionando normalmente", score: 4, severity: "ok" },
+      { value: "parcial", label: "FuncionarÃ­a parcialmente", score: 3, severity: "ok" },
+      { value: "dificil", label: "TendrÃ­a dificultades importantes", score: 1, severity: "warning", action: "Reducir dependencia del dueÃ±o mediante procesos, respaldo y delegaciÃ³n." },
+      { value: "detiene", label: "PrÃ¡cticamente se detendrÃ­a", score: 0, severity: "critical", action: "Crear continuidad operacional y reducir dependencia crÃ­tica del dueÃ±o." },
     ],
   },
   {
     id: "estacionalidad",
     section: "Riesgos",
     dimension: "Riesgos",
-    title: "¿Tus ingresos dependen fuertemente de temporadas o fechas específicas?",
+    title: "Â¿Tus ingresos dependen fuertemente de temporadas o fechas especÃ­ficas?",
     options: [
-      { value: "alta", label: "Sí, gran parte del ingreso se concentra en una temporada", score: 1, severity: "warning", action: "Preparar caja y oferta complementaria para períodos de baja demanda." },
-      { value: "media", label: "Sí, pero tengo actividad el resto del año", score: 2, severity: "warning", action: "Planificar caja y acciones comerciales según temporada." },
+      { value: "alta", label: "SÃ­, gran parte del ingreso se concentra en una temporada", score: 1, severity: "warning", action: "Preparar caja y oferta complementaria para perÃ­odos de baja demanda." },
+      { value: "media", label: "SÃ­, pero tengo actividad el resto del aÃ±o", score: 2, severity: "warning", action: "Planificar caja y acciones comerciales segÃºn temporada." },
       { value: "baja", label: "Hay variaciones, pero son manejables", score: 3, severity: "ok" },
-      { value: "estable", label: "La actividad es relativamente estable todo el año", score: 4, severity: "ok" },
-      { value: "nose", label: "Todavía no lo sé", score: 1, severity: "warning", action: "Medir ventas por mes para conocer la estacionalidad real." },
+      { value: "estable", label: "La actividad es relativamente estable todo el aÃ±o", score: 4, severity: "ok" },
+      { value: "nose", label: "TodavÃ­a no lo sÃ©", score: 1, severity: "warning", action: "Medir ventas por mes para conocer la estacionalidad real." },
     ],
   },
   {
     id: "capital",
     section: "Crecimiento",
     dimension: "Crecimiento",
-    title: "¿Sabes cuánto capital necesitas para tu siguiente etapa?",
+    title: "Â¿Sabes cuÃ¡nto capital necesitas para tu siguiente etapa?",
     options: yesNo("Preparar presupuesto, flujo y destino de los recursos antes de buscar financiamiento."),
   },
   {
     id: "meta",
     section: "Crecimiento",
     dimension: "Crecimiento",
-    title: "¿Tienes definido dónde quieres que esté el negocio en 12 meses?",
-    options: yesNo("Definir dos o tres metas concretas y medibles para los próximos 12 meses."),
+    title: "Â¿Tienes definido dÃ³nde quieres que estÃ© el negocio en 12 meses?",
+    options: yesNo("Definir dos o tres metas concretas y medibles para los prÃ³ximos 12 meses."),
   },
 
   // AGRICULTURA
   {
     id: "agri_agua",
-    section: "Actividad específica",
+    section: "Actividad especÃ­fica",
     dimension: "Sectorial",
-    title: "¿Tienes acceso suficiente y confiable al agua necesaria para el proyecto?",
+    title: "Â¿Tienes acceso suficiente y confiable al agua necesaria para el proyecto?",
     when: sectorIs("agricultura"),
-    options: yesNo("Validar disponibilidad y continuidad de agua antes de ampliar superficie o inversión."),
+    options: yesNo("Validar disponibilidad y continuidad de agua antes de ampliar superficie o inversiÃ³n."),
   },
   {
     id: "agri_suelo",
-    section: "Actividad específica",
+    section: "Actividad especÃ­fica",
     dimension: "Sectorial",
-    title: "¿Has evaluado suelo y condiciones agroclimáticas para lo que quieres producir?",
+    title: "Â¿Has evaluado suelo y condiciones agroclimÃ¡ticas para lo que quieres producir?",
     when: sectorIs("agricultura"),
-    options: yesNo("Validar técnicamente suelo y condiciones productivas antes de plantar o invertir."),
+    options: yesNo("Validar tÃ©cnicamente suelo y condiciones productivas antes de plantar o invertir."),
   },
   {
     id: "agri_mercado",
-    section: "Actividad específica",
+    section: "Actividad especÃ­fica",
     dimension: "Mercado y ventas",
-    title: "Antes de producir, ¿tienes definido quién podría comprar tu producción?",
+    title: "Antes de producir, Â¿tienes definido quiÃ©n podrÃ­a comprar tu producciÃ³n?",
     when: sectorIs("agricultura"),
-    options: yesNo("Validar comprador, canal, volumen y precio antes de comprometer inversión productiva."),
+    options: yesNo("Validar comprador, canal, volumen y precio antes de comprometer inversiÃ³n productiva."),
   },
 
   // PESCA
   {
     id: "pesca_rpa",
-    section: "Actividad específica",
+    section: "Actividad especÃ­fica",
     dimension: "Sectorial",
-    title: "¿Tu actividad está inscrita en el Registro Pesquero Artesanal cuando corresponde?",
+    title: "Â¿Tu actividad estÃ¡ inscrita en el Registro Pesquero Artesanal cuando corresponde?",
     when: sectorIs("pesca"),
-    options: yesNo("Revisar inscripción y categoría aplicable antes de operar.", "Sernapesca"),
+    options: yesNo("Revisar inscripciÃ³n y categorÃ­a aplicable antes de operar.", "Sernapesca"),
   },
   {
     id: "pesca_costos",
-    section: "Actividad específica",
+    section: "Actividad especÃ­fica",
     dimension: "Finanzas",
-    title: "¿Conoces el costo real de una jornada considerando combustible, hielo, mantención, tripulación y otros gastos?",
+    title: "Â¿Conoces el costo real de una jornada considerando combustible, hielo, mantenciÃ³n, tripulaciÃ³n y otros gastos?",
     when: sectorIs("pesca"),
     options: yesNo("Calcular costo por jornada y margen real por recurso vendido."),
   },
@@ -555,113 +555,113 @@ const questions: Question[] = [
   // FERIA / COMERCIO
   {
     id: "feria_permiso",
-    section: "Actividad específica",
+    section: "Actividad especÃ­fica",
     dimension: "Municipal y permisos",
-    title: "¿Tienes permiso para vender en el lugar o feria donde trabajas?",
+    title: "Â¿Tienes permiso para vender en el lugar o feria donde trabajas?",
     when: sectorIs("feria"),
     options: yesNo("Regularizar el permiso correspondiente antes de ampliar la actividad.", "Municipalidad"),
   },
   {
     id: "comercio_resultado",
-    section: "Actividad específica",
+    section: "Actividad especÃ­fica",
     dimension: "Finanzas",
-    title: "Al terminar una jornada o período, ¿sabes cuánto ganaste después de mercadería y otros costos?",
+    title: "Al terminar una jornada o perÃ­odo, Â¿sabes cuÃ¡nto ganaste despuÃ©s de mercaderÃ­a y otros costos?",
     when: sectorIs("feria", "comercio"),
     options: yesNo("Separar ventas de utilidad e implementar un control simple de resultado."),
   },
 
-  // GASTRONOMÍA
+  // GASTRONOMÃA
   {
     id: "gastro_costeo",
-    section: "Actividad específica",
+    section: "Actividad especÃ­fica",
     dimension: "Finanzas",
-    title: "¿Conoces el costo actualizado de cada plato o producto principal?",
+    title: "Â¿Conoces el costo actualizado de cada plato o producto principal?",
     when: sectorIs("gastronomia"),
     options: yesNo("Costear recetas y productos antes de ajustar precios o promociones."),
   },
   {
     id: "gastro_merma",
-    section: "Actividad específica",
-    dimension: "Operación",
-    title: "¿Controlas mermas y pérdidas de alimentos?",
+    section: "Actividad especÃ­fica",
+    dimension: "OperaciÃ³n",
+    title: "Â¿Controlas mermas y pÃ©rdidas de alimentos?",
     when: sectorIs("gastronomia"),
     options: yesNo("Implementar control de mermas por producto y causa."),
   },
 
-  // ARTESANÍA / MANUFACTURA
+  // ARTESANÃA / MANUFACTURA
   {
     id: "art_horas",
-    section: "Actividad específica",
+    section: "Actividad especÃ­fica",
     dimension: "Finanzas",
-    title: "¿Sabes cuántas horas reales toma fabricar cada producto y las incluyes en el precio?",
+    title: "Â¿Sabes cuÃ¡ntas horas reales toma fabricar cada producto y las incluyes en el precio?",
     when: sectorIs("artesania", "manufactura"),
-    options: yesNo("Medir horas de producción e incorporar la mano de obra real al costo."),
+    options: yesNo("Medir horas de producciÃ³n e incorporar la mano de obra real al costo."),
   },
 
   // TRANSPORTE
   {
     id: "carga_costo",
-    section: "Actividad específica",
+    section: "Actividad especÃ­fica",
     dimension: "Finanzas",
-    title: "¿Sabes cuánto te cuesta realmente cada viaje o kilómetro?",
+    title: "Â¿Sabes cuÃ¡nto te cuesta realmente cada viaje o kilÃ³metro?",
     when: sectorIs("carga"),
-    options: yesNo("Calcular costo por kilómetro incluyendo combustible, peajes, neumáticos, mantención, depreciación y tiempo."),
+    options: yesNo("Calcular costo por kilÃ³metro incluyendo combustible, peajes, neumÃ¡ticos, mantenciÃ³n, depreciaciÃ³n y tiempo."),
   },
   {
     id: "pasajeros_meta",
-    section: "Actividad específica",
+    section: "Actividad especÃ­fica",
     dimension: "Finanzas",
-    title: "¿Sabes cuánto debes facturar diariamente para cubrir vehículo, combustible, mantención y tu ingreso esperado?",
+    title: "Â¿Sabes cuÃ¡nto debes facturar diariamente para cubrir vehÃ­culo, combustible, mantenciÃ³n y tu ingreso esperado?",
     when: sectorIs("pasajeros"),
-    options: yesNo("Definir una meta diaria mínima de facturación basada en el costo total."),
+    options: yesNo("Definir una meta diaria mÃ­nima de facturaciÃ³n basada en el costo total."),
   },
   {
     id: "transporte_permisos",
-    section: "Actividad específica",
+    section: "Actividad especÃ­fica",
     dimension: "Sectorial",
-    title: "¿Tu vehículo y servicio cuentan con la documentación y permisos vigentes para el tipo de transporte realizado?",
+    title: "Â¿Tu vehÃ­culo y servicio cuentan con la documentaciÃ³n y permisos vigentes para el tipo de transporte realizado?",
     when: sectorIs("pasajeros", "carga"),
-    options: yesNo("Regularizar documentación y permisos aplicables antes de continuar o ampliar la operación.", "Ministerio de Transportes / organismo competente"),
+    options: yesNo("Regularizar documentaciÃ³n y permisos aplicables antes de continuar o ampliar la operaciÃ³n.", "Ministerio de Transportes / organismo competente"),
   },
 
-  // CONSTRUCCIÓN
+  // CONSTRUCCIÃ“N
   {
     id: "construccion_regulado",
-    section: "Actividad específica",
+    section: "Actividad especÃ­fica",
     dimension: "Sectorial",
-    title: "¿Has revisado si los trabajos que realizas requieren instalador autorizado, certificación o habilitación específica?",
+    title: "Â¿Has revisado si los trabajos que realizas requieren instalador autorizado, certificaciÃ³n o habilitaciÃ³n especÃ­fica?",
     when: sectorIs("construccion"),
-    options: yesNo("Validar si los trabajos ofrecidos requieren habilitación o certificación sectorial.", "Organismo sectorial competente"),
+    options: yesNo("Validar si los trabajos ofrecidos requieren habilitaciÃ³n o certificaciÃ³n sectorial.", "Organismo sectorial competente"),
   },
 
   // TURISMO
   {
     id: "turismo_registro",
-    section: "Actividad específica",
+    section: "Actividad especÃ­fica",
     dimension: "Sectorial",
-    title: "¿Has revisado si tu servicio debe estar inscrito en el Registro de Prestadores de Servicios Turísticos?",
+    title: "Â¿Has revisado si tu servicio debe estar inscrito en el Registro de Prestadores de Servicios TurÃ­sticos?",
     when: sectorIs("turismo"),
-    options: yesNo("Revisar y regularizar la inscripción aplicable.", "Sernatur"),
+    options: yesNo("Revisar y regularizar la inscripciÃ³n aplicable.", "Sernatur"),
   },
 
   // SERVICIOS
   {
     id: "serv_tarifa",
-    section: "Actividad específica",
+    section: "Actividad especÃ­fica",
     dimension: "Finanzas",
-    title: "¿Tu tarifa considera tiempo, costos, traslados, impuestos y margen?",
+    title: "Â¿Tu tarifa considera tiempo, costos, traslados, impuestos y margen?",
     when: sectorIs("profesional", "personal", "belleza", "educacion", "tecnologia"),
-    options: yesNo("Calcular una tarifa mínima rentable por hora o servicio."),
+    options: yesNo("Calcular una tarifa mÃ­nima rentable por hora o servicio."),
   },
 
-  // MÚSICA
+  // MÃšSICA
   {
     id: "musica_precio",
-    section: "Actividad específica",
+    section: "Actividad especÃ­fica",
     dimension: "Finanzas",
-    title: "¿El precio por presentación considera músicos, traslado, sonido, montaje y tiempo total?",
+    title: "Â¿El precio por presentaciÃ³n considera mÃºsicos, traslado, sonido, montaje y tiempo total?",
     when: sectorIs("musica"),
-    options: yesNo("Construir el costo mínimo por presentación antes de cotizar."),
+    options: yesNo("Construir el costo mÃ­nimo por presentaciÃ³n antes de cotizar."),
   },
 ];
 
@@ -689,6 +689,7 @@ function DiagnosticoPage() {
   const [selectedEntrepreneurId, setSelectedEntrepreneurId] = useState("");
   const [savedDiagnosticId, setSavedDiagnosticId] = useState<string | null>(null);
   const [savingDiagnostic, setSavingDiagnostic] = useState(false);
+  const [entrepreneursLoaded, setEntrepreneursLoaded] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -698,6 +699,7 @@ function DiagnosticoPage() {
         if (active) {
           setEntrepreneurs([]);
           setSelectedEntrepreneurId("");
+          setEntrepreneursLoaded(true);
         }
         return;
       }
@@ -712,6 +714,7 @@ function DiagnosticoPage() {
 
       if (error) {
         console.error("No fue posible cargar emprendimientos:", error.message);
+        if (active) setEntrepreneursLoaded(true);
         return;
       }
 
@@ -721,6 +724,8 @@ function DiagnosticoPage() {
       if (rows.length === 1) {
         setSelectedEntrepreneurId(rows[0].id);
       }
+
+      setEntrepreneursLoaded(true);
     }
 
     loadEntrepreneurs();
@@ -813,7 +818,7 @@ function DiagnosticoPage() {
         setSavingDiagnostic(false);
 
         if (error) {
-          console.error("No fue posible guardar el diagnóstico:", error.message);
+          console.error("No fue posible guardar el diagnÃ³stico:", error.message);
         } else {
           setSavedDiagnosticId(data.id);
         }
@@ -835,6 +840,52 @@ function DiagnosticoPage() {
   function back() {
     if (index > 0) setIndex((v) => v - 1);
     else setMode("intro");
+  }
+
+  if (!user?.id) {
+    return (
+      <section className="container-page py-10">
+        <div className="mx-auto max-w-xl rounded-2xl border border-border bg-card p-8 text-center">
+          <p className="eyebrow">DIAGNÃ“STICO DEL EMPRENDEDOR</p>
+          <h1 className="mt-2 font-display text-2xl font-semibold">
+            Ingresa para realizar tu diagnÃ³stico
+          </h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Esta herramienta estÃ¡ disponible para emprendedores registrados en La Vitrina.
+          </p>
+          <Button asChild className="mt-5">
+            <Link to="/auth">Ingresar</Link>
+          </Button>
+        </div>
+      </section>
+    );
+  }
+
+  if (!entrepreneursLoaded) {
+    return (
+      <section className="container-page py-10">
+        <div className="h-40 animate-pulse rounded-2xl bg-muted" />
+      </section>
+    );
+  }
+
+  if (entrepreneurs.length === 0) {
+    return (
+      <section className="container-page py-10">
+        <div className="mx-auto max-w-xl rounded-2xl border border-border bg-card p-8 text-center">
+          <p className="eyebrow">DIAGNÃ“STICO DEL EMPRENDEDOR</p>
+          <h1 className="mt-2 font-display text-2xl font-semibold">
+            Primero registra tu emprendimiento
+          </h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            El diagnÃ³stico se guarda en la ficha de tu emprendimiento.
+          </p>
+          <Button asChild className="mt-5">
+            <Link to="/sumate">Registrar emprendimiento</Link>
+          </Button>
+        </div>
+      </section>
+    );
   }
 
   if (mode === "intro") {
@@ -898,11 +949,11 @@ function DiagnosticIntro({
     <>
       <section className="border-b border-border bg-surface">
         <div className="container-page py-7 sm:py-8">
-          <p className="eyebrow">EVALUACIÓN INTEGRAL</p>
-          <h1 className="mt-1 page-title">Diagnóstico del Emprendedor</h1>
+          <p className="eyebrow">EVALUACIÃ“N INTEGRAL</p>
+          <h1 className="mt-1 page-title">DiagnÃ³stico del Emprendedor</h1>
           <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
             Conoce el estado real de tu emprendimiento, identifica brechas y fortalezas,
-            y descubre qué deberías priorizar para avanzar.
+            y descubre quÃ© deberÃ­as priorizar para avanzar.
           </p>
         </div>
       </section>
@@ -911,18 +962,18 @@ function DiagnosticIntro({
         <div className="grid gap-3 sm:grid-cols-3">
           <IntroCard
             icon={<Clock3 className="h-4 w-4" />}
-            title="12–18 minutos"
+            title="12â€“18 minutos"
             text="Las preguntas se adaptan a tu actividad y etapa."
           />
           <IntroCard
             icon={<BarChart3 className="h-4 w-4" />}
-            title="Evaluación personalizada"
-            text="Un agricultor, feriante o transportista no recorre el mismo diagnóstico."
+            title="EvaluaciÃ³n personalizada"
+            text="Un agricultor, feriante o transportista no recorre el mismo diagnÃ³stico."
           />
           <IntroCard
             icon={<RouteIcon className="h-4 w-4" />}
             title="Plan concreto"
-            text="Recibirás prioridades y una hoja de ruta para 30 y 90 días."
+            text="RecibirÃ¡s prioridades y una hoja de ruta para 30 y 90 dÃ­as."
           />
         </div>
 
@@ -931,20 +982,20 @@ function DiagnosticIntro({
             <div className="flex items-start gap-3">
               <ShieldCheck className="mt-0.5 h-5 w-5 text-primary" />
               <div>
-                <p className="eyebrow">QUÉ EVALUAREMOS</p>
+                <p className="eyebrow">QUÃ‰ EVALUAREMOS</p>
                 <h2 className="mt-1 section-title">Una mirada completa de tu negocio</h2>
               </div>
             </div>
             <div className="mt-4 grid gap-2 sm:grid-cols-2">
               {[
-                "Formalización, SII y tributación",
-                "Patentes, permisos y habilitación",
+                "FormalizaciÃ³n, SII y tributaciÃ³n",
+                "Patentes, permisos y habilitaciÃ³n",
                 "Costos, precios y rentabilidad",
                 "Clientes, mercado y ventas",
-                "Operación, personas y capacidad",
-                "Digitalización y continuidad",
-                "Inversión y crecimiento",
-                "Exigencias según tu actividad",
+                "OperaciÃ³n, personas y capacidad",
+                "DigitalizaciÃ³n y continuidad",
+                "InversiÃ³n y crecimiento",
+                "Exigencias segÃºn tu actividad",
               ].map((item) => (
                 <div
                   key={item}
@@ -959,26 +1010,26 @@ function DiagnosticIntro({
 
           <article className="rounded-xl border border-border bg-secondary/15 p-5">
             <p className="eyebrow">AL FINALIZAR</p>
-            <h2 className="mt-1 section-title">Recibirás un reporte accionable</h2>
+            <h2 className="mt-1 section-title">RecibirÃ¡s un reporte accionable</h2>
             <div className="mt-4 space-y-2.5 text-xs leading-relaxed">
-              <p>✓ Fortalezas y cumplimientos destacados.</p>
-              <p>✓ Brechas y riesgos que requieren atención.</p>
-              <p>✓ Oportunidades de mejora y crecimiento.</p>
-              <p>✓ Prioridades ordenadas por impacto y urgencia.</p>
-              <p>✓ Plan concreto para los próximos 30 y 90 días.</p>
+              <p>âœ“ Fortalezas y cumplimientos destacados.</p>
+              <p>âœ“ Brechas y riesgos que requieren atenciÃ³n.</p>
+              <p>âœ“ Oportunidades de mejora y crecimiento.</p>
+              <p>âœ“ Prioridades ordenadas por impacto y urgencia.</p>
+              <p>âœ“ Plan concreto para los prÃ³ximos 30 y 90 dÃ­as.</p>
             </div>
             <p className="mt-4 text-[10px] leading-relaxed text-muted-foreground">
-              No necesitas conocimientos técnicos. Responde según tu situación real.
-              Las materias regulatorias que correspondan deberán validarse ante el organismo competente.
+              No necesitas conocimientos tÃ©cnicos. Responde segÃºn tu situaciÃ³n real.
+              Las materias regulatorias que correspondan deberÃ¡n validarse ante el organismo competente.
             </p>
           </article>
         </div>
 
         <div className="mt-5 rounded-xl border border-border bg-card p-5">
-          <p className="eyebrow">IDENTIFICACIÓN</p>
+          <p className="eyebrow">IDENTIFICACIÃ“N</p>
           <h2 className="mt-1 section-title">Ficha del emprendimiento</h2>
           <p className="mt-1 text-[11px] text-muted-foreground">
-            Al comenzar te pediremos los datos básicos para personalizar e identificar tu informe.
+            Al comenzar te pediremos los datos bÃ¡sicos para personalizar e identificar tu informe.
           </p>
         </div>
 
@@ -989,7 +1040,7 @@ function DiagnosticIntro({
             {entrepreneurs.length > 0 ? (
               <>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  El diagnóstico quedará guardado en la ficha del emprendimiento seleccionado.
+                  El diagnÃ³stico quedarÃ¡ guardado en la ficha del emprendimiento seleccionado.
                 </p>
 
                 <select
@@ -1007,14 +1058,14 @@ function DiagnosticIntro({
               </>
             ) : (
               <p className="mt-1 text-xs text-muted-foreground">
-                Para guardar el diagnóstico necesitas tener una ficha de emprendimiento creada.
+                Para guardar el diagnÃ³stico necesitas tener una ficha de emprendimiento creada.
               </p>
             )}
           </div>
         ) : (
           <div className="mt-5 rounded-xl border border-border bg-secondary/15 p-4">
             <p className="text-xs leading-relaxed text-muted-foreground">
-              Puedes realizar el diagnóstico sin iniciar sesión, pero para guardarlo en tu ficha y descargarlo posteriormente debes ingresar a tu cuenta.
+              Puedes realizar el diagnÃ³stico sin iniciar sesiÃ³n, pero para guardarlo en tu ficha y descargarlo posteriormente debes ingresar a tu cuenta.
             </p>
           </div>
         )}
@@ -1025,11 +1076,11 @@ function DiagnosticIntro({
             onClick={onStart}
             disabled={isLoggedIn && entrepreneurs.length > 0 && !selectedEntrepreneurId}
           >
-            Comenzar diagnóstico
+            Comenzar diagnÃ³stico
           </Button>
           {hasSaved ? (
             <Button type="button" variant="outline" onClick={onResume}>
-              Continuar diagnóstico guardado
+              Continuar diagnÃ³stico guardado
             </Button>
           ) : null}
         </div>
@@ -1120,7 +1171,7 @@ function QuestionView({
               Volver
             </Button>
             <Button type="button" size="sm" disabled={!value} onClick={onNext}>
-              {index === total - 1 ? "Ver diagnóstico" : "Continuar"}
+              {index === total - 1 ? "Ver diagnÃ³stico" : "Continuar"}
               <ArrowRight className="h-4 w-4" />
             </Button>
           </div>
@@ -1149,80 +1200,80 @@ type Report = {
 
 
 const supportByDimension: Record<string, { where: string; support: string }> = {
-  "Formalización": {
-    where: "Servicio de Impuestos Internos (SII) y, si crearás una sociedad, Registro de Empresas y Sociedades.",
-    support: "Centro de Desarrollo de Negocios Sercotec: orientación para ordenar el modelo y la formalización.",
+  "FormalizaciÃ³n": {
+    where: "Servicio de Impuestos Internos (SII) y, si crearÃ¡s una sociedad, Registro de Empresas y Sociedades.",
+    support: "Centro de Desarrollo de Negocios Sercotec: orientaciÃ³n para ordenar el modelo y la formalizaciÃ³n.",
   },
   "Tributario": {
-    where: "Servicio de Impuestos Internos (SII), presencialmente o mediante sus servicios en línea.",
-    support: "Capacitación en obligaciones tributarias, documentos y administración básica para pequeños negocios.",
+    where: "Servicio de Impuestos Internos (SII), presencialmente o mediante sus servicios en lÃ­nea.",
+    support: "CapacitaciÃ³n en obligaciones tributarias, documentos y administraciÃ³n bÃ¡sica para pequeÃ±os negocios.",
   },
   "Municipal y permisos": {
-    where: "Municipalidad correspondiente; Dirección de Obras Municipales cuando el inmueble o habilitación lo requiera; SEREMI de Salud en materias sanitarias.",
-    support: "Antes de invertir en infraestructura, solicita orientación sobre requisitos y compatibilidad del lugar con la actividad.",
+    where: "Municipalidad correspondiente; DirecciÃ³n de Obras Municipales cuando el inmueble o habilitaciÃ³n lo requiera; SEREMI de Salud en materias sanitarias.",
+    support: "Antes de invertir en infraestructura, solicita orientaciÃ³n sobre requisitos y compatibilidad del lugar con la actividad.",
   },
   "Finanzas": {
-    where: "Gestión interna del negocio; contador/a cuando existan materias tributarias que deban validarse.",
+    where: "GestiÃ³n interna del negocio; contador/a cuando existan materias tributarias que deban validarse.",
     support: "Centro de Desarrollo de Negocios Sercotec: costos, precios, flujo de caja y rentabilidad.",
   },
   "Mercado y ventas": {
-    where: "Gestión comercial del propio emprendimiento.",
+    where: "GestiÃ³n comercial del propio emprendimiento.",
     support: "Sercotec / Centro de Desarrollo de Negocios: modelo de negocio, marketing, ventas y canales digitales.",
   },
-  "Operación": {
-    where: "Gestión interna y proveedores técnicos según la actividad.",
-    support: "Capacitación técnica sectorial y documentación de procesos críticos.",
+  "OperaciÃ³n": {
+    where: "GestiÃ³n interna y proveedores tÃ©cnicos segÃºn la actividad.",
+    support: "CapacitaciÃ³n tÃ©cnica sectorial y documentaciÃ³n de procesos crÃ­ticos.",
   },
   "Personas": {
-    where: "Dirección del Trabajo y organismos previsionales cuando existan trabajadores dependientes.",
-    support: "Orientación laboral y prevención de riesgos según tamaño y actividad.",
+    where: "DirecciÃ³n del Trabajo y organismos previsionales cuando existan trabajadores dependientes.",
+    support: "OrientaciÃ³n laboral y prevenciÃ³n de riesgos segÃºn tamaÃ±o y actividad.",
   },
   "Digital": {
-    where: "Gestión interna del emprendimiento.",
-    support: "Ruta Digital de Sercotec u otras capacitaciones de digitalización para MIPES.",
+    where: "GestiÃ³n interna del emprendimiento.",
+    support: "Ruta Digital de Sercotec u otras capacitaciones de digitalizaciÃ³n para MIPES.",
   },
   "Riesgos": {
-    where: "Gestión interna; aseguradora, mutualidad u organismo sectorial cuando corresponda.",
+    where: "GestiÃ³n interna; aseguradora, mutualidad u organismo sectorial cuando corresponda.",
     support: "Construir un plan simple de continuidad operacional y respaldo.",
   },
   "Crecimiento": {
-    where: "Gestión interna; instituciones financieras o programas públicos sólo después de cuantificar la necesidad.",
-    support: "Sercotec, Centros de Desarrollo de Negocios y programas públicos pertinentes al perfil del emprendedor.",
+    where: "GestiÃ³n interna; instituciones financieras o programas pÃºblicos sÃ³lo despuÃ©s de cuantificar la necesidad.",
+    support: "Sercotec, Centros de Desarrollo de Negocios y programas pÃºblicos pertinentes al perfil del emprendedor.",
   },
   "Sectorial": {
-    where: "Organismo sectorial competente según la actividad: Sernapesca, Sernatur, Ministerio de Transportes, SEC, SEREMI u otro que corresponda.",
-    support: "Buscar capacitación técnica y normativa específica antes de invertir o ampliar operaciones.",
+    where: "Organismo sectorial competente segÃºn la actividad: Sernapesca, Sernatur, Ministerio de Transportes, SEC, SEREMI u otro que corresponda.",
+    support: "Buscar capacitaciÃ³n tÃ©cnica y normativa especÃ­fica antes de invertir o ampliar operaciones.",
   },
 };
 
 function conclusionFor(q: Question, selected: Option): string {
-  const d = q.dimension ?? "Gestión";
+  const d = q.dimension ?? "GestiÃ³n";
   const good: Record<string, string> = {
-    "Formalización": "La base de formalización declarada se encuentra resuelta.",
+    "FormalizaciÃ³n": "La base de formalizaciÃ³n declarada se encuentra resuelta.",
     "Tributario": "El cumplimiento tributario evaluado presenta una base adecuada.",
-    "Municipal y permisos": "Los permisos o habilitaciones consultados se encuentran resueltos según lo declarado.",
-    "Finanzas": "Existe una práctica financiera favorable para controlar la rentabilidad.",
+    "Municipal y permisos": "Los permisos o habilitaciones consultados se encuentran resueltos segÃºn lo declarado.",
+    "Finanzas": "Existe una prÃ¡ctica financiera favorable para controlar la rentabilidad.",
     "Mercado y ventas": "Existe una base comercial favorable para captar y gestionar clientes.",
-    "Operación": "La operación evaluada muestra capacidad y orden para responder al negocio.",
-    "Personas": "La gestión de personas evaluada presenta una base adecuada.",
+    "OperaciÃ³n": "La operaciÃ³n evaluada muestra capacidad y orden para responder al negocio.",
+    "Personas": "La gestiÃ³n de personas evaluada presenta una base adecuada.",
     "Digital": "La presencia digital facilita el contacto con potenciales clientes.",
-    "Riesgos": "El negocio presenta una condición favorable frente al riesgo evaluado.",
+    "Riesgos": "El negocio presenta una condiciÃ³n favorable frente al riesgo evaluado.",
     "Crecimiento": "Existe una base favorable para planificar la siguiente etapa.",
-    "Sectorial": "El requisito sectorial evaluado se encuentra resuelto según lo declarado.",
+    "Sectorial": "El requisito sectorial evaluado se encuentra resuelto segÃºn lo declarado.",
   };
-  return good[d] ?? `${d}: condición favorable detectada.`;
+  return good[d] ?? `${d}: condiciÃ³n favorable detectada.`;
 }
 
 function actionCard(q: Question, selected: Option): Recommendation {
-  const dimension = q.dimension ?? "Gestión";
+  const dimension = q.dimension ?? "GestiÃ³n";
   const support = supportByDimension[dimension] ?? {
-    where: "Organismo o institución competente según la materia.",
-    support: "Solicitar orientación especializada antes de ejecutar una inversión relevante.",
+    where: "Organismo o instituciÃ³n competente segÃºn la materia.",
+    support: "Solicitar orientaciÃ³n especializada antes de ejecutar una inversiÃ³n relevante.",
   };
   return {
     priority: selected.severity === "critical" ? "alta" : "media",
     title: q.title,
-    detail: `${selected.action ?? "Revisar esta materia y definir una acción concreta."} Dónde gestionarlo: ${selected.organism ?? support.where} Apoyo sugerido: ${support.support}`,
+    detail: `${selected.action ?? "Revisar esta materia y definir una acciÃ³n concreta."} DÃ³nde gestionarlo: ${selected.organism ?? support.where} Apoyo sugerido: ${support.support}`,
     organism: selected.organism,
   };
 }
@@ -1280,21 +1331,21 @@ function buildReport(answers: AnswerMap): Report {
     priorities: top,
     opportunities: merged.slice(5, 11),
     plan30: [
-      top[0] ? `Semana 1 · Validar requisito y reunir antecedentes: ${top[0].title}` : "Semana 1 · Revisar la situación formal y regulatoria del negocio.",
-      top[0] ? `Semana 2 · Ejecutar o iniciar la gestión prioritaria. ${top[0].detail}` : "Semana 2 · Ordenar costos, precios y caja.",
-      top[1] ? `Semana 3 · Abordar la segunda brecha: ${top[1].detail}` : "Semana 3 · Validar clientes y canales de venta.",
-      top[2] ? `Semana 4 · Dejar evidencia, responsables y fecha de cierre para: ${top[2].title}` : "Semana 4 · Definir metas y seguimiento mensual.",
+      top[0] ? `Semana 1 Â· Validar requisito y reunir antecedentes: ${top[0].title}` : "Semana 1 Â· Revisar la situaciÃ³n formal y regulatoria del negocio.",
+      top[0] ? `Semana 2 Â· Ejecutar o iniciar la gestiÃ³n prioritaria. ${top[0].detail}` : "Semana 2 Â· Ordenar costos, precios y caja.",
+      top[1] ? `Semana 3 Â· Abordar la segunda brecha: ${top[1].detail}` : "Semana 3 Â· Validar clientes y canales de venta.",
+      top[2] ? `Semana 4 Â· Dejar evidencia, responsables y fecha de cierre para: ${top[2].title}` : "Semana 4 Â· Definir metas y seguimiento mensual.",
     ],
     plan90: [
       top[0]
-        ? `Mes 1 · Base habilitante: cerrar o dejar formalmente encaminadas las brechas críticas antes de nuevas inversiones. Prioridad: ${top[0].title}`
-        : "Mes 1 · Consolidar formalización, permisos y control financiero.",
+        ? `Mes 1 Â· Base habilitante: cerrar o dejar formalmente encaminadas las brechas crÃ­ticas antes de nuevas inversiones. Prioridad: ${top[0].title}`
+        : "Mes 1 Â· Consolidar formalizaciÃ³n, permisos y control financiero.",
       top[1]
-        ? `Mes 2 · Gestión: ordenar costos, procesos y ventas mientras se completa: ${top[1].title}`
-        : "Mes 2 · Mejorar rentabilidad, operación y gestión comercial.",
+        ? `Mes 2 Â· GestiÃ³n: ordenar costos, procesos y ventas mientras se completa: ${top[1].title}`
+        : "Mes 2 Â· Mejorar rentabilidad, operaciÃ³n y gestiÃ³n comercial.",
       top[2]
-        ? `Mes 3 · Crecimiento condicionado: invertir o expandirse sólo si las brechas críticas están resueltas y existe demanda validada. Revisar: ${top[2].title}`
-        : "Mes 3 · Evaluar crecimiento sólo con demanda, capacidad y caja validadas.",
+        ? `Mes 3 Â· Crecimiento condicionado: invertir o expandirse sÃ³lo si las brechas crÃ­ticas estÃ¡n resueltas y existe demanda validada. Revisar: ${top[2].title}`
+        : "Mes 3 Â· Evaluar crecimiento sÃ³lo con demanda, capacidad y caja validadas.",
     ],
   };
 }
@@ -1321,25 +1372,25 @@ function ReportView({
   const dimensions = report.dimensions.slice(0, 8);
 
   const cleanTitle = (title: string) => {
-    const t = title.replace(/[¿?]/g, "").trim();
+    const t = title.replace(/[Â¿?]/g, "").trim();
     if (/funciona legalmente|forma.*legal/i.test(t)) return "Definir la forma legal";
-    if (/inicio de actividades/i.test(t)) return "Formalización tributaria";
-    if (/seguimiento.*clientes|personas interesadas/i.test(t)) return "Gestión comercial";
+    if (/inicio de actividades/i.test(t)) return "FormalizaciÃ³n tributaria";
+    if (/seguimiento.*clientes|personas interesadas/i.test(t)) return "GestiÃ³n comercial";
     if (/no pudieras trabajar/i.test(t)) return "Continuidad del negocio";
     if (/patente|permiso municipal/i.test(t)) return "Patente y permisos";
-    if (/inmueble|terreno/i.test(t)) return "Habilitación del lugar";
-    if (/sanitaria/i.test(t)) return "Autorización sanitaria";
+    if (/inmueble|terreno/i.test(t)) return "HabilitaciÃ³n del lugar";
+    if (/sanitaria/i.test(t)) return "AutorizaciÃ³n sanitaria";
     if (/costos|margen|precio/i.test(t)) return "Costos y rentabilidad";
-    if (/mermas|pérdidas/i.test(t)) return "Control de mermas";
+    if (/mermas|pÃ©rdidas/i.test(t)) return "Control de mermas";
     if (/digital|redes|internet/i.test(t)) return "Presencia digital";
-    return t.length > 44 ? `${t.slice(0, 41)}…` : t;
+    return t.length > 44 ? `${t.slice(0, 41)}â€¦` : t;
   };
 
   const actionOnly = (detail: string) =>
-    detail.split("Dónde gestionarlo:")[0].trim();
+    detail.split("DÃ³nde gestionarlo:")[0].trim();
 
   const whereOnly = (detail: string) => {
-    const m = detail.match(/Dónde gestionarlo:\s*(.*?)(?:\s+Apoyo sugerido:|$)/);
+    const m = detail.match(/DÃ³nde gestionarlo:\s*(.*?)(?:\s+Apoyo sugerido:|$)/);
     return m?.[1]?.trim() ?? "";
   };
 
@@ -1362,7 +1413,7 @@ function ReportView({
       : answers.nombre_emprendedor || "No informado";
 
   const stageLabel =
-    answers.etapa === "idea" ? "Idea / preparación"
+    answers.etapa === "idea" ? "Idea / preparaciÃ³n"
     : answers.etapa === "inicio" ? "Inicio"
     : answers.etapa === "operando" ? "En funcionamiento"
     : answers.etapa === "crecimiento" ? "Crecimiento"
@@ -1376,10 +1427,10 @@ function ReportView({
 
   const executiveMessage =
     report.overall >= 75
-      ? `El diagnóstico muestra un emprendimiento con una base favorable y fortalezas que conviene proteger. El siguiente desafío es aprovechar las oportunidades detectadas, cerrar brechas específicas y transformar esos avances en mayor rentabilidad, capacidad de gestión y crecimiento sostenible. Las prioridades señaladas no buscan frenar el negocio, sino concentrar el esfuerzo donde puede generar mayor impacto.`
+      ? `El diagnÃ³stico muestra un emprendimiento con una base favorable y fortalezas que conviene proteger. El siguiente desafÃ­o es aprovechar las oportunidades detectadas, cerrar brechas especÃ­ficas y transformar esos avances en mayor rentabilidad, capacidad de gestiÃ³n y crecimiento sostenible. Las prioridades seÃ±aladas no buscan frenar el negocio, sino concentrar el esfuerzo donde puede generar mayor impacto.`
       : report.overall >= 50
-      ? `El diagnóstico muestra avances relevantes y capacidades sobre las cuales seguir construyendo. Al mismo tiempo, existen espacios de mejora que hoy limitan parte del potencial del emprendimiento. La recomendación es mantener y reforzar lo que ya funciona, resolver primero las brechas prioritarias y aprovechar las oportunidades detectadas para ordenar la gestión, mejorar resultados y preparar una siguiente etapa de crecimiento.`
-      : `El diagnóstico identifica aspectos positivos que constituyen una base para avanzar, pero también brechas que hoy requieren atención y oportunidades que todavía no están siendo plenamente aprovechadas. La recomendación es concentrarse primero en los temas habilitantes y de mayor impacto, fortalecer lo que ya se está haciendo bien y avanzar paso a paso sobre los espacios de mejora. Resolver estas prioridades permitirá construir un emprendimiento más ordenado, seguro, rentable y preparado para crecer.`;
+      ? `El diagnÃ³stico muestra avances relevantes y capacidades sobre las cuales seguir construyendo. Al mismo tiempo, existen espacios de mejora que hoy limitan parte del potencial del emprendimiento. La recomendaciÃ³n es mantener y reforzar lo que ya funciona, resolver primero las brechas prioritarias y aprovechar las oportunidades detectadas para ordenar la gestiÃ³n, mejorar resultados y preparar una siguiente etapa de crecimiento.`
+      : `El diagnÃ³stico identifica aspectos positivos que constituyen una base para avanzar, pero tambiÃ©n brechas que hoy requieren atenciÃ³n y oportunidades que todavÃ­a no estÃ¡n siendo plenamente aprovechadas. La recomendaciÃ³n es concentrarse primero en los temas habilitantes y de mayor impacto, fortalecer lo que ya se estÃ¡ haciendo bien y avanzar paso a paso sobre los espacios de mejora. Resolver estas prioridades permitirÃ¡ construir un emprendimiento mÃ¡s ordenado, seguro, rentable y preparado para crecer.`;
 
   return (
     <section className="container-page py-7 sm:py-8">
@@ -1398,17 +1449,17 @@ function ReportView({
       `}</style>
 
       <div className="diagnostic-report mx-auto max-w-5xl">
-        {/* HOJA 1 · IDENTIFICACIÓN + RESUMEN EJECUTIVO */}
+        {/* HOJA 1 Â· IDENTIFICACIÃ“N + RESUMEN EJECUTIVO */}
         <div className="diagnostic-page">
           <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-start">
             <div>
               <p className="eyebrow">RESULTADO</p>
-              <h1 className="mt-1 page-title">Diagnóstico del Emprendedor</h1>
+              <h1 className="mt-1 page-title">DiagnÃ³stico del Emprendedor</h1>
               <p className="mt-1 text-sm text-muted-foreground">{sectorLabel}</p>
             </div>
 
             <div className="rounded-xl border border-border bg-secondary/15 px-5 py-3 text-right">
-              <p className="text-[9px] font-semibold uppercase tracking-wide text-muted-foreground">Índice orientativo</p>
+              <p className="text-[9px] font-semibold uppercase tracking-wide text-muted-foreground">Ãndice orientativo</p>
               <p className="font-display text-4xl font-semibold leading-none">{report.overall}<span className="text-sm text-muted-foreground">/100</span></p>
             </div>
           </div>
@@ -1417,7 +1468,7 @@ function ReportView({
             {savedDiagnosticId ? (
               <Button asChild type="button" variant="outline" size="sm">
                 <Link to="/diagnosticos/$id" params={{ id: savedDiagnosticId }}>
-                  Ver diagnóstico guardado
+                  Ver diagnÃ³stico guardado
                 </Link>
               </Button>
             ) : null}
@@ -1426,12 +1477,12 @@ function ReportView({
               <Download className="h-4 w-4" /> Informe PDF
             </Button>
             <Button type="button" variant="ghost" size="sm" onClick={onRestart}>
-              <RotateCcw className="h-4 w-4" /> Nuevo diagnóstico
+              <RotateCcw className="h-4 w-4" /> Nuevo diagnÃ³stico
             </Button>
           </div>
 
           <section className="mt-3 rounded-xl border border-border bg-card p-3">
-            <p className="eyebrow">IDENTIFICACIÓN DEL EMPRENDIMIENTO</p>
+            <p className="eyebrow">IDENTIFICACIÃ“N DEL EMPRENDIMIENTO</p>
             <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1.5 text-[10px] sm:grid-cols-3">
               <p><span className="font-semibold">Emprendimiento:</span> {businessName}</p>
               <p><span className="font-semibold">Responsable:</span> {entrepreneurName}</p>
@@ -1455,16 +1506,16 @@ function ReportView({
               <div className="mt-2 space-y-2">
                 {strengths.length ? strengths.map((s,i)=>(
                   <div key={i}>
-                    <p className="text-[11px] font-semibold">✓ {cleanTitle(s)}</p>
+                    <p className="text-[11px] font-semibold">âœ“ {cleanTitle(s)}</p>
                     <p className="mt-0.5 text-[10px] leading-relaxed text-muted-foreground">{s}</p>
                   </div>
-                )) : <p className="text-[10px] text-muted-foreground">Estás construyendo las bases del negocio. El foco inicial será convertir avances incipientes en fortalezas sostenibles.</p>}
+                )) : <p className="text-[10px] text-muted-foreground">EstÃ¡s construyendo las bases del negocio. El foco inicial serÃ¡ convertir avances incipientes en fortalezas sostenibles.</p>}
               </div>
             </article>
 
             <article className="rounded-xl border border-border bg-card p-4">
               <p className="eyebrow">OPORTUNIDADES Y BRECHAS</p>
-              <h2 className="mt-1 section-title">Dónde existe mayor espacio para avanzar</h2>
+              <h2 className="mt-1 section-title">DÃ³nde existe mayor espacio para avanzar</h2>
               <div className="mt-2 space-y-2">
                 {[...priorities, ...opportunities].slice(0,3).map((item,i)=>(
                   <div key={i}>
@@ -1477,7 +1528,7 @@ function ReportView({
           </section>
 
           <section className="mt-3">
-            <p className="eyebrow">MAPA DE SITUACIÓN</p>
+            <p className="eyebrow">MAPA DE SITUACIÃ“N</p>
             <div className="mt-2 grid grid-cols-2 gap-1.5 sm:grid-cols-4">
               {dimensions.map(d=>(
                 <div key={d.name} className="rounded-lg border border-border bg-card px-2.5 py-2">
@@ -1494,11 +1545,11 @@ function ReportView({
           </section>
         </div>
 
-        {/* HOJA 2 · PRIORIDADES + PASO A PASO */}
+        {/* HOJA 2 Â· PRIORIDADES + PASO A PASO */}
         <div className="diagnostic-page">
           <section className="rounded-xl border border-border bg-card p-4">
             <p className="eyebrow">PASO A PASO</p>
-            <h2 className="mt-1 section-title">Qué hacer ahora</h2>
+            <h2 className="mt-1 section-title">QuÃ© hacer ahora</h2>
             <p className="mt-1 text-[10px] text-muted-foreground">
               A partir de las brechas y oportunidades detectadas, este es el orden recomendado para avanzar. Cada paso resuelto facilita el siguiente.
             </p>
@@ -1510,7 +1561,7 @@ function ReportView({
                   <div>
                     <p className="text-[11px] font-semibold">{cleanTitle(item.title)}</p>
                     <p className="mt-0.5 text-[10px] leading-relaxed">{actionOnly(item.detail)}</p>
-                    {whereOnly(item.detail) && <p className="mt-0.5 text-[9px] text-muted-foreground"><span className="font-semibold text-foreground">Dónde:</span> {whereOnly(item.detail)}</p>}
+                    {whereOnly(item.detail) && <p className="mt-0.5 text-[9px] text-muted-foreground"><span className="font-semibold text-foreground">DÃ³nde:</span> {whereOnly(item.detail)}</p>}
                   </div>
                 </div>
               ))}
@@ -1519,60 +1570,60 @@ function ReportView({
 
           <section className="mt-3 grid gap-3 md:grid-cols-2">
             <article className="rounded-xl border border-border bg-secondary/15 p-3">
-              <p className="eyebrow">APOYO Y CAPACITACIÓN</p>
+              <p className="eyebrow">APOYO Y CAPACITACIÃ“N</p>
               <p className="mt-1 text-[10px] leading-relaxed">
-                Para gestión, costos, ventas y digitalización, busca apoyo en Sercotec y Centros de Desarrollo de Negocios. Para materias regulatorias, valida directamente con SII, Municipalidad, SEREMI u organismo sectorial competente.
+                Para gestiÃ³n, costos, ventas y digitalizaciÃ³n, busca apoyo en Sercotec y Centros de Desarrollo de Negocios. Para materias regulatorias, valida directamente con SII, Municipalidad, SEREMI u organismo sectorial competente.
               </p>
             </article>
             <article className="rounded-xl border border-border bg-card p-3">
-              <p className="eyebrow">ANTES DE INVERTIR MÁS</p>
+              <p className="eyebrow">ANTES DE INVERTIR MÃS</p>
               <p className="mt-1 text-[10px] leading-relaxed">
-                Primero deja encaminadas las brechas prioritarias. Luego mide resultados y recién después evalúa nuevas inversiones, costos fijos o expansión.
+                Primero deja encaminadas las brechas prioritarias. Luego mide resultados y reciÃ©n despuÃ©s evalÃºa nuevas inversiones, costos fijos o expansiÃ³n.
               </p>
             </article>
           </section>
         </div>
 
-        {/* HOJA 3 · RUTA + CIERRE */}
+        {/* HOJA 3 Â· RUTA + CIERRE */}
         <div className="diagnostic-page">
           <section className="rounded-xl border border-border bg-card p-5">
             <p className="eyebrow">HOJA DE RUTA</p>
             <h2 className="mt-1 section-title">De ordenar a crecer</h2>
-            <p className="mt-1 text-[10px] text-muted-foreground">Una secuencia simple para transformar el diagnóstico en avance.</p>
+            <p className="mt-1 text-[10px] text-muted-foreground">Una secuencia simple para transformar el diagnÃ³stico en avance.</p>
 
             <div className="mt-4 grid gap-3 md:grid-cols-3">
               <div className="rounded-lg border border-border bg-background p-3">
-                <p className="text-[9px] font-semibold uppercase tracking-wide text-muted-foreground">0–30 días</p>
+                <p className="text-[9px] font-semibold uppercase tracking-wide text-muted-foreground">0â€“30 dÃ­as</p>
                 <p className="mt-1 text-xs font-semibold">Resolver lo habilitante</p>
-                <p className="mt-1 text-[10px] leading-relaxed text-muted-foreground">{priorities[0] ? actionOnly(priorities[0].detail) : "Ordenar la base formal y de gestión."}</p>
+                <p className="mt-1 text-[10px] leading-relaxed text-muted-foreground">{priorities[0] ? actionOnly(priorities[0].detail) : "Ordenar la base formal y de gestiÃ³n."}</p>
               </div>
               <div className="rounded-lg border border-border bg-background p-3">
-                <p className="text-[9px] font-semibold uppercase tracking-wide text-muted-foreground">31–60 días</p>
+                <p className="text-[9px] font-semibold uppercase tracking-wide text-muted-foreground">31â€“60 dÃ­as</p>
                 <p className="mt-1 text-xs font-semibold">Gestionar y medir</p>
-                <p className="mt-1 text-[10px] leading-relaxed text-muted-foreground">Implementa controles simples sobre ventas, costos, clientes y operación para saber qué está funcionando.</p>
+                <p className="mt-1 text-[10px] leading-relaxed text-muted-foreground">Implementa controles simples sobre ventas, costos, clientes y operaciÃ³n para saber quÃ© estÃ¡ funcionando.</p>
               </div>
               <div className="rounded-lg border border-border bg-background p-3">
-                <p className="text-[9px] font-semibold uppercase tracking-wide text-muted-foreground">61–90 días</p>
+                <p className="text-[9px] font-semibold uppercase tracking-wide text-muted-foreground">61â€“90 dÃ­as</p>
                 <p className="mt-1 text-xs font-semibold">Preparar el crecimiento</p>
-                <p className="mt-1 text-[10px] leading-relaxed text-muted-foreground">Con las brechas principales encaminadas, evalúa oportunidades de inversión o expansión con demanda, capacidad y caja validadas.</p>
+                <p className="mt-1 text-[10px] leading-relaxed text-muted-foreground">Con las brechas principales encaminadas, evalÃºa oportunidades de inversiÃ³n o expansiÃ³n con demanda, capacidad y caja validadas.</p>
               </div>
             </div>
           </section>
 
           <section className="mt-4 rounded-xl border border-border bg-secondary/15 p-5">
             <p className="eyebrow">MENSAJE FINAL</p>
-            <h2 className="mt-1 section-title">El diagnóstico no busca detenerte: busca ayudarte a avanzar mejor.</h2>
+            <h2 className="mt-1 section-title">El diagnÃ³stico no busca detenerte: busca ayudarte a avanzar mejor.</h2>
             <p className="mt-2 text-xs leading-relaxed">
-              No necesitas resolver todo de una vez. Reconoce lo que ya has construido, concéntrate en las oportunidades y brechas que pueden generar mayor impacto y avanza paso a paso. Cada mejora fortalece tu emprendimiento y te acerca a un negocio más ordenado, rentable, sostenible y preparado para crecer.
+              No necesitas resolver todo de una vez. Reconoce lo que ya has construido, concÃ©ntrate en las oportunidades y brechas que pueden generar mayor impacto y avanza paso a paso. Cada mejora fortalece tu emprendimiento y te acerca a un negocio mÃ¡s ordenado, rentable, sostenible y preparado para crecer.
             </p>
           </section>
 
           <section className="mt-4 border-t border-border pt-3">
             <p className="text-[9px] leading-relaxed text-muted-foreground">
-              Herramienta de orientación basada en la información proporcionada. Los requisitos legales, tributarios, sanitarios, municipales o sectoriales deben validarse ante el organismo competente.
+              Herramienta de orientaciÃ³n basada en la informaciÃ³n proporcionada. Los requisitos legales, tributarios, sanitarios, municipales o sectoriales deben validarse ante el organismo competente.
             </p>
             <div className="mt-2 text-[9px] text-muted-foreground">
-              <span className="font-semibold text-foreground">Metodología y desarrollo:</span> Álvaro Díaz Barros · <span className="font-semibold text-foreground">Asistencia tecnológica:</span> Inteligencia Artificial
+              <span className="font-semibold text-foreground">MetodologÃ­a y desarrollo:</span> Ãlvaro DÃ­az Barros Â· <span className="font-semibold text-foreground">Asistencia tecnolÃ³gica:</span> Inteligencia Artificial
             </div>
           </section>
         </div>
@@ -1609,3 +1660,4 @@ function Plan({
     </article>
   );
 }
+

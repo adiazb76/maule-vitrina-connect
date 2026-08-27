@@ -91,7 +91,23 @@ function SumatePage() {
   const navigate =
     useNavigate();
 
-  const categories =
+  
+  const existingEntrepreneur =
+    useQuery({
+      queryKey: ["existing-entrepreneur", user?.id],
+      enabled: Boolean(user?.id),
+      queryFn: async () => {
+        const { data, error } = await (supabase as any)
+          .from("entrepreneurs")
+          .select("id,business_name,slug")
+          .eq("user_id", user!.id)
+          .maybeSingle();
+
+        if (error) throw error;
+        return data ?? null;
+      },
+    });
+const categories =
     useQuery({
       queryKey: [
         "categories",
@@ -220,6 +236,12 @@ function SumatePage() {
           selectedCategory?.id,
         ),
     });
+
+  useEffect(() => {
+    if (existingEntrepreneur.data && !existingEntrepreneur.isLoading) {
+      navigate({ to: "/panel", replace: true });
+    }
+  }, [existingEntrepreneur.data, existingEntrepreneur.isLoading, navigate]);
 
   const set =
     (
@@ -364,6 +386,14 @@ function SumatePage() {
     event.preventDefault();
 
     if (!user) {
+      return;
+    }
+
+    if (existingEntrepreneur.data) {
+      toast.error(
+        "Ya tienes un emprendimiento registrado. Puedes editarlo desde Mi panel.",
+      );
+      navigate({ to: "/panel" });
       return;
     }
 
