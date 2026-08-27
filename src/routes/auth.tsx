@@ -43,12 +43,19 @@ function AuthPage() {
   async function signIn(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
     setBusy(false);
+
     if (error) {
       toast.error(error.message);
       return;
     }
+
     toast.success("¡Bienvenido de vuelta!");
     navigate({ to: "/panel" });
   }
@@ -56,6 +63,7 @@ function AuthPage() {
   async function signUp(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
+
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -64,49 +72,30 @@ function AuthPage() {
         data: { full_name: name },
       },
     });
+
     setBusy(false);
+
     if (error) {
       toast.error(error.message);
       return;
     }
+
     toast.success("Cuenta creada. Revisa tu correo si te pedimos confirmación.");
     navigate({ to: "/sumate" });
-  }
-
-  async function google() {
-    setBusy(true);
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/panel`,
-      },
-    });
-    setBusy(false);
-
-    if (error) {
-      toast.error(error.message);
-    }
   }
 
   return (
     <section className="container-page flex justify-center py-16">
       <div className="w-full max-w-md rounded-2xl border border-border bg-card p-8 shadow-sm">
         <p className="eyebrow">Comunidad</p>
-        <h1 className="mt-2 font-display text-3xl font-semibold">Ingresa a La Vitrina</h1>
+        <h1 className="mt-2 font-display text-3xl font-semibold">
+          Ingresa a La Vitrina
+        </h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Publica tu emprendimiento, revisa tus visitas y conecta con otros del Maule Sur.
         </p>
 
-        <Button variant="outline" className="mt-6 w-full" onClick={google} disabled={busy}>
-          Continuar con Google
-        </Button>
-
-        <div className="my-6 flex items-center gap-3 text-xs text-muted-foreground">
-          <span className="h-px flex-1 bg-border" /> o con tu correo
-          <span className="h-px flex-1 bg-border" />
-        </div>
-
-        <Tabs defaultValue="in">
+        <Tabs defaultValue="in" className="mt-6">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="in">Ingresar</TabsTrigger>
             <TabsTrigger value="up">Crear cuenta</TabsTrigger>
@@ -124,6 +113,7 @@ function AuthPage() {
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="pass-in">Contraseña</Label>
                 <Input
@@ -134,6 +124,7 @@ function AuthPage() {
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
+
               <Button type="submit" className="w-full" disabled={busy}>
                 {busy ? "Ingresando…" : "Ingresar"}
               </Button>
@@ -151,6 +142,7 @@ function AuthPage() {
                   onChange={(e) => setName(e.target.value)}
                 />
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="email-up">Correo</Label>
                 <Input
@@ -161,6 +153,7 @@ function AuthPage() {
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="pass-up">Contraseña</Label>
                 <Input
@@ -172,6 +165,7 @@ function AuthPage() {
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
+
               <Button type="submit" className="w-full" disabled={busy}>
                 {busy ? "Creando…" : "Crear cuenta"}
               </Button>
@@ -181,7 +175,10 @@ function AuthPage() {
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
           ¿Aún no tienes emprendimiento publicado?{" "}
-          <Link to="/sumate" className="text-primary underline-offset-4 hover:underline">
+          <Link
+            to="/sumate"
+            className="text-primary underline-offset-4 hover:underline"
+          >
             Súmate aquí
           </Link>
         </p>
