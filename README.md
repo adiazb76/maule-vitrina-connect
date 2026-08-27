@@ -1,12 +1,12 @@
-# Maule Conecta
+﻿# La Vitrina
 
-Prompt para Lovable — La Vitrina | Comunidad de Emprendedores del Maule Sur
+Comunidad de Emprendedores del Maule Sur
 
-Quiero crear una plataforma web profesional, moderna, simple y escalable llamada “La Vitrina”, vinculada al programa radial del mismo nombre.
+Quiero crear una plataforma web profesional, moderna, simple y escalable llamada â€œLa Vitrinaâ€, vinculada al programa radial del mismo nombre.
 
-La plataforma será una comunidad digital de emprendedores del Maule Sur, donde los participantes del programa radial puedan crear un perfil, mostrar sus productos o servicios, descubrir otros emprendimientos y generar contactos y oportunidades de negocio entre ellos.
+La plataforma serÃ¡ una comunidad digital de emprendedores del Maule Sur, donde los participantes del programa radial puedan crear un perfil, mostrar sus productos o servicios, descubrir otros emprendimientos y generar contactos y oportunidades de negocio entre ellos.
 
-La visión de largo plazo es convertir La Vitrina en una red de emprendedores del Maule Sur, no solamente en un directorio.
+La visiÃ³n de largo plazo es convertir La Vitrina en una red de emprendedores del Maule Sur, no solamente en un directorio.
 
 1. OBJETIVO PRINCIPAL
 
@@ -14,11 +14,11 @@ Crear un sitio web que permita:
 
 Dar visibilidad a emprendedores locales.
 
-Facilitar que los emprendedores se encuentren entre sí.
+Facilitar que los emprendedores se encuentren entre sÃ­.
 
 Generar nuevos contactos comerciales.
 
-Promover colaboración entre emprendedores.
+Promover colaboraciÃ³n entre emprendedores.
 
 Permitir recomendaciones y alianzas.
 
@@ -28,15 +28,15 @@ Crear una comunidad que pueda crecer progresivamente.
 
 En una segunda etapa, incorporar funcionalidades de comunidad, eventos, beneficios, publicaciones y networking.
 
-La plataforma debe ser diseñada desde el principio para poder escalar sin tener que reconstruirla posteriormente.
+La plataforma debe ser diseÃ±ada desde el principio para poder escalar sin tener que reconstruirla posteriormente.
 
 2. CONCEPTO
 
 La idea central de la plataforma es:
 
-“Tu emprendimiento tiene un lugar en La Vitrina.”
+â€œTu emprendimiento tiene un lugar en La Vitrina.â€
 
-La Vitrina debe sentirse como una combinación entre:
+La Vitrina debe sentirse como una combinaciÃ³n entre:
 
 Directorio profesional.
 
@@ -46,17 +46,17 @@ Red de networking.
 
 Comunidad local.
 
-Extensión digital del programa radial.
+ExtensiÃ³n digital del programa radial.
 
 El foco inicial NO es vender productos directamente dentro de la plataforma.
 
 El foco es:
 
-DESCUBRIR → CONOCER → CONTACTAR → COLABORAR → RECOMENDAR
+DESCUBRIR â†’ CONOCER â†’ CONTACTAR â†’ COLABORAR â†’ RECOMENDAR
 
-3. PÁGINA DE INICIO
+3. PÃGINA DE INICIO
 
-Crear una página de inicio visualmente atractiva pero simple.
+Crear una pÃ¡gina de inicio visualmente atractiva pero simple.
 
 Hero principal:
 
@@ -64,9 +64,9 @@ LA VITRINA
 
 La comunidad de emprendedores del Maule Sur
 
-Subtítulo:
+SubtÃ­tulo:
 
-“Descubre emprendimientos, conecta con personas y encuentra nuevas oportunidades para hacer crecer tu negocio.”
+â€œDescubre emprendimientos, conecta con personas y encuentra nuevas oportunidades para hacer crecer tu negocio.â€
 
 Botones principales:
 
@@ -74,13 +74,13 @@ Botones principales:
 
 [Quiero ser parte de La Vitrina]
 
-Incluir una sección destacada con:
+Incluir una secciÃ³n destacada con:
 
 Emprendedores destacados
 
-Mostrar tarjetas visuales con fotografía, nombre del emprendimiento, categoría, comuna y breve descripción.
+Mostrar tarjetas visuales con fotografÃ­a, nombre del emprendimiento, categorÃ­a, comuna y breve descripciÃ³n.
 
-Botón:
+BotÃ³n:
 
 Ver todos los emprendedores
 
@@ -98,19 +98,19 @@ Producto.
 
 Servicio.
 
-Categoría.
+CategorÃ­a.
 
 Comuna.
 
-Región.
+RegiÃ³n.
 
 Agregar filtros:
 
-Categoría
+CategorÃ­a
 
 Ejemplos:
 
-Gastronomía
+GastronomÃ­a
 
 Agricultura
 
@@ -120,21 +120,21 @@ Servicios profesionales
 
 Turismo
 
-Artesanía
+ArtesanÃ­a
 
 Belleza
 
 Salud y bienestar
 
-Tecnología
+TecnologÃ­a
 
-Educación
+EducaciÃ³n
 
 Transporte
 
-Construcción
+ConstrucciÃ³n
 
-Diseño
+DiseÃ±o
 
 Moda
 
@@ -142,11 +142,11 @@ Hogar
 
 Otros
 
-Ubicación
+UbicaciÃ³n
 
 Permitir filtrar por comunas del Maule Sur.
 
-Diseñar esta estructura para que posteriormente puedan agregarse nuevas comunas y categorías desde el panel administrador.
+DiseÃ±ar esta estructura para que posteriormente puedan agregarse nuevas comunas y categorÃ­as desde el panel administrador.
 
 5. TARJETA DE CADA EMPRENDEDOR
 
@@ -154,7 +154,7 @@ Cada emprendedor debe aparecer en una tarjeta limpia y profesional.
 
 La tarjeta debe contener:
 
-Fotografía principal.
+FotografÃ­a principal.
 
 Logo, si existe.
 
@@ -162,17 +162,17 @@ Nombre del emprendimiento.
 
 Nombre del emprendedor.
 
-Categoría.
+CategorÃ­a.
 
 Comuna.
 
-Descripción corta.
+DescripciÃ³n corta.
 
 Etiquetas.
 
-Botón “Ver perfil”.
+BotÃ³n â€œVer perfilâ€.
 
-Botón de contacto.
+BotÃ³n de contacto.
 
 Opcionalmente mostrar:
 
@@ -184,17 +184,17 @@ WhatsApp.
 
 Sitio web.
 
-La tarjeta debe ser visualmente atractiva y funcionar perfectamente en computador y teléfono.
+La tarjeta debe ser visualmente atractiva y funcionar perfectamente en computador y telÃ©fono.
 
 6. PERFIL INDIVIDUAL DEL EMPRENDEDOR
 
-Cada emprendedor tendrá una página/perfil propio.
+Cada emprendedor tendrÃ¡ una pÃ¡gina/perfil propio.
 
 Debe incluir:
 
 Encabezado
 
-Fotografía.
+FotografÃ­a.
 
 Logo.
 
@@ -204,7 +204,7 @@ Nombre del emprendedor.
 
 Comuna.
 
-Categoría.
+CategorÃ­a.
 
 Frase corta o propuesta de valor.
 
@@ -212,11 +212,11 @@ Sobre el emprendimiento
 
 Campo para contar:
 
-Qué hace.
+QuÃ© hace.
 
-Qué ofrece.
+QuÃ© ofrece.
 
-Qué lo diferencia.
+QuÃ© lo diferencia.
 
 Historia breve.
 
@@ -228,9 +228,9 @@ Imagen.
 
 Nombre.
 
-Descripción.
+DescripciÃ³n.
 
-Información relevante.
+InformaciÃ³n relevante.
 
 No implementar carrito de compra inicialmente.
 
@@ -252,55 +252,55 @@ El objetivo principal es generar contacto.
 
 Agregar un CTA:
 
-“Contactar a este emprendedor”
+â€œContactar a este emprendedorâ€
 
-7. BOTÓN DE WHATSAPP
+7. BOTÃ“N DE WHATSAPP
 
 La plataforma debe facilitar enormemente el contacto.
 
-Cuando un usuario presione “Contactar por WhatsApp”, generar un mensaje inicial configurable, por ejemplo:
+Cuando un usuario presione â€œContactar por WhatsAppâ€, generar un mensaje inicial configurable, por ejemplo:
 
-“Hola, vi tu emprendimiento en La Vitrina y me gustaría conocer más sobre tus productos/servicios.”
+â€œHola, vi tu emprendimiento en La Vitrina y me gustarÃ­a conocer mÃ¡s sobre tus productos/servicios.â€
 
-El número de WhatsApp debe ser configurable por cada emprendedor desde su perfil.
+El nÃºmero de WhatsApp debe ser configurable por cada emprendedor desde su perfil.
 
-8. SECCIÓN “DESCUBRE”
+8. SECCIÃ“N â€œDESCUBREâ€
 
-Crear una sección para descubrir emprendimientos.
+Crear una secciÃ³n para descubrir emprendimientos.
 
 Opciones:
 
 Emprendedores nuevos
 
-Los últimos incorporados.
+Los Ãºltimos incorporados.
 
 Emprendedores destacados
 
-Seleccionados por administración.
+Seleccionados por administraciÃ³n.
 
-Más visitados
+MÃ¡s visitados
 
 Mostrar los perfiles con mayor cantidad de visitas.
 
 Recomendados
 
-Perfiles destacados por la comunidad o por administración.
+Perfiles destacados por la comunidad o por administraciÃ³n.
 
 Cerca de ti
 
-En una segunda etapa permitir explorar emprendedores por ubicación.
+En una segunda etapa permitir explorar emprendedores por ubicaciÃ³n.
 
 9. COMUNIDAD
 
-La plataforma debe estar diseñada para evolucionar posteriormente hacia una comunidad real.
+La plataforma debe estar diseÃ±ada para evolucionar posteriormente hacia una comunidad real.
 
-Crear inicialmente una sección llamada:
+Crear inicialmente una secciÃ³n llamada:
 
 Comunidad
 
 Con un mensaje:
 
-“En La Vitrina no solo mostramos emprendimientos. También conectamos personas.”
+â€œEn La Vitrina no solo mostramos emprendimientos. TambiÃ©n conectamos personas.â€
 
 Preparar la arquitectura para incorporar posteriormente:
 
@@ -314,17 +314,17 @@ Eventos.
 
 Networking.
 
-Solicitudes de colaboración.
+Solicitudes de colaboraciÃ³n.
 
 Beneficios exclusivos.
 
 Encuentros entre emprendedores.
 
-No es necesario implementar todas estas funciones en la primera versión, pero la arquitectura debe permitir incorporarlas posteriormente.
+No es necesario implementar todas estas funciones en la primera versiÃ³n, pero la arquitectura debe permitir incorporarlas posteriormente.
 
 10. EVENTOS
 
-Crear una sección:
+Crear una secciÃ³n:
 
 Eventos
 
@@ -346,7 +346,7 @@ Cada evento debe poder incluir:
 
 Imagen.
 
-Título.
+TÃ­tulo.
 
 Fecha.
 
@@ -354,15 +354,15 @@ Hora.
 
 Lugar.
 
-Descripción.
+DescripciÃ³n.
 
 Organizador.
 
-Botón de inscripción.
+BotÃ³n de inscripciÃ³n.
 
-11. “EMPRENDEDOR DE LA SEMANA”
+11. â€œEMPRENDEDOR DE LA SEMANAâ€
 
-Crear una sección visual especial llamada:
+Crear una secciÃ³n visual especial llamada:
 
 Emprendedor de la semana
 
@@ -370,7 +370,7 @@ Esto debe conectarse conceptualmente con el programa radial.
 
 Mostrar:
 
-Fotografía.
+FotografÃ­a.
 
 Nombre.
 
@@ -378,7 +378,7 @@ Emprendimiento.
 
 Historia.
 
-Categoría.
+CategorÃ­a.
 
 Comuna.
 
@@ -386,25 +386,25 @@ Link al perfil.
 
 Agregar espacio para incorporar posteriormente audio o video de la entrevista realizada en La Vitrina.
 
-12. INTEGRACIÓN CON EL PROGRAMA RADIAL
+12. INTEGRACIÃ“N CON EL PROGRAMA RADIAL
 
-Crear una sección:
+Crear una secciÃ³n:
 
 La Vitrina en Radio
 
 Debe permitir publicar:
 
-Últimos programas.
+Ãšltimos programas.
 
 Entrevistas.
 
-Cápsulas.
+CÃ¡psulas.
 
 Historias de emprendedores.
 
 Noticias de la comunidad.
 
-Diseñar esta sección para que posteriormente pueda integrar:
+DiseÃ±ar esta secciÃ³n para que posteriormente pueda integrar:
 
 Spotify.
 
@@ -416,7 +416,7 @@ Facebook.
 
 Podcast.
 
-La plataforma debe funcionar como la extensión digital del programa radial.
+La plataforma debe funcionar como la extensiÃ³n digital del programa radial.
 
 13. REGISTRO DE EMPRENDEDORES
 
@@ -432,11 +432,11 @@ Apellido.
 
 Nombre del emprendimiento.
 
-Categoría.
+CategorÃ­a.
 
 Comuna.
 
-Teléfono.
+TelÃ©fono.
 
 WhatsApp.
 
@@ -448,27 +448,27 @@ Facebook.
 
 Sitio web.
 
-Descripción.
+DescripciÃ³n.
 
 Productos/servicios.
 
-Fotografía.
+FotografÃ­a.
 
 Logo.
 
 Propuesta de valor.
 
-¿Qué tipo de colaboración busca?
+Â¿QuÃ© tipo de colaboraciÃ³n busca?
 
-¿Qué puede ofrecer a otros emprendedores?
+Â¿QuÃ© puede ofrecer a otros emprendedores?
 
-Agregar consentimiento para publicación de información.
+Agregar consentimiento para publicaciÃ³n de informaciÃ³n.
 
-Después del registro, el perfil debe quedar:
+DespuÃ©s del registro, el perfil debe quedar:
 
-Pendiente de aprobación
+Pendiente de aprobaciÃ³n
 
-El administrador podrá revisar y aprobar antes de hacerlo público.
+El administrador podrÃ¡ revisar y aprobar antes de hacerlo pÃºblico.
 
 14. PERFIL DE USUARIO
 
@@ -480,15 +480,15 @@ Puede:
 
 Crear perfil.
 
-Editar información.
+Editar informaciÃ³n.
 
-Subir fotografías.
+Subir fotografÃ­as.
 
 Agregar productos/servicios.
 
 Gestionar sus datos de contacto.
 
-Ver estadísticas básicas de su perfil.
+Ver estadÃ­sticas bÃ¡sicas de su perfil.
 
 Recibir contactos.
 
@@ -502,7 +502,7 @@ Editar perfiles.
 
 Destacar emprendimientos.
 
-Crear categorías.
+Crear categorÃ­as.
 
 Administrar comunas.
 
@@ -512,11 +512,11 @@ Administrar publicaciones.
 
 Gestionar emprendedores destacados.
 
-Revisar estadísticas.
+Revisar estadÃ­sticas.
 
 Moderar contenido.
 
-Diseñar la arquitectura para incorporar posteriormente otros roles.
+DiseÃ±ar la arquitectura para incorporar posteriormente otros roles.
 
 15. PANEL ADMINISTRADOR
 
@@ -530,15 +530,15 @@ Emprendedores activos.
 
 Nuevos registros.
 
-Perfiles pendientes de aprobación.
+Perfiles pendientes de aprobaciÃ³n.
 
 Visitas a perfiles.
 
 Contactos generados.
 
-Categorías más utilizadas.
+CategorÃ­as mÃ¡s utilizadas.
 
-Comunas con más emprendedores.
+Comunas con mÃ¡s emprendedores.
 
 Emprendimientos destacados.
 
@@ -546,7 +546,7 @@ Crear tablas para gestionar:
 
 Emprendedores.
 
-Categorías.
+CategorÃ­as.
 
 Comunas.
 
@@ -558,7 +558,7 @@ Usuarios.
 
 16. ESCALABILIDAD
 
-La plataforma debe diseñarse pensando que inicialmente puede tener 50 emprendedores, pero eventualmente puede tener:
+La plataforma debe diseÃ±arse pensando que inicialmente puede tener 50 emprendedores, pero eventualmente puede tener:
 
 500
 
@@ -570,9 +570,9 @@ emprendedores.
 
 La base de datos debe estar correctamente estructurada y normalizada.
 
-No crear información estática dentro del frontend.
+No crear informaciÃ³n estÃ¡tica dentro del frontend.
 
-Los emprendedores, categorías, comunas, productos, eventos y publicaciones deben provenir de una base de datos.
+Los emprendedores, categorÃ­as, comunas, productos, eventos y publicaciones deben provenir de una base de datos.
 
 Preparar la arquitectura para futuras funcionalidades.
 
@@ -582,13 +582,13 @@ Dejar preparada la plataforma para eventualmente incorporar:
 
 Sistema de recomendaciones.
 
-“Conecta con este emprendedor”.
+â€œConecta con este emprendedorâ€.
 
-Mensajería interna.
+MensajerÃ­a interna.
 
 Networking.
 
-Grupos por categoría.
+Grupos por categorÃ­a.
 
 Grupos por comuna.
 
@@ -606,9 +606,9 @@ Cupones.
 
 Marketplace.
 
-Solicitudes de colaboración.
+Solicitudes de colaboraciÃ³n.
 
-Estadísticas avanzadas.
+EstadÃ­sticas avanzadas.
 
 Perfiles premium.
 
@@ -616,19 +616,19 @@ Patrocinios.
 
 Publicidad local.
 
-Membresías.
+MembresÃ­as.
 
 No implementar todo ahora.
 
-La primera versión debe ser simple, rápida y fácil de usar.
+La primera versiÃ³n debe ser simple, rÃ¡pida y fÃ¡cil de usar.
 
-18. DISEÑO VISUAL
+18. DISEÃ‘O VISUAL
 
-El diseño debe transmitir:
+El diseÃ±o debe transmitir:
 
-Comunidad + confianza + emprendimiento + cercanía + profesionalismo.
+Comunidad + confianza + emprendimiento + cercanÃ­a + profesionalismo.
 
-Evitar un diseño excesivamente corporativo.
+Evitar un diseÃ±o excesivamente corporativo.
 
 Debe sentirse local, humano y moderno.
 
@@ -636,17 +636,17 @@ Utilizar mucho espacio en blanco.
 
 Tarjetas limpias.
 
-Fotografías grandes.
+FotografÃ­as grandes.
 
-Tipografía moderna y muy legible.
+TipografÃ­a moderna y muy legible.
 
-Iconografía simple.
+IconografÃ­a simple.
 
 Animaciones suaves y discretas.
 
 Evitar exceso de elementos.
 
-La experiencia debe ser excelente principalmente desde celular, porque gran parte de los usuarios accederá desde Instagram, WhatsApp y redes sociales.
+La experiencia debe ser excelente principalmente desde celular, porque gran parte de los usuarios accederÃ¡ desde Instagram, WhatsApp y redes sociales.
 
 19. IDENTIDAD
 
@@ -654,7 +654,7 @@ Utilizar el nombre:
 
 LA VITRINA
 
-Subtítulo:
+SubtÃ­tulo:
 
 Comunidad de Emprendedores del Maule Sur
 
@@ -662,7 +662,7 @@ Crear una identidad visual consistente.
 
 El logo debe ser simple y reconocible.
 
-La palabra “Vitrina” debe transmitir la idea de:
+La palabra â€œVitrinaâ€ debe transmitir la idea de:
 
 mostrar + descubrir + conectar.
 
@@ -670,33 +670,33 @@ Evitar que parezca una tienda online tradicional.
 
 20. EXPERIENCIA DEL USUARIO
 
-La navegación debe ser extremadamente sencilla.
+La navegaciÃ³n debe ser extremadamente sencilla.
 
-Menú principal:
+MenÃº principal:
 
-Inicio | Emprendedores | Categorías | Comunidad | Eventos | Radio | Sobre La Vitrina
+Inicio | Emprendedores | CategorÃ­as | Comunidad | Eventos | Radio | Sobre La Vitrina
 
-Botón destacado:
+BotÃ³n destacado:
 
 Quiero ser parte
 
-En móvil, utilizar navegación clara y accesible.
+En mÃ³vil, utilizar navegaciÃ³n clara y accesible.
 
 La regla principal debe ser:
 
-máximo 2 o 3 clics para encontrar y contactar a un emprendedor.
+mÃ¡ximo 2 o 3 clics para encontrar y contactar a un emprendedor.
 
 21. SEO
 
-Preparar correctamente la plataforma para posicionamiento orgánico.
+Preparar correctamente la plataforma para posicionamiento orgÃ¡nico.
 
-Cada emprendedor debe tener una URL amigable y una página indexable.
+Cada emprendedor debe tener una URL amigable y una pÃ¡gina indexable.
 
 Ejemplo:
 
 /emprendedores/nombre-emprendimiento
 
-Las páginas deben tener:
+Las pÃ¡ginas deben tener:
 
 Title.
 
@@ -708,19 +708,19 @@ Imagen para compartir.
 
 Datos estructurados cuando corresponda.
 
-Esto permitirá que los emprendimientos puedan aparecer en Google.
+Esto permitirÃ¡ que los emprendimientos puedan aparecer en Google.
 
-22. ANALÍTICA
+22. ANALÃTICA
 
 Preparar la plataforma para medir:
 
 Visitas.
 
-Perfiles más vistos.
+Perfiles mÃ¡s vistos.
 
-Categorías más buscadas.
+CategorÃ­as mÃ¡s buscadas.
 
-Emprendedores más contactados.
+Emprendedores mÃ¡s contactados.
 
 Clics en WhatsApp.
 
@@ -740,9 +740,9 @@ La Vitrina no solamente da visibilidad: genera oportunidades.
 
 Crear inicialmente datos ficticios para visualizar correctamente la plataforma.
 
-Incluir al menos 12 emprendedores de ejemplo de distintas categorías y comunas del Maule Sur.
+Incluir al menos 12 emprendedores de ejemplo de distintas categorÃ­as y comunas del Maule Sur.
 
-No utilizar datos reales sin autorización.
+No utilizar datos reales sin autorizaciÃ³n.
 
 Cada perfil debe tener:
 
@@ -750,9 +750,9 @@ Nombre.
 
 Imagen.
 
-Descripción.
+DescripciÃ³n.
 
-Categoría.
+CategorÃ­a.
 
 Comuna.
 
@@ -764,7 +764,7 @@ Redes sociales ficticias.
 
 24. PRINCIPIO FUNDAMENTAL DEL PRODUCTO
 
-No quiero que construyas simplemente un “directorio de emprendedores”.
+No quiero que construyas simplemente un â€œdirectorio de emprendedoresâ€.
 
 Quiero construir una comunidad digital.
 
@@ -778,7 +778,7 @@ conectar.
 
 La tercera:
 
-generar colaboración.
+generar colaboraciÃ³n.
 
 La cuarta:
 
@@ -786,7 +786,7 @@ generar negocios y oportunidades.
 
 La plataforma debe permitir que un emprendedor pueda descubrir a otro y pensar:
 
-“Con esta persona podríamos hacer algo juntos.”
+â€œCon esta persona podrÃ­amos hacer algo juntos.â€
 
 Ese debe ser uno de los objetivos centrales del producto.
 
@@ -794,15 +794,15 @@ Ese debe ser uno de los objetivos centrales del producto.
 
 Utilizar como concepto de marca:
 
-“Nos mostramos. Nos conectamos. Crecemos juntos.”
+â€œNos mostramos. Nos conectamos. Crecemos juntos.â€
 
 Y como mensaje secundario:
 
-“El Maule Sur tiene talento. Hagámoslo visible.”
+â€œEl Maule Sur tiene talento. HagÃ¡moslo visible.â€
 
 RESULTADO ESPERADO
 
-Construye una primera versión funcional, moderna y responsive de La Vitrina, con:
+Construye una primera versiÃ³n funcional, moderna y responsive de La Vitrina, con:
 
 Landing page.
 
@@ -826,25 +826,25 @@ Eventos.
 
 Emprendedor de la semana.
 
-Sección radial.
+SecciÃ³n radial.
 
 Contacto por WhatsApp.
 
 Base de datos.
 
-Estadísticas básicas.
+EstadÃ­sticas bÃ¡sicas.
 
 Arquitectura preparada para comunidad y escalabilidad.
 
 Prioriza:
 
-simplicidad + velocidad + experiencia móvil + profesionalismo + escalabilidad.
+simplicidad + velocidad + experiencia mÃ³vil + profesionalismo + escalabilidad.
 
-No sobrecargues la primera versión.
+No sobrecargues la primera versiÃ³n.
 
-La sensación final debe ser:
+La sensaciÃ³n final debe ser:
 
-“Este es el lugar donde están los emprendedores del Maule Sur.”
+â€œEste es el lugar donde estÃ¡n los emprendedores del Maule Sur.â€
 
 This project was built with [Lovable](https://lovable.dev).
 
@@ -860,7 +860,7 @@ Continue developing this project in the [Lovable editor](https://lovable.dev/pro
 
 ## Development
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+Prefer working locally? You need Node.js and npm â€” [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
 
 ```sh
 git clone <this-repository-url>
@@ -868,3 +868,4 @@ cd <repository-name>
 npm i
 npm run dev
 ```
+

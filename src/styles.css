@@ -6,7 +6,7 @@
 
 /*
  * ============================================================
- * LA VITRINA — SISTEMA VISUAL GLOBAL
+ * LA VITRINA â€” SISTEMA VISUAL GLOBAL
  * ============================================================
  *
  * Objetivos:
@@ -22,11 +22,11 @@
  *
  * Escala recomendada:
  * - Eyebrow / etiqueta: 10 px
- * - Auxiliar: 10–12 px
- * - Texto normal: 12–14 px
- * - Tarjeta: 14–17 px
- * - Sección: 18–22 px
- * - Página: 24–30 px
+ * - Auxiliar: 10â€“12 px
+ * - Texto normal: 12â€“14 px
+ * - Tarjeta: 14â€“17 px
+ * - Sección: 18â€“22 px
+ * - Página: 24â€“30 px
  * ============================================================
  */
 
@@ -585,6 +585,9 @@
 
     text-size-adjust:
       100%;
+
+    overflow-x:
+      clip;
   }
 
   body {
@@ -617,6 +620,9 @@
 
     -moz-osx-font-smoothing:
       grayscale;
+
+    overflow-x:
+      clip;
   }
 
   h1,

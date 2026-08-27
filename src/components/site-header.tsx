@@ -23,6 +23,16 @@ export function SiteHeader() {
   const { user } =
     useAuth();
 
+  const todayLabel =
+    new Intl.DateTimeFormat("es-CL", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    })
+      .format(new Date())
+      .replace(".", "")
+      .toUpperCase();
+
   return (
     <header className="sticky top-0 z-40 border-b border-border/80 bg-background/95 backdrop-blur">
       {/* DESKTOP / TABLET */}
@@ -52,7 +62,7 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        {/* MENÚ ESCRITORIO */}
+        {/* MENÃš ESCRITORIO */}
 
         <nav className="hidden min-w-0 flex-1 items-center justify-center gap-0.5 lg:flex">
           {NAV.map(
@@ -86,6 +96,10 @@ export function SiteHeader() {
         {/* ACCIONES */}
 
         <div className="hidden shrink-0 items-center gap-1.5 lg:flex">
+          <span className="mr-2 whitespace-nowrap text-[9px] font-medium uppercase tracking-wide text-muted-foreground">
+            {"Actualizado · "}{todayLabel}
+          </span>
+
           <Button
             asChild
             variant="ghost"
@@ -116,7 +130,11 @@ export function SiteHeader() {
           </Button>
         </div>
 
-        {/* MENÚ MÓVIL */}
+        {/* MENÃš MÓVIL */}
+
+        <span className="ml-auto whitespace-nowrap text-[9px] font-medium uppercase tracking-wide text-muted-foreground lg:hidden">
+          {todayLabel}
+        </span>
 
         <button
           type="button"
@@ -146,7 +164,7 @@ export function SiteHeader() {
         </button>
       </div>
 
-      {/* MENÚ MÓVIL ABIERTO */}
+      {/* MENÃš MÓVIL ABIERTO */}
 
       {open ? (
         <div className="border-t border-border bg-background lg:hidden">

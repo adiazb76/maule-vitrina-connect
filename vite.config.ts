@@ -1,7 +1,9 @@
-// @lovable.dev/vite-tanstack-config already includes the core TanStack/Vite plugins.
-// Force Cloudflare build-time VITE_SUPABASE_* variables when present so production
-// cannot fall back to another Lovable/Supabase project.
-import { defineConfig } from "@lovable.dev/vite-tanstack-config";
+﻿import { tanstackStart } from "@tanstack/react-start/plugin/vite";
+import tailwindcss from "@tailwindcss/vite";
+import viteReact from "@vitejs/plugin-react";
+import { nitro } from "nitro/vite";
+import { defineConfig } from "vite";
+import tsconfigPaths from "vite-tsconfig-paths";
 
 const forcedDefine: Record<string, string> = {};
 
@@ -16,10 +18,12 @@ if (process.env.VITE_SUPABASE_PUBLISHABLE_KEY) {
 }
 
 export default defineConfig({
-  tanstackStart: {
-    server: { entry: "server" },
-  },
-  vite: {
-    define: forcedDefine,
-  },
+  plugins: [
+    tsconfigPaths(),
+    tailwindcss(),
+    tanstackStart(),
+    nitro(),
+    viteReact(),
+  ],
+  define: forcedDefine,
 });

@@ -258,35 +258,50 @@ function IndexPage() {
 
   return (
     <>
-      {/* LA VITRINA EN NÚMEROS */}
+      {/* LA VITRINA EN NUMEROS */}
 
       <section className="border-b border-border bg-background">
-        <div className="container-page py-3">
-          <div className="rounded-xl border border-border bg-card px-4 py-3 shadow-sm">
-            <p className="text-left text-[10px] font-semibold uppercase tracking-[0.12em] text-primary">
-              La Vitrina en números
-            </p>
+        <div className="container-page py-2">
+          <div className="grid min-w-0 grid-cols-[minmax(0,1.45fr)_repeat(3,minmax(0,1fr))] items-center rounded-lg border border-border bg-secondary/15 px-2 py-2 sm:max-w-2xl sm:px-3">
+            <div className="flex min-w-0 items-center gap-1.5 pr-2 sm:pr-4">
+              <TrendingUp className="h-3.5 w-3.5 shrink-0 text-primary" />
 
-            <p className="mt-1 text-left text-[9px] text-muted-foreground">
-              {new Intl.DateTimeFormat("es-CL", {
-                day: "2-digit",
-                month: "short",
-                year: "numeric",
-              }).format(new Date())}
-            </p>
+              <span className="min-w-0 truncate text-[7px] font-semibold uppercase tracking-wide text-muted-foreground sm:text-[9px]">
+                {"La Vitrina en n\u00fameros"}
+              </span>
+            </div>
 
             {publicMetrics.isLoading ? (
-              <div className="mt-3 h-10 animate-pulse rounded-md bg-muted" />
+              <>
+                <div className="h-5 animate-pulse border-l border-border px-2 sm:px-4">
+                  <div className="h-full rounded bg-muted" />
+                </div>
+                <div className="h-5 animate-pulse border-l border-border px-2 sm:px-4">
+                  <div className="h-full rounded bg-muted" />
+                </div>
+                <div className="h-5 animate-pulse border-l border-border px-2 sm:px-4">
+                  <div className="h-full rounded bg-muted" />
+                </div>
+              </>
             ) : publicMetrics.data ? (
-              <div className="mt-3 grid max-w-xl grid-cols-3 divide-x divide-border">
-                <StripMetric value={publicMetrics.data.entrepreneurs} label="Emprendedores" />
-                <StripMetric value={publicMetrics.data.views} label="Visitas" />
-                <StripMetric value={publicMetrics.data.comunas} label="Comunas" />
-              </div>
+              <>
+                <CompactMetric
+                  value={publicMetrics.data.entrepreneurs}
+                  label="Emprendedores"
+                />
+                <CompactMetric
+                  value={publicMetrics.data.views}
+                  label="Visitas"
+                />
+                <CompactMetric
+                  value={publicMetrics.data.comunas}
+                  label="Comunas"
+                />
+              </>
             ) : (
-              <p className="mt-3 text-left text-[10px] text-muted-foreground">
-                Cifras en actualización.
-              </p>
+              <div className="col-span-3 border-l border-border px-2 text-[8px] text-muted-foreground sm:px-4">
+                Cifras en actualizacion.
+              </div>
             )}
           </div>
         </div>
@@ -313,7 +328,7 @@ function IndexPage() {
               {heroDescription}
             </p>
 
-            {/* ÚNICOS 3 CTA PRINCIPALES */}
+            {/* ÃšNICOS 3 CTA PRINCIPALES */}
 
             <div className="mt-5 flex flex-wrap gap-2">
               <Button
@@ -348,15 +363,15 @@ function IndexPage() {
 
             {indicators.data ? (
               <div className="mt-4 rounded-lg border border-border bg-secondary/15 px-3 py-2">
-                <div className="flex items-center gap-4 overflow-x-auto">
-                  <div className="flex shrink-0 items-center gap-1.5">
+                <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
+                  <div className="flex min-w-0 items-center gap-1.5">
                     <TrendingUp className="h-3.5 w-3.5 text-primary" />
                     <span className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">
                       Indicadores económicos
                     </span>
                   </div>
 
-                  <div className="h-4 w-px shrink-0 bg-border" />
+                  <div className="hidden h-4 w-px shrink-0 bg-border sm:block" />
                   <Indicator label="UF" value={indicators.data.uf?.valor} decimals={2} />
                   <Indicator label="UTM" value={indicators.data.utm?.valor} decimals={0} />
                   <Indicator label="Dólar" value={indicators.data.dolar?.valor} decimals={2} />
@@ -652,7 +667,7 @@ function IndexPage() {
   );
 }
 
-function StripMetric({
+function CompactMetric({
   value,
   label,
 }: {
@@ -660,13 +675,16 @@ function StripMetric({
   label: string;
 }) {
   return (
-    <div className="min-w-0 px-2 text-center sm:px-3">
-      <p className="font-display text-base font-semibold leading-none text-foreground">
-        {new Intl.NumberFormat("es-CL").format(value)}
-      </p>
-      <p className="mt-1 truncate text-[8px] uppercase tracking-wide text-muted-foreground">
-        {label}
-      </p>
+    <div className="min-w-0 border-l border-border px-1.5 sm:px-4">
+      <div className="flex min-w-0 items-baseline gap-1 sm:gap-1.5">
+        <span className="truncate text-[6px] font-semibold uppercase tracking-wide text-muted-foreground sm:text-[8px]">
+          {label}
+        </span>
+
+        <span className="shrink-0 text-[10px] font-semibold leading-none text-foreground sm:text-xs">
+          {new Intl.NumberFormat("es-CL").format(value)}
+        </span>
+      </div>
     </div>
   );
 }
@@ -688,7 +706,7 @@ function Indicator({
   }
 
   return (
-    <div className="flex shrink-0 items-baseline gap-1.5">
+    <div className="flex min-w-0 items-baseline gap-1.5">
       <span className="text-[9px] font-semibold uppercase text-muted-foreground">
         {label}
       </span>
@@ -849,3 +867,4 @@ function SponsorCard({
 
   return content;
 }
+
