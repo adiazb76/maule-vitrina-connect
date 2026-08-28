@@ -150,11 +150,10 @@ export function MyMarketplaceAdmin({
     }
 
     if (
-      file.size >
-      4 * 1024 * 1024
+      file.size > 20 * 1024 * 1024
     ) {
       toast.error(
-        "La imagen no puede superar los 4 MB.",
+        "La imagen original no puede superar los 20 MB.",
       );
 
       return;
