@@ -81,7 +81,7 @@ function AuthPage() {
     }
 
     toast.success("Cuenta creada. Revisa tu correo si te pedimos confirmación.");
-    navigate({ to: "/sumate" });
+    navigate({ to: "/panel" });
   }
 
   return (

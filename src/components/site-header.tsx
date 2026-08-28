@@ -124,7 +124,7 @@ export function SiteHeader() {
             size="sm"
             className="h-8 px-3 text-xs"
           >
-            <Link to="/sumate">
+            <Link to={user ? "/panel" : "/auth"}>
               Quiero ser parte
             </Link>
           </Button>
@@ -232,7 +232,7 @@ export function SiteHeader() {
                 size="sm"
               >
                 <Link
-                  to="/sumate"
+                  to={user ? "/panel" : "/auth"}
                   onClick={() =>
                     setOpen(
                       false,
