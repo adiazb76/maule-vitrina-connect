@@ -62,7 +62,7 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        {/* MENÃš ESCRITORIO */}
+        {/* MENÚ ESCRITORIO */}
 
         <nav className="hidden min-w-0 flex-1 items-center justify-center gap-0.5 lg:flex">
           {NAV.map(
@@ -130,7 +130,7 @@ export function SiteHeader() {
           </Button>
         </div>
 
-        {/* MENÃš MÓVIL */}
+        {/* MENÚ MÓVIL */}
 
         <span className="ml-auto whitespace-nowrap text-[9px] font-medium uppercase tracking-wide text-muted-foreground lg:hidden">
           {todayLabel}
@@ -164,7 +164,7 @@ export function SiteHeader() {
         </button>
       </div>
 
-      {/* MENÃš MÓVIL ABIERTO */}
+      {/* MENÚ MÓVIL ABIERTO */}
 
       {open ? (
         <div className="border-t border-border bg-background lg:hidden">

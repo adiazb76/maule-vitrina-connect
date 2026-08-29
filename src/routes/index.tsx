@@ -24,6 +24,8 @@ import {
   supabase,
 } from "@/integrations/supabase/client";
 
+import { useAuth } from "@/hooks/use-auth";
+
 import {
   fetchNewsItems,
   fetchSiteSettings,
@@ -115,6 +117,7 @@ async function fetchEconomicIndicators(): Promise<EconomicIndicators> {
 }
 
 function IndexPage() {
+  const { user } = useAuth();
   const settings =
     useQuery({
       queryKey: [
@@ -328,7 +331,7 @@ function IndexPage() {
               {heroDescription}
             </p>
 
-            {/* ÃšNICOS 3 CTA PRINCIPALES */}
+            {/* ÚNICOS 3 CTA PRINCIPALES */}
 
             <div className="mt-5 flex flex-wrap gap-2">
               <Button
@@ -355,7 +358,7 @@ function IndexPage() {
                 size="sm"
                 className="bg-primary text-primary-foreground"
               >
-                <Link to="/sumate">
+                <Link to={user ? "/panel" : "/auth"}>
                   Quiero ser parte
                 </Link>
               </Button>
