@@ -9,6 +9,7 @@ import {
 } from "@tanstack/react-query";
 
 import {
+  useEffect,
   useMemo,
   useState,
 } from "react";
@@ -64,7 +65,7 @@ export const Route =
       meta: [
         {
           title:
-            "Súmate a La Vitrina — Publica tu emprendimiento",
+            "Súmate a La Vitrina Conecta — Publica tu emprendimiento",
         },
 
         {
