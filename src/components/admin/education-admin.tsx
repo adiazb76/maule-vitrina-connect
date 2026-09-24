@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   BookOpen,
@@ -43,6 +43,8 @@ export function EducationAdmin() {
     sort_order: "0",
   });
 
+  const [imageFile, setImageFile] = useState<File | null>(null);
+
   const items = useQuery({
     queryKey: ["education-admin"],
     queryFn: async () => {
@@ -59,12 +61,60 @@ export function EducationAdmin() {
     },
   });
 
+  async function uploadEducationImage(file: File) {
+    if (!file.type.startsWith("image/")) {
+      throw new Error("Selecciona una imagen válida.");
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      throw new Error("La imagen no puede superar los 5 MB.");
+    }
+
+    const extension =
+      file.name.split(".").pop()?.toLowerCase() || "jpg";
+
+    const path =
+      `educa/${Date.now()}-${Math.random()
+        .toString(36)
+        .slice(2, 8)}.${extension}`;
+
+    const { error } = await supabase.storage
+      .from("Entrepreneur-images")
+      .upload(path, file, {
+        cacheControl: "3600",
+        upsert: false,
+        contentType: file.type,
+      });
+
+    if (error) throw error;
+
+    const { data } = supabase.storage
+      .from("Entrepreneur-images")
+      .getPublicUrl(path);
+
+    return data.publicUrl;
+  }
+
   async function save() {
     if (!form.title.trim()) {
       toast.error("El título es obligatorio.");
       return;
     }
 
+    let imageUrl = form.image_url || null;
+
+    if (imageFile) {
+      try {
+        imageUrl = await uploadEducationImage(imageFile);
+      } catch (error) {
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : "No pudimos subir la imagen.",
+        );
+        return;
+      }
+    }
     const payload = {
       kind: form.kind,
       category: form.category || null,
@@ -72,7 +122,7 @@ export function EducationAdmin() {
       summary: form.summary || null,
       author_name: form.author_name || null,
       author_role: form.author_role || null,
-      image_url: form.image_url || null,
+      image_url: imageUrl,
       media_url: form.media_url || null,
       external_url: form.external_url || null,
       tool_type:
@@ -189,7 +239,7 @@ export function EducationAdmin() {
         </div>
 
         <div>
-          <p className="eyebrow">La Vitrina Educa</p>
+          <p className="eyebrow">La Vitrina Conecta Educa</p>
           <h2 className="mt-1 font-display text-2xl font-semibold">
             Cápsulas y herramientas
           </h2>
@@ -331,18 +381,25 @@ export function EducationAdmin() {
         )}
 
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="URL imagen">
+          <Field label="Imagen">
             <Input
-              value={form.image_url}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
               onChange={(e) =>
-                setForm((p) => ({
-                  ...p,
-                  image_url: e.target.value,
-                }))
+                setImageFile(e.target.files?.[0] ?? null)
               }
             />
-          </Field>
 
+            {imageFile ? (
+              <p className="text-xs text-muted-foreground">
+                Imagen seleccionada: {imageFile.name}
+              </p>
+            ) : form.image_url ? (
+              <p className="text-xs text-muted-foreground">
+                Imagen actual conservada.
+              </p>
+            ) : null}
+          </Field>
           <Field label="URL video / audio">
             <Input
               value={form.media_url}
